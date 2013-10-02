@@ -12,10 +12,10 @@ var configData = {};
 
 configData.general = {
   apiVersion: "0.0.1",
-  serverName: "actionHero API",
+  serverName: "Thurgood API",
   // id: "myActionHeroServer",                                    // id can be set here, or generated dynamically.  be sure that every server you run as a unique ID (which will happen when genrated dynamically)
   serverToken: "change-me",                                       // A unique token to your application which servers will use to authenticate to eachother
-  welcomeMessage : "Hello! Welcome to the actionHero api",        // The welcome message seen by TCP and webSocket clients upon connection
+  welcomeMessage : "Hello! Welcome to the Thurgood!",        // The welcome message seen by TCP and webSocket clients upon connection
   flatFileDirectory: __dirname + "/public/",                      // The directory which will be the root for the /public route
   flatFileNotFoundMessage: "Sorry, that file is not found :(",    // The body message to acompany 404 (file not found) errors regading flat files
   serverErrorMessage: "The server experienced an internal error", // The message to acompany 500 errors (internal server errors)
@@ -92,12 +92,12 @@ configData.servers = {
   "web" : {
     secure: false,                       // HTTP or HTTPS?
     serverOptions: {},                   // passed to https.createServer if secure=ture. Should contain SSL certificates
-    port: 8080,                          // Port or Socket
+    port: 3001,                          // Port or Socket
     bindIP: "0.0.0.0",                   // which IP to listen on (use 0.0.0.0 for all)
     httpHeaders : {},                    // Any additional headers you want actionHero to respond with
     urlPathForActions : "api",           // route which actions will be served from; secondary route against this route will be treated as actions, IE: /api/?action=test == /api/test/
     urlPathForFiles : "public",          // route which static files will be served from; path (relitive to your project root) to server static content from
-    rootEndpointType : "api",            // when visiting the root URL, should visitors see "api" or "file"? visitors can always visit /api and /public as normal
+    rootEndpointType : "file",            // when visiting the root URL, should visitors see "api" or "file"? visitors can always visit /api and /public as normal
     directoryFileType : "index.html",    // the default filetype to server when a user requests a directory
     flatFileCacheDuration : 60,          // the header which will be returend for all flat file served from /public; defiend in seconds
     fingerprintOptions : {               // settings for determining the id of an http(s) requset (browser-fingerprint)
