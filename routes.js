@@ -43,7 +43,7 @@ example:
 
 exports.routes = {
   get: [
-    
+    { path: "/:apiVersion/servers", action: "serversList" }
   ],
 
   post: [
