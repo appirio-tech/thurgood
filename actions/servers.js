@@ -93,7 +93,7 @@ exports.serversCreate = {
 
     // Assign parameters
     _.each(serverDoc, function(value, key) {
-      if (connection.params[key]) {
+      if (_.contains(Object.keys(connection.params), key)) {
         serverDoc[key] = connection.params[key];
       }
     });
@@ -140,7 +140,7 @@ exports.serversUpdate = {
 
     // Create a document with the new values
     _.each(connection.params, function(paramValue, paramKey) {
-      if (paramKey != 'id' && api.mongo.schema.server[paramKey] === null) {
+      if (paramKey != 'id' && _.contains(Object.keys(api.mongo.schema.server), paramKey)) {
         serverDoc[paramKey] = paramValue;
       }
     });

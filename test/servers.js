@@ -3,6 +3,30 @@ var assert = require('assert');
 var request = require('request');
 var setup = require('./setup.js');
 
+var testingServerId;
+
+describe("POST /servers", function () {
+  before(function (done) {
+     setup.init(done);
+  });
+
+  it("should create a new server", function (done) {
+    var params = {
+      name: 'jeff',
+      status: 'available'
+    };
+
+    request.post({ url: setup.testUrl + "/servers", form: params }, function (err, response, body) {
+      body = JSON.parse(body);
+      assert.ok(body.success);
+      assert.ok(body.data[0].name == 'jeff');
+      assert.ok(body.data[0].status == 'available');
+      testingServerId = body.data[0]._id;
+      done();
+    });
+  });
+});
+
 describe("GET /servers", function () {
   before(function (done) {
      setup.init(done);
@@ -81,11 +105,11 @@ describe("GET /servers", function () {
     });
   });
 
-  it("should return x servers", function (done) {
+  it("should return maximum x servers", function (done) {
     request.get(setup.testUrl + "/servers?limit=2", function (err, response, body) {
       body = JSON.parse(body);
       assert.ok(body.success);
-      assert.ok(body.data.length == 2);
+      assert.ok(body.data.length <= 2);
       done();
     });
   });
@@ -126,17 +150,17 @@ describe("GET /servers/:id", function () {
   });
 
   it("should return server by id", function (done) {
-    request.get(setup.testUrl + "/servers/524ef68a1d81003742000001", function (err, response, body) {
+    request.get(setup.testUrl + "/servers/" + testingServerId, function (err, response, body) {
       body = JSON.parse(body);
       assert.ok(body.success);
       assert.ok(body.data.length == 1);
-      assert.ok(body.data[0]._id == '524ef68a1d81003742000001');
+      assert.ok(body.data[0]._id == testingServerId);
       done();
     });
   });
 
   it("should return only specified fields", function (done) {
-    request.get(setup.testUrl + "/servers/524ef68a1d81003742000001?fields={\"name\": 1, \"status\": 1}", function (err, response, body) {
+    request.get(setup.testUrl + "/servers/" + testingServerId + "?fields={\"name\": 1, \"status\": 1}", function (err, response, body) {
       body = JSON.parse(body);
       assert.ok(body.success);
 
@@ -159,7 +183,7 @@ describe("PUT /servers/:id", function () {
     var newName = 'jeff-' + Math.floor((Math.random()*100)+1);
     var params = { name: newName };
 
-    request.put({ url: setup.testUrl + "/servers/524ef68a1d81003742000001", form: params }, function (err, response, body) {
+    request.put({ url: setup.testUrl + "/servers/" + testingServerId, form: params }, function (err, response, body) {
       body = JSON.parse(body);
       assert.ok(body.success);
       assert.ok(body.data.name == newName);
