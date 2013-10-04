@@ -18,7 +18,18 @@ exports.action = {
 
     // If id is defined, override selector
     if (connection.params.id) {
-      selector = { _id: new ObjectID(connection.params.id) };
+      try {
+        selector = { _id: new ObjectID(connection.params.id) };
+      } catch(err) {
+        connection.rawConnection.responseHttpCode = 400;
+        connection.response = {
+          success: false,
+          message: "Invalid id"
+        };
+
+        next(connection, true);
+        return;
+      }
     } else {
       // Otherwise try to parse selector parameter
       try {
@@ -99,13 +110,8 @@ exports.accountsCreate = {
       }
     };
 
-    var auth = {
-      username: "cloudspokes",
-      password: "239f45c2eu4d709m3c56684e827508d6"
-    };
-
     // Create Papertrail account
-    request.post({ url: "https://papertrailapp.com/api/v1/distributors/accounts", form: params, auth: auth }, function (err, response, body) {
+    request.post({ url: "https://papertrailapp.com/api/v1/distributors/accounts", form: params, auth: api.configData.papertrail }, function (err, response, body) {
       if (err) {
         connection.rawConnection.responseHttpCode = 500;
         connection.error = err;
@@ -170,15 +176,25 @@ exports.accountsDelete = {
   version: 1.0,
   run: function(api, connection, next) {
     var accountsCollection = api.mongo.collections.loggerAccounts;
-    var auth = {
-      username: "cloudspokes",
-      password: "239f45c2eu4d709m3c56684e827508d6"
-    };
+    var selector;
+
+    try {
+      selector = { _id: new ObjectID(connection.params.id) };
+    } catch(err) {
+      connection.rawConnection.responseHttpCode = 400;
+      connection.response = {
+        success: false,
+        message: "Invalid id"
+      };
+
+      next(connection, true);
+      return;
+    }
 
     // Delete account from database and Papertrail
-    accountsCollection.findAndModify({ _id: new ObjectID(connection.params.id) }, {}, {}, { remove: true }, function(err, doc) {
+    accountsCollection.findAndModify(selector, {}, {}, { remove: true }, function(err, doc) {
       if (!err && doc) {
-        request.del({ url: "https://papertrailapp.com/api/v1/distributors/accounts/" + doc.papertrailId, auth: auth }, function (err, response, body) {
+        request.del({ url: "https://papertrailapp.com/api/v1/distributors/accounts/" + doc.papertrailId, auth: api.configData.papertrail }, function (err, response, body) {
           if (!err) {
             connection.rawConnection.responseHttpCode = 200;
             connection.response = {

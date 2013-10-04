@@ -17,7 +17,18 @@ exports.action = {
 
     // If id is defined, override selector
     if (connection.params.id) {
-      selector = { _id: new ObjectID(connection.params.id) };
+      try {
+        selector = { _id: new ObjectID(connection.params.id) };
+      } catch(err) {
+        connection.rawConnection.responseHttpCode = 400;
+        connection.response = {
+          success: false,
+          message: "Invalid id"
+        };
+
+        next(connection, true);
+        return;
+      }
     } else if (connection.params.status) {
       // Otherwise if status is defined, override selector
       selector = { status: connection.params.status };
@@ -133,7 +144,7 @@ exports.serversUpdate = {
   version: 1.0,
   run: function(api, connection, next) {
     var serversCollection = api.mongo.collections.servers;
-    var serverDoc = {};
+    var selector, serverDoc = {};
 
     // Create a document with the new values
     _.each(connection.params, function(paramValue, paramKey) {
@@ -142,9 +153,22 @@ exports.serversUpdate = {
       }
     });
 
+    try {
+      selector = { _id: new ObjectID(connection.params.id) };
+    } catch(err) {
+      connection.rawConnection.responseHttpCode = 400;
+      connection.response = {
+        success: false,
+        message: "Invalid id"
+      };
+
+      next(connection, true);
+      return;
+    }
+
     // Update document
     serverDoc.updatedAt = new Date().getTime();
-    serversCollection.findAndModify({ _id: new ObjectID(connection.params.id) }, {}, { $set: serverDoc }, { new: true, w:1 }, function(err, result) {
+    serversCollection.findAndModify(selector, {}, { $set: serverDoc }, { new: true, w:1 }, function(err, result) {
       if (!err) {
         connection.rawConnection.responseHttpCode = 200;
         connection.response = {

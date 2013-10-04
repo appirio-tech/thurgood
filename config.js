@@ -130,6 +130,15 @@ configData.mongo = {
   serverUri: "mongodb://thurgood:thurgood@paulo.mongohq.com:10067/app18484458"
 };
 
+////////////////
+// PAPERTRAIL //
+////////////////
+
+configData.papertrail = {
+  username: "cloudspokes",
+  password: "239f45c2eu4d709m3c56684e827508d6"
+};
+
 //////////////////////////////////
 
 exports.configData = configData;
