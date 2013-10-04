@@ -8,7 +8,7 @@ exports.mongoDb = function (api, next) {
   api.mongo.schema = {};
 
   // Connect to the database
-  MongoClient.connect(api.configData.mongo.serverUri, {server: {auto_reconnect: true}}, function(err, db) {
+  MongoClient.connect(api.configData.mongo.serverUri, { server: { auto_reconnect: true } }, function(err, db) {
     if(!err) {
       api.log("Connected to MongoDB", "notice");
       api.mongo.db = db;
