@@ -2,7 +2,7 @@ var _ = require('underscore');
 var ObjectID = require('mongodb').ObjectID;
 
 exports.action = {
-  name: "serversList",
+  name: "serversFetch",
   description: "Retrieves all the servers, or a specific one if id is defined. Method: GET",
   inputs: {
     required: [],
@@ -57,7 +57,6 @@ exports.action = {
         connection.rawConnection.responseHttpCode = 200;
         connection.response = {
           success: true,
-          message: undefined,
           data: docs
         };
 
@@ -67,8 +66,7 @@ exports.action = {
         connection.error = err;
         connection.response = {
           success: false,
-          message: err,
-          data: undefined
+          message: err
         };
 
         next(connection, true);
@@ -114,8 +112,7 @@ exports.serversCreate = {
         connection.error = err;
         connection.response = {
           success: false,
-          message: err,
-          data: undefined
+          message: err
         };
 
         next(connection, true);
@@ -162,8 +159,7 @@ exports.serversUpdate = {
         connection.error = err;
         connection.response = {
           success: false,
-          message: err,
-          data: undefined
+          message: err
         };
 
         next(connection, true);

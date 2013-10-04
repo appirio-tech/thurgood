@@ -127,7 +127,7 @@ configData.servers = {
 /////////////
 
 configData.mongo = {
-  serverUri: "mongodb://thurgood:thurgood@paulo.mongohq.com:10039/Alux-Thurgood-API"
+  serverUri: "mongodb://thurgood:thurgood@paulo.mongohq.com:10067/app18484458"
 };
 
 //////////////////////////////////

@@ -43,12 +43,13 @@ example:
 
 exports.routes = {
   get: [
-    { path: "/:apiVersion/servers/:id", action: "serversList" },
-    { path: "/:apiVersion/servers", action: "serversList" }
+    { path: "/:apiVersion/servers/:id", action: "serversFetch" },
+    { path: "/:apiVersion/servers", action: "serversFetch" }
   ],
 
   post: [
-    { path: "/:apiVersion/servers", action: "serversCreate" }
+    { path: "/:apiVersion/servers", action: "serversCreate" },
+    { path: "/:apiVersion/accounts", action: "accountsCreate" }
   ],
 
   put: [
