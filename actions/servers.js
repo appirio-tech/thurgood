@@ -52,7 +52,7 @@ exports.serversList = {
   description: "Retrieves all the servers. Method: GET",
   inputs: {
     required: [],
-    optional: ['q', 'fields', 'sort', 'limit', 'skip'],
+    optional: ['q', 'fields', 'sort', 'limit', 'skip', 'status'],
   },
   authenticated: false,
   outputExample: {},
@@ -61,11 +61,16 @@ exports.serversList = {
     var serversCollection = api.mongo.collections.servers;
     var selector, fields, sort, options = {};
 
-    // Try to parse selector parameter
-    try {
-      selector = JSON.parse(connection.params.q);
-    } catch(err) {
-      selector = {};
+    // If status is defined, override selector
+    if (connection.params.status) {
+      selector = { status: connection.params.status };
+    } else {
+      // Otherwise try to parse selector parameter
+      try {
+        selector = JSON.parse(connection.params.q);
+      } catch(err) {
+        selector = {};
+      }
     }
     
     // Try to parse fields parameter

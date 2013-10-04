@@ -19,12 +19,12 @@ describe("GET /servers", function () {
 
   it("should return servers by query", function (done) {
     request.get(setup.testUrl + "/servers?limit=2&q={\"name\":\"jeff\"}", function (err, response, body) {
-    	body = JSON.parse(body);
+      body = JSON.parse(body);
       assert.ok(body.success);
 
       // Check if every object's name value is 'jeff'
       _.each(body.data, function(value) {
-      	assert.ok(value.name == 'jeff');
+        assert.ok(value.name == 'jeff');
       });
 
       done();
@@ -102,6 +102,20 @@ describe("GET /servers", function () {
 	      assert.ok(body.data[1]._id == body2.data[0]._id);
 	      done();
 	    });
+    });
+  });
+
+  it("should return servers by status", function (done) {
+    request.get(setup.testUrl + "/servers?limit=3&status=available", function (err, response, body) {
+      body = JSON.parse(body);
+      assert.ok(body.success);
+
+      // Check if every object's status is 'available'
+      _.each(body.data, function(value) {
+        assert.ok(value.status == 'available');
+      });
+
+      done();
     });
   });
 });
