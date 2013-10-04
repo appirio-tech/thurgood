@@ -10,7 +10,7 @@ describe("GET /servers", function () {
 
   it("should return all servers", function (done) {
     request.get(setup.testUrl + "/servers", function (err, response, body) {
-    	body = JSON.parse(body);
+      body = JSON.parse(body);
       assert.ok(body.success);
       assert.ok(body.data.length >= 0);
       done();
@@ -33,14 +33,14 @@ describe("GET /servers", function () {
 
   it("should return only specified fields", function (done) {
     request.get(setup.testUrl + "/servers?limit=2&fields={\"name\": 1, \"status\": 1}", function (err, response, body) {
-    	body = JSON.parse(body);
+      body = JSON.parse(body);
       assert.ok(body.success);
 
-      // Check if every object has only the 3 correct keys
+      // Check if every object has only the 3 correct fields
       _.each(body.data, function(value) {
-      	_.each(Object.keys(value), function(key) {
-	      	assert.ok(key == 'name' || key == 'status' || key == '_id');
-	      });
+        _.each(Object.keys(value), function(key) {
+          assert.ok(key == 'name' || key == 'status' || key == '_id');
+        });
       });
 
       done();
@@ -49,15 +49,15 @@ describe("GET /servers", function () {
 
   it("should return servers sorted asc", function (done) {
     request.get(setup.testUrl + "/servers?limit=3&sort={\"createdAt\": 1}", function (err, response, body) {
-    	body = JSON.parse(body);
+      body = JSON.parse(body);
       assert.ok(body.success);
 
       // Check if objects are sorted correctly by createdAt
       var previousTimestamp = 0;
 
       _.each(body.data, function(value) {
-      	assert.ok(value.createdAt >= previousTimestamp);
-      	previousTimestamp = value.createdAt;
+        assert.ok(value.createdAt >= previousTimestamp);
+        previousTimestamp = value.createdAt;
       });
       
       done();
@@ -66,15 +66,15 @@ describe("GET /servers", function () {
 
   it("should return servers sorted desc", function (done) {
     request.get(setup.testUrl + "/servers?limit=3&sort={\"createdAt\": -1}", function (err, response, body) {
-    	body = JSON.parse(body);
+      body = JSON.parse(body);
       assert.ok(body.success);
 
       // Check if objects are sorted correctly by createdAt
       var previousTimestamp = new Date().getTime();
 
       _.each(body.data, function(value) {
-      	assert.ok(value.createdAt <= previousTimestamp);
-      	previousTimestamp = value.createdAt;
+        assert.ok(value.createdAt <= previousTimestamp);
+        previousTimestamp = value.createdAt;
       });
       
       done();
@@ -83,7 +83,7 @@ describe("GET /servers", function () {
 
   it("should return x servers", function (done) {
     request.get(setup.testUrl + "/servers?limit=2", function (err, response, body) {
-    	body = JSON.parse(body);
+      body = JSON.parse(body);
       assert.ok(body.success);
       assert.ok(body.data.length == 2);
       done();
@@ -92,16 +92,16 @@ describe("GET /servers", function () {
 
   it("should skip x servers", function (done) {
     request.get(setup.testUrl + "/servers?limit=3", function (err, response, body) {
-    	body = JSON.parse(body);
+      body = JSON.parse(body);
       assert.ok(body.success);
       
       // Get servers again and compare the responses
       request.get(setup.testUrl + "/servers?skip=1", function (err, response, body2) {
-	    	body2 = JSON.parse(body2);
-	      assert.ok(body2.success);
-	      assert.ok(body.data[1]._id == body2.data[0]._id);
-	      done();
-	    });
+        body2 = JSON.parse(body2);
+        assert.ok(body2.success);
+        assert.ok(body.data[1]._id == body2.data[0]._id);
+        done();
+      });
     });
   });
 
@@ -113,6 +113,36 @@ describe("GET /servers", function () {
       // Check if every object's status is 'available'
       _.each(body.data, function(value) {
         assert.ok(value.status == 'available');
+      });
+
+      done();
+    });
+  });
+});
+
+describe("GET /servers/:id", function () {
+  before(function (done) {
+     setup.init(done);
+  });
+
+  it("should return server by id", function (done) {
+    request.get(setup.testUrl + "/servers/524ef68a1d81003742000001", function (err, response, body) {
+      body = JSON.parse(body);
+      assert.ok(body.success);
+      assert.ok(body.data.length == 1);
+      assert.ok(body.data[0]._id == '524ef68a1d81003742000001');
+      done();
+    });
+  });
+
+  it("should return only specified fields", function (done) {
+    request.get(setup.testUrl + "/servers/524ef68a1d81003742000001?fields={\"name\": 1, \"status\": 1}", function (err, response, body) {
+      body = JSON.parse(body);
+      assert.ok(body.success);
+
+      // Check if every object has only the 3 correct fields
+      _.each(Object.keys(body.data[0]), function(key) {
+        assert.ok(key == 'name' || key == 'status' || key == '_id');
       });
 
       done();

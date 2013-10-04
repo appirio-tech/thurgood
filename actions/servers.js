@@ -1,4 +1,5 @@
 var _ = require('underscore');
+var ObjectID = require('mongodb').ObjectID;
 
 exports.action = {
   name: "serversCreate",
@@ -52,7 +53,7 @@ exports.serversList = {
   description: "Retrieves all the servers. Method: GET",
   inputs: {
     required: [],
-    optional: ['q', 'fields', 'sort', 'limit', 'skip', 'status'],
+    optional: ['q', 'fields', 'sort', 'limit', 'skip', 'status', 'id'],
   },
   authenticated: false,
   outputExample: {},
@@ -61,8 +62,11 @@ exports.serversList = {
     var serversCollection = api.mongo.collections.servers;
     var selector, fields, sort, options = {};
 
-    // If status is defined, override selector
-    if (connection.params.status) {
+    // If id is defined, override selector
+    if (connection.params.id) {
+      selector = { _id: new ObjectID(connection.params.id) };
+    } else if (connection.params.status) {
+      // Otherwise if status is defined, override selector
       selector = { status: connection.params.status };
     } else {
       // Otherwise try to parse selector parameter
@@ -87,10 +91,12 @@ exports.serversList = {
       sort = undefined;
     }
 
-    // Options parameters
-    options.limit = connection.params.limit;
-    options.skip = connection.params.skip;
-    options.sort = sort;
+    // Options parameters. Ignore them if id is defined
+    if (!connection.params.id) {
+      options.limit = connection.params.limit;
+      options.skip = connection.params.skip;
+      options.sort = sort;
+    }
 
     // Find servers
     serversCollection.find(selector, fields, options).toArray(function(err, docs) {

@@ -43,6 +43,7 @@ example:
 
 exports.routes = {
   get: [
+    { path: "/:apiVersion/servers/:id", action: "serversList" },
     { path: "/:apiVersion/servers", action: "serversList" }
   ],
 
