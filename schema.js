@@ -14,8 +14,9 @@ exports.server = {
   username: null,
   password: null,
   jobId: null,
-  createdAt: new Date().getTime(),
-  updatedAt: new Date().getTime()
+  createdAt: null,
+  updatedAt: null,
+  _id: null
 };
 
 /**
@@ -34,8 +35,9 @@ exports.job = {
   options: null,
   startTime: null,
   endTime: null,
-  createdAt: new Date().getTime(),
-  updatedAt: new Date().getTime()
+  createdAt: null,
+  updatedAt: null,
+  _id: null
 };
 
 /**
@@ -45,8 +47,9 @@ exports.job = {
 exports.apiKey = {
   description: null,
   access_key: null,
-  createdAt: new Date().getTime(),
-  updatedAt: new Date().getTime()
+  createdAt: null,
+  updatedAt: null,
+  _id: null
 };
 
 /**
@@ -58,8 +61,9 @@ exports.loggerAccount = {
   email: null,
   papertrailId: null,
   papertrailApiToken: null,
-  createdAt: new Date().getTime(),
-  updatedAt: new Date().getTime()
+  createdAt: null,
+  updatedAt: null,
+  _id: null
 };
 
 /**
@@ -73,6 +77,7 @@ exports.loggerSystem = {
   papertrailAccountId: null,
   syslogHostname: null,
   syslogPort: null,
-  createdAt: new Date().getTime(),
-  updatedAt: new Date().getTime()
+  createdAt: null,
+  updatedAt: null,
+  _id: null
 };

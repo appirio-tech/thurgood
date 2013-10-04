@@ -10,7 +10,7 @@ exports.action = {
   version: 1.0,
   run: function(api, connection, next) {
     var serversCollection = api.mongo.collections.servers;
-    var serverDoc = api.mongo.schema.server;
+    var serverDoc = api.mongo.schema.new(api.mongo.schema.server);
     
     serversCollection.insert(serverDoc, {w:1}, function(err, result) {
       if (!err) {
