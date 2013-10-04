@@ -123,7 +123,9 @@ describe("GET /servers", function () {
       request.get(setup.testUrl + "/servers?skip=1", function (err, response, body2) {
         body2 = JSON.parse(body2);
         assert.ok(body2.success);
-        assert.ok(body.data[1]._id == body2.data[0]._id);
+        if (body.data.length > 1) {
+          assert.ok(body.data[1]._id == body2.data[0]._id);
+        }
         done();
       });
     });
