@@ -149,3 +149,21 @@ describe("GET /servers/:id", function () {
     });
   });
 });
+
+describe("PUT /servers/:id", function () {
+  before(function (done) {
+     setup.init(done);
+  });
+
+  it("should update server", function (done) {
+    var newName = 'jeff-' + Math.floor((Math.random()*100)+1);
+    var params = { name: newName };
+
+    request.put({ url: setup.testUrl + "/servers/524ef68a1d81003742000001", form: params }, function (err, response, body) {
+      body = JSON.parse(body);
+      assert.ok(body.success);
+      assert.ok(body.data.name == newName);
+      done();
+    });
+  });
+});

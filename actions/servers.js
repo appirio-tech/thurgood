@@ -2,55 +2,8 @@ var _ = require('underscore');
 var ObjectID = require('mongodb').ObjectID;
 
 exports.action = {
-  name: "serversCreate",
-  description: "Creates a new server. Method: POST",
-  inputs: {
-    required: [],
-    optional: ['name', 'status', 'instanceUrl', 'operatingSystem', 'installedServices', 'languages', 'platform', 'repoName', 'username', 'password', 'jobId'],
-  },
-  authenticated: false,
-  outputExample: {},
-  version: 1.0,
-  run: function(api, connection, next) {
-    var serversCollection = api.mongo.collections.servers;
-    var serverDoc = api.mongo.schema.new(api.mongo.schema.server);
-
-    // Assign parameters
-    _.each(serverDoc, function(value, key) {
-      if (connection.params[key]) {
-        serverDoc[key] = connection.params[key];
-      }
-    });
-
-    // Insert document
-    serversCollection.insert(serverDoc, {w:1}, function(err, result) {
-      if (!err) {
-        connection.rawConnection.responseHttpCode = 201;
-        connection.response = {
-          success: true,
-          message: "Server created successfully",
-          data: result
-        };
-
-        next(connection, true);
-      } else {
-        connection.rawConnection.responseHttpCode = 500;
-        connection.error = err;
-        connection.response = {
-          success: false,
-          message: err,
-          data: undefined
-        };
-
-        next(connection, true);
-      }
-    });
-  }
-};
-
-exports.serversList = {
   name: "serversList",
-  description: "Retrieves all the servers. Method: GET",
+  description: "Retrieves all the servers, or a specific one if id is defined. Method: GET",
   inputs: {
     required: [],
     optional: ['q', 'fields', 'sort', 'limit', 'skip', 'status', 'id'],
@@ -106,6 +59,101 @@ exports.serversList = {
           success: true,
           message: undefined,
           data: docs
+        };
+
+        next(connection, true);
+      } else {
+        connection.rawConnection.responseHttpCode = 500;
+        connection.error = err;
+        connection.response = {
+          success: false,
+          message: err,
+          data: undefined
+        };
+
+        next(connection, true);
+      }
+    });
+  }
+};
+
+exports.serversCreate = {
+  name: "serversCreate",
+  description: "Creates a new server. Method: POST",
+  inputs: {
+    required: [],
+    optional: ['name', 'status', 'instanceUrl', 'operatingSystem', 'installedServices', 'languages', 'platform', 'repoName', 'username', 'password', 'jobId'],
+  },
+  authenticated: false,
+  outputExample: {},
+  version: 1.0,
+  run: function(api, connection, next) {
+    var serversCollection = api.mongo.collections.servers;
+    var serverDoc = api.mongo.schema.new(api.mongo.schema.server);
+
+    // Assign parameters
+    _.each(serverDoc, function(value, key) {
+      if (connection.params[key]) {
+        serverDoc[key] = connection.params[key];
+      }
+    });
+
+    // Insert document
+    serversCollection.insert(serverDoc, { w:1 }, function(err, result) {
+      if (!err) {
+        connection.rawConnection.responseHttpCode = 201;
+        connection.response = {
+          success: true,
+          message: "Server created successfully",
+          data: result
+        };
+
+        next(connection, true);
+      } else {
+        connection.rawConnection.responseHttpCode = 500;
+        connection.error = err;
+        connection.response = {
+          success: false,
+          message: err,
+          data: undefined
+        };
+
+        next(connection, true);
+      }
+    });
+  }
+};
+
+exports.serversUpdate = {
+  name: "serversUpdate",
+  description: "Updates a server. Method: PUT",
+  inputs: {
+    required: [],
+    optional: ['id', 'name', 'status', 'instanceUrl', 'operatingSystem', 'installedServices', 'languages', 'platform', 'repoName', 'username', 'password', 'jobId'],
+  },
+  authenticated: false,
+  outputExample: {},
+  version: 1.0,
+  run: function(api, connection, next) {
+    var serversCollection = api.mongo.collections.servers;
+    var serverDoc = {};
+
+    // Create a document with the new values
+    _.each(connection.params, function(paramValue, paramKey) {
+      if (paramKey != 'id' && api.mongo.schema.server[paramKey] === null) {
+        serverDoc[paramKey] = paramValue;
+      }
+    });
+
+    // Update document
+    serverDoc.updatedAt = new Date().getTime();
+    serversCollection.findAndModify({ _id: new ObjectID(connection.params.id) }, undefined, { $set: serverDoc }, { new: true, w:1 }, function(err, result) {
+      if (!err) {
+        connection.rawConnection.responseHttpCode = 200;
+        connection.response = {
+          success: true,
+          message: "Server updated successfully",
+          data: result
         };
 
         next(connection, true);

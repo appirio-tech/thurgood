@@ -52,6 +52,6 @@ exports.routes = {
   ],
 
   put: [
-    
+    { path: "/:apiVersion/servers/:id", action: "serversUpdate" }
   ]
 };

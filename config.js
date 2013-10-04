@@ -126,9 +126,6 @@ configData.servers = {
 // MONGODB //
 /////////////
 
-// Console access:
-// mongo paulo.mongohq.com:10039/Alux-Thurgood-API -u thurgood -p thurgood
-
 configData.mongo = {
   serverUri: "mongodb://thurgood:thurgood@paulo.mongohq.com:10039/Alux-Thurgood-API"
 };
