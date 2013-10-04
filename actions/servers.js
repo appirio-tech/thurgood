@@ -144,7 +144,7 @@ exports.serversUpdate = {
 
     // Update document
     serverDoc.updatedAt = new Date().getTime();
-    serversCollection.findAndModify({ _id: new ObjectID(connection.params.id) }, undefined, { $set: serverDoc }, { new: true, w:1 }, function(err, result) {
+    serversCollection.findAndModify({ _id: new ObjectID(connection.params.id) }, {}, { $set: serverDoc }, { new: true, w:1 }, function(err, result) {
       if (!err) {
         connection.rawConnection.responseHttpCode = 200;
         connection.response = {

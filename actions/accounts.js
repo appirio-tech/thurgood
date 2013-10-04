@@ -106,7 +106,6 @@ exports.accountsCreate = {
 
     // Create Papertrail account
     request.post({ url: "https://papertrailapp.com/api/v1/distributors/accounts", form: params, auth: auth }, function (err, response, body) {
-      console.log(body);
       if (err) {
         connection.rawConnection.responseHttpCode = 500;
         connection.error = err;
@@ -154,6 +153,70 @@ exports.accountsCreate = {
             }
           });
         }
+      }
+    });
+  }
+};
+
+exports.accountsDelete = {
+  name: "accountsDelete",
+  description: "Deletes an account. Method: DELETE",
+  inputs: {
+    required: ['id'],
+    optional: [],
+  },
+  authenticated: false,
+  outputExample: {},
+  version: 1.0,
+  run: function(api, connection, next) {
+    var accountsCollection = api.mongo.collections.loggerAccounts;
+    var auth = {
+      username: "cloudspokes",
+      password: "239f45c2eu4d709m3c56684e827508d6"
+    };
+
+    // Delete account from database and Papertrail
+    accountsCollection.findAndModify({ _id: new ObjectID(connection.params.id) }, {}, {}, { remove: true }, function(err, doc) {
+      if (!err && doc) {
+        request.del({ url: "https://papertrailapp.com/api/v1/distributors/accounts/" + doc.papertrailId, auth: auth }, function (err, response, body) {
+          if (!err) {
+            connection.rawConnection.responseHttpCode = 200;
+            connection.response = {
+              success: true,
+              message: "Account deleted successfully"
+            };
+
+            next(connection, true);
+          } else {
+            connection.rawConnection.responseHttpCode = 500;
+            connection.error = err;
+            connection.response = {
+              success: false,
+              message: err
+            };
+
+            next(connection, true);
+          }
+        });
+      } else if (!doc) {
+        err = "Account not found"
+        connection.rawConnection.responseHttpCode = 404;
+        connection.error = err;
+        connection.response = {
+          success: false,
+          message: err
+        };
+
+        next(connection, true);
+      } else {
+        connection.rawConnection.responseHttpCode = 500;
+        connection.error = err;
+        connection.response = {
+          success: false,
+          message: err
+        };
+
+        next(connection, true);
       }
     });
   }

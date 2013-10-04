@@ -56,5 +56,9 @@ exports.routes = {
 
   put: [
     { path: "/:apiVersion/servers/:id", action: "serversUpdate" }
+  ],
+
+  delete: [
+    { path: "/:apiVersion/accounts/:id", action: "accountsDelete" }
   ]
 };

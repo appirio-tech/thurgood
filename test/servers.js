@@ -19,8 +19,8 @@ describe("POST /servers", function () {
     request.post({ url: setup.testUrl + "/servers", form: params }, function (err, response, body) {
       body = JSON.parse(body);
       assert.ok(body.success);
-      assert.ok(body.data[0].name == 'jeff');
-      assert.ok(body.data[0].status == 'available');
+      assert.ok(body.data[0].name == params.name);
+      assert.ok(body.data[0].status == params.status);
       testingServerId = body.data[0]._id;
       done();
     });

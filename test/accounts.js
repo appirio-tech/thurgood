@@ -3,7 +3,29 @@ var assert = require('assert');
 var request = require('request');
 var setup = require('./setup.js');
 
-var testingAccountId = "524f22a214fe435c52000002";
+var testingAccountId;
+
+describe("POST /accounts", function () {
+  before(function (done) {
+     setup.init(done);
+  });
+
+  it("should create a new account", function (done) {
+    var params = {
+      username: 'jeff',
+      email: 'jeff@thurgood.com'
+    };
+
+    request.post({ url: setup.testUrl + "/accounts", form: params }, function (err, response, body) {
+      body = JSON.parse(body);
+      assert.ok(body.success);
+      assert.ok(body.data[0].name == params.username);
+      assert.ok(body.data[0].email == params.email);
+      testingAccountId = body.data[0]._id;
+      done();
+    });
+  });
+});
 
 describe("GET /accounts", function () {
   before(function (done) {
@@ -128,6 +150,20 @@ describe("GET /accounts/:id", function () {
         assert.ok(key == 'name' || key == 'email' || key == '_id');
       });
 
+      done();
+    });
+  });
+});
+
+describe("DELETE /accounts/:id", function () {
+  before(function (done) {
+     setup.init(done);
+  });
+
+  it("should delete account", function (done) {
+    request.del(setup.testUrl + "/accounts/" + testingAccountId, function (err, response, body) {
+      body = JSON.parse(body);
+      assert.ok(body.success);
       done();
     });
   });
