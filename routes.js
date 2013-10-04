@@ -44,7 +44,8 @@ example:
 exports.routes = {
   get: [
     { path: "/:apiVersion/servers/:id", action: "serversFetch" },
-    { path: "/:apiVersion/servers", action: "serversFetch" }
+    { path: "/:apiVersion/servers", action: "serversFetch" },
+    { path: "/:apiVersion/accounts/:id", action: "accountsFetch" }
   ],
 
   post: [

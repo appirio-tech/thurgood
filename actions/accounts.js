@@ -1,7 +1,53 @@
 var _ = require('underscore');
+var ObjectID = require('mongodb').ObjectID;
 var request = require('request');
 
 exports.action = {
+  name: "accountsFetch",
+  description: "Returns a specific account. Method: GET",
+  inputs: {
+    required: ['id'],
+    optional: ['fields'],
+  },
+  authenticated: false,
+  outputExample: {},
+  version: 1.0,
+  run: function(api, connection, next) {
+    var accountsCollection = api.mongo.collections.loggerAccounts;
+    var fields;
+    
+    // Try to parse fields parameter
+    try {
+      fields = JSON.parse(connection.params.fields);
+    } catch(err) {
+      fields = {};
+    }
+
+    // Find account
+    accountsCollection.findOne({ _id: new ObjectID(connection.params.id) }, fields, function(err, doc) {
+      if (!err) {
+        connection.rawConnection.responseHttpCode = 200;
+        connection.response = {
+          success: true,
+          data: doc
+        };
+
+        next(connection, true);
+      } else {
+        connection.rawConnection.responseHttpCode = 500;
+        connection.error = err;
+        connection.response = {
+          success: false,
+          message: err
+        };
+
+        next(connection, true);
+      }
+    });
+  }
+};
+
+exports.accountsCreate = {
   name: "accountsCreate",
   description: "Creates a new account. Method: POST",
   inputs: {
