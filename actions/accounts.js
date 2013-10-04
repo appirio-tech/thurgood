@@ -4,17 +4,29 @@ var request = require('request');
 
 exports.action = {
   name: "accountsFetch",
-  description: "Returns a specific account. Method: GET",
+  description: "Returns a list of accounts, or a specific one if id is defined. Method: GET",
   inputs: {
-    required: ['id'],
-    optional: ['fields'],
+    required: [],
+    optional: ['q', 'fields', 'sort', 'limit', 'skip', 'id'],
   },
   authenticated: false,
   outputExample: {},
   version: 1.0,
   run: function(api, connection, next) {
     var accountsCollection = api.mongo.collections.loggerAccounts;
-    var fields;
+    var selector, fields, sort, options = {};
+
+    // If id is defined, override selector
+    if (connection.params.id) {
+      selector = { _id: new ObjectID(connection.params.id) };
+    } else {
+      // Otherwise try to parse selector parameter
+      try {
+        selector = JSON.parse(connection.params.q);
+      } catch(err) {
+        selector = {};
+      }
+    }
     
     // Try to parse fields parameter
     try {
@@ -22,14 +34,28 @@ exports.action = {
     } catch(err) {
       fields = {};
     }
+    
+    // Try to parse sort parameter
+    try {
+      sort = JSON.parse(connection.params.sort);
+    } catch(err) {
+      sort = undefined;
+    }
 
-    // Find account
-    accountsCollection.findOne({ _id: new ObjectID(connection.params.id) }, fields, function(err, doc) {
+    // Options parameters. Ignore them if id is defined
+    if (!connection.params.id) {
+      options.limit = connection.params.limit;
+      options.skip = connection.params.skip;
+      options.sort = sort;
+    }
+
+    // Find accounts
+    accountsCollection.find(selector, fields, options).toArray(function(err, docs) {
       if (!err) {
         connection.rawConnection.responseHttpCode = 200;
         connection.response = {
           success: true,
-          data: doc
+          data: docs
         };
 
         next(connection, true);

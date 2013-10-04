@@ -3,7 +3,7 @@ var ObjectID = require('mongodb').ObjectID;
 
 exports.action = {
   name: "serversFetch",
-  description: "Retrieves all the servers, or a specific one if id is defined. Method: GET",
+  description: "Returns a list of servers, or a specific one if id is defined. Method: GET",
   inputs: {
     required: [],
     optional: ['q', 'fields', 'sort', 'limit', 'skip', 'status', 'id'],
