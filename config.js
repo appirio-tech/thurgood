@@ -120,7 +120,15 @@ configData.servers = {
   // },
   // "websocket" : {
   // },
-}
+};
+
+/////////////
+// MONGODB //
+/////////////
+
+configData.mongo = {
+  serverUri: "mongodb://thurgood:thurgood@paulo.mongohq.com:10039/Alux-Thurgood-API"
+};
 
 //////////////////////////////////
 

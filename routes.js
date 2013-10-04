@@ -41,4 +41,16 @@ example:
 // ROUTES //
 ////////////
 
-exports.routes = {};
+exports.routes = {
+  get: [
+    
+  ],
+
+  post: [
+    { path: "/:apiVersion/servers", action: "serversCreate" }
+  ],
+
+  put: [
+    
+  ]
+};
