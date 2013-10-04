@@ -1,7 +1,7 @@
 {
-  "author": "YOU <YOU@example.com>",
-  "name": "my_actionHero_project",
-  "description": "",
+  "author": "Jeff Douglas <jeff@jeffdouglas.com>",
+  "name": "ThurgoodAPI",
+  "description": "Thurgood API",
   "version": "0.0.1",
   "homepage": "",
   "repository": {
@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "mocha": "~1.13.0",
+    "assert": "~0.4.9",
     "request": "~2.27.0"
   },
   "scripts": {
