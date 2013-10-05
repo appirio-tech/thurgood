@@ -136,6 +136,7 @@ describe("GET /accounts/:id", function () {
       assert.ok(body.success);
       assert.ok(body.data.length == 1);
       assert.ok(body.data[0]._id == testingAccountId);
+      assert.ok(body.data[0].loggerSystems.length >= 0);
       done();
     });
   });

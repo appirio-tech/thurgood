@@ -63,13 +63,36 @@ exports.action = {
     // Find accounts
     accountsCollection.find(selector, fields, options).toArray(function(err, docs) {
       if (!err) {
-        connection.rawConnection.responseHttpCode = 200;
-        connection.response = {
-          success: true,
-          data: docs
-        };
+        // If this is a GET /accounts/:id request and loggerSystems is included in projection then return the corresponding loggers too
+        if (connection.params.id && (Object.keys(fields).length == 0 || fields.loggerSystems == 1)) {
+          api.mongo.collections.loggerSystems.find({ loggerAccountId: docs[0]._id }).toArray(function(err, loggerDocs) {
+            if (!err) {
+              docs[0].loggerSystems = loggerDocs;
+              connection.rawConnection.responseHttpCode = 200;
+              connection.response = {
+                success: true,
+                data: docs
+              };
+            } else {
+              connection.rawConnection.responseHttpCode = 500;
+              connection.error = err;
+              connection.response = {
+                success: false,
+                message: err
+              };
+            }
 
-        next(connection, true);
+            next(connection, true);
+          })
+        } else {
+          connection.rawConnection.responseHttpCode = 200;
+          connection.response = {
+            success: true,
+            data: docs
+          };
+
+          next(connection, true);
+        }
       } else {
         connection.rawConnection.responseHttpCode = 500;
         connection.error = err;
@@ -145,8 +168,6 @@ exports.accountsCreate = {
                 message: "Account created successfully",
                 data: result
               };
-
-              next(connection, true);
             } else {
               connection.rawConnection.responseHttpCode = 500;
               connection.error = err;
@@ -154,9 +175,9 @@ exports.accountsCreate = {
                 success: false,
                 message: err
               };
-
-              next(connection, true);
             }
+
+            next(connection, true);
           });
         }
       }
@@ -201,8 +222,6 @@ exports.accountsDelete = {
               success: true,
               message: "Account deleted successfully"
             };
-
-            next(connection, true);
           } else {
             connection.rawConnection.responseHttpCode = 500;
             connection.error = err;
@@ -210,9 +229,9 @@ exports.accountsDelete = {
               success: false,
               message: err
             };
-
-            next(connection, true);
           }
+          
+          next(connection, true);
         });
       } else if (!doc) {
         err = "Account not found"

@@ -70,8 +70,6 @@ exports.action = {
           success: true,
           data: docs
         };
-
-        next(connection, true);
       } else {
         connection.rawConnection.responseHttpCode = 500;
         connection.error = err;
@@ -79,9 +77,9 @@ exports.action = {
           success: false,
           message: err
         };
-
-        next(connection, true);
       }
+
+      next(connection, true);
     });
   }
 };
@@ -116,8 +114,6 @@ exports.serversCreate = {
           message: "Server created successfully",
           data: result
         };
-
-        next(connection, true);
       } else {
         connection.rawConnection.responseHttpCode = 500;
         connection.error = err;
@@ -125,9 +121,9 @@ exports.serversCreate = {
           success: false,
           message: err
         };
-
-        next(connection, true);
       }
+
+      next(connection, true);
     });
   }
 };
@@ -176,8 +172,6 @@ exports.serversUpdate = {
           message: "Server updated successfully",
           data: result
         };
-
-        next(connection, true);
       } else {
         connection.rawConnection.responseHttpCode = 500;
         connection.error = err;
@@ -185,9 +179,9 @@ exports.serversUpdate = {
           success: false,
           message: err
         };
-
-        next(connection, true);
       }
+
+      next(connection, true);
     });
   }
 };
