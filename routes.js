@@ -58,7 +58,8 @@ exports.routes = {
   ],
 
   put: [
-    { path: "/:apiVersion/servers/:id", action: "serversUpdate" }
+    { path: "/:apiVersion/servers/:id", action: "serversUpdate" },
+    { path: "/:apiVersion/jobs/:id", action: "jobsUpdate" }
   ],
 
   delete: [

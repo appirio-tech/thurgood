@@ -161,3 +161,22 @@ describe("GET /jobs/:id", function () {
     });
   });
 });
+
+describe("PUT /jobs/:id", function () {
+  before(function (done) {
+     setup.init(done);
+  });
+
+  it("should update job", function (done) {
+    var params = {
+      status: 'completed'
+    };
+
+    request.put({ url: setup.testUrl + "/jobs/" + testingJobId, form: params }, function (err, response, body) {
+      body = JSON.parse(body);
+      assert.ok(body.success);
+      assert.ok(body.data.status == params.status);
+      done();
+    });
+  });
+});

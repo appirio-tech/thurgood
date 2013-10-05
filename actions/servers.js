@@ -132,8 +132,8 @@ exports.serversUpdate = {
   name: "serversUpdate",
   description: "Updates a server. Method: PUT",
   inputs: {
-    required: [],
-    optional: ['id', 'name', 'status', 'instanceUrl', 'operatingSystem', 'installedServices', 'languages', 'platform', 'repoName', 'username', 'password', 'jobId'],
+    required: ['id'],
+    optional: ['name', 'status', 'instanceUrl', 'operatingSystem', 'installedServices', 'languages', 'platform', 'repoName', 'username', 'password', 'jobId'],
   },
   authenticated: false,
   outputExample: {},

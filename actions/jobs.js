@@ -91,22 +91,79 @@ exports.jobsCreate = {
   outputExample: {},
   version: 1.0,
   run: function(api, connection, next) {
-    var serverDoc = api.mongo.schema.new(api.mongo.schema.job);
+    var jobDoc = api.mongo.schema.new(api.mongo.schema.job);
 
     // Assign parameters
-    _.each(serverDoc, function(value, key) {
+    _.each(jobDoc, function(value, key) {
       if (_.contains(Object.keys(connection.params), key)) {
-        serverDoc[key] = connection.params[key];
+        jobDoc[key] = connection.params[key];
       }
     });
 
     // Insert document
-    api.mongo.collections.jobs.insert(serverDoc, { w:1 }, function(err, result) {
+    api.mongo.collections.jobs.insert(jobDoc, { w:1 }, function(err, result) {
       if (!err) {
         connection.rawConnection.responseHttpCode = 201;
         connection.response = {
           success: true,
           message: "Job created successfully",
+          data: result
+        };
+      } else {
+        connection.rawConnection.responseHttpCode = 500;
+        connection.error = err;
+        connection.response = {
+          success: false,
+          message: err
+        };
+      }
+
+      next(connection, true);
+    });
+  }
+};
+
+exports.jobsUpdate = {
+  name: "jobsUpdate",
+  description: "Updates a job. Method: PUT",
+  inputs: {
+    required: ['id'],
+    optional: ['status', 'email', 'platform', 'language', 'papertrailSystem', 'userId', 'codeUrl', 'options', 'startTime', 'endTime'],
+  },
+  authenticated: false,
+  outputExample: {},
+  version: 1.0,
+  run: function(api, connection, next) {
+    var selector, jobDoc = {};
+
+    // Create a document with the new values
+    _.each(connection.params, function(paramValue, paramKey) {
+      if (paramKey != 'id' && _.contains(Object.keys(api.mongo.schema.job), paramKey)) {
+        jobDoc[paramKey] = paramValue;
+      }
+    });
+
+    try {
+      selector = { _id: new ObjectID(connection.params.id) };
+    } catch(err) {
+      connection.rawConnection.responseHttpCode = 400;
+      connection.response = {
+        success: false,
+        message: "Invalid id"
+      };
+
+      next(connection, true);
+      return;
+    }
+
+    // Update document
+    jobDoc.updatedAt = new Date().getTime();
+    api.mongo.collections.jobs.findAndModify(selector, {}, { $set: jobDoc }, { new: true, w:1 }, function(err, result) {
+      if (!err) {
+        connection.rawConnection.responseHttpCode = 200;
+        connection.response = {
+          success: true,
+          message: "Job updated successfully",
           data: result
         };
       } else {
