@@ -1,0 +1,4 @@
+--reporter spec
+--require assert
+--growl
+--timeout 15000
