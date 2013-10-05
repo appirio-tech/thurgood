@@ -171,7 +171,7 @@ describe("PUT /jobs/:id/submit", function () {
         name: 'jeff',
         status: 'available',
         platform: 'Heroku',
-        language: 'Java'
+        languages: '["Java"]'
       };
 
       request.post({ url: setup.testUrl + "/servers", form: params }, function (err, response, body) {

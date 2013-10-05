@@ -152,11 +152,11 @@ exports.jobsSubmit = {
 
     api.mongo.collections.jobs.findOne(selector, function(err, doc) {
       if (!err && doc) {
-        if (doc.status == "running") {
+        if (doc.status != "pending") {
           connection.rawConnection.responseHttpCode = 200;
           connection.response = {
             success: true,
-            message: "Job already running",
+            message: "Job already submitted",
             data: doc
           };
 
@@ -168,7 +168,13 @@ exports.jobsSubmit = {
             status: 'available'
           };
 
-          api.mongo.collections.servers.findAndModify(serverSelector, {}, { $set: { jobId: doc._id, status: 'reserved' } }, { new: true, w:1 }, function(err, server) {
+          var newDoc = {
+            jobId: doc._id,
+            status: 'reserved',
+            updatedAt: new Date().getTime()
+          };
+
+          api.mongo.collections.servers.findAndModify(serverSelector, {}, { $set: newDoc }, { new: true, w:1 }, function(err, server) {
             if (!err && server) {
               var rabbitMq = amqp.createConnection({ url: api.configData.rabbitmq.url });
               var message = {
@@ -176,19 +182,31 @@ exports.jobsSubmit = {
                 type: doc.language
               };
 
-              // Publish message
-              rabbitMq.on('ready', function () {
-                rabbitMq.publish('thurgood-dev-queue', message);
-                rabbitMq.end();
+              // Set job status to submitted
+              api.mongo.collections.jobs.update({ _id: doc._id }, { $set: { status: 'submitted', updatedAt: new Date().getTime() } }, { w:1 }, function(err, result) {
+                if (!err) {
+                  // Publish message
+                  rabbitMq.on('ready', function () {
+                    rabbitMq.publish('thurgood-dev-queue', message);
+                    rabbitMq.end();
+                  });
+
+                  connection.rawConnection.responseHttpCode = 200;
+                  connection.response = {
+                    success: true,
+                    message: "Job has been successfully submitted"
+                  };
+                } else {
+                  connection.rawConnection.responseHttpCode = 500;
+                  connection.error = err;
+                  connection.response = {
+                    success: true,
+                    message: err
+                  };
+                }
+
+                next(connection, true);
               });
-
-              connection.rawConnection.responseHttpCode = 200;
-              connection.response = {
-                success: true,
-                message: "Job has been successfully submitted"
-              };
-
-              next(connection, true);
             } else if (!server) {
               err = "Could not find any available servers. Try again in a few minutes";
               connection.rawConnection.responseHttpCode = 500;

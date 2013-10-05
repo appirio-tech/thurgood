@@ -8,7 +8,7 @@ exports.server = {
   installedServices: null,
   instanceUrl: null,
   jobId: null,
-  languages: null,
+  languages: [],
   name: null,
   operatingSystem: null,
   password: null,
