@@ -31,7 +31,7 @@ exports.job = {
   endTime: null,
   language: null,
   options: null,
-  papertrailSystem: null,
+  loggerId: null,
   platform: null,
   startTime: null,
   updatedAt: null,

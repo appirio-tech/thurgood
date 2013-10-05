@@ -7,7 +7,7 @@ var testingServerId;
 
 describe("POST /servers", function () {
   before(function (done) {
-     setup.init(done);
+    setup.init(done);
   });
 
   it("should create a new server", function (done) {
@@ -29,7 +29,7 @@ describe("POST /servers", function () {
 
 describe("GET /servers", function () {
   before(function (done) {
-     setup.init(done);
+    setup.init(done);
   });
 
   it("should return all servers", function (done) {
@@ -148,7 +148,7 @@ describe("GET /servers", function () {
 
 describe("GET /servers/:id", function () {
   before(function (done) {
-     setup.init(done);
+    setup.init(done);
   });
 
   it("should return server by id", function (done) {
@@ -178,7 +178,7 @@ describe("GET /servers/:id", function () {
 
 describe("PUT /servers/:id", function () {
   before(function (done) {
-     setup.init(done);
+    setup.init(done);
   });
 
   it("should update server", function (done) {

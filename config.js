@@ -139,6 +139,16 @@ configData.papertrail = {
   password: "239f45c2eu4d709m3c56684e827508d6"
 };
 
+//////////////
+// RABBITMQ //
+//////////////
+
+configData.rabbitmq = {
+  rxUrl: "amqp://KsFd5NW4:EXKgmHYcw3OLzaMJybkFbsRqNJgmJ6N-@swift-thunder-5.bigwig.lshift.net:10079/LsQARvoFyPd1",
+  txUrl: "amqp://KsFd5NW4:EXKgmHYcw3OLzaMJybkFbsRqNJgmJ6N-@swift-thunder-5.bigwig.lshift.net:10078/LsQARvoFyPd1",
+  url: "amqp://KsFd5NW4:EXKgmHYcw3OLzaMJybkFbsRqNJgmJ6N-@swift-thunder-5.bigwig.lshift.net:10078/LsQARvoFyPd1"
+};
+
 //////////////////////////////////
 
 exports.configData = configData;

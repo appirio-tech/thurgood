@@ -59,6 +59,7 @@ exports.routes = {
 
   put: [
     { path: "/:apiVersion/servers/:id", action: "serversUpdate" },
+    { path: "/:apiVersion/jobs/:id/submit", action: "jobsSubmit" },
     { path: "/:apiVersion/jobs/:id", action: "jobsUpdate" }
   ],
 

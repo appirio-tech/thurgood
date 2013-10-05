@@ -7,13 +7,15 @@ var testingJobId;
 
 describe("POST /jobs", function () {
   before(function (done) {
-     setup.init(done);
+    setup.init(done);
   });
 
   it("should create a new job", function (done) {
     var params = {
       userId: 'jeff',
-      status: 'pending'
+      status: 'pending',
+      platform: 'Heroku',
+      language: 'Java'
     };
 
     request.post({ url: setup.testUrl + "/jobs", form: params }, function (err, response, body) {
@@ -29,7 +31,7 @@ describe("POST /jobs", function () {
 
 describe("GET /jobs", function () {
   before(function (done) {
-     setup.init(done);
+    setup.init(done);
   });
 
   it("should return all jobs", function (done) {
@@ -134,7 +136,7 @@ describe("GET /jobs", function () {
 
 describe("GET /jobs/:id", function () {
   before(function (done) {
-     setup.init(done);
+    setup.init(done);
   });
 
   it("should return job by id", function (done) {
@@ -162,9 +164,34 @@ describe("GET /jobs/:id", function () {
   });
 });
 
+describe("PUT /jobs/:id/submit", function () {
+  before(function (done) {
+    setup.init(function() {
+      var params = {
+        name: 'jeff',
+        status: 'available',
+        platform: 'Heroku',
+        language: 'Java'
+      };
+
+      request.post({ url: setup.testUrl + "/servers", form: params }, function (err, response, body) {
+        done();
+      });
+    });
+  });
+
+  it("should submit job", function (done) {
+    request.put({ url: setup.testUrl + "/jobs/" + testingJobId + "/submit" }, function (err, response, body) {
+      body = JSON.parse(body);
+      assert.ok(body.success);
+      done();
+    });
+  });
+});
+
 describe("PUT /jobs/:id", function () {
   before(function (done) {
-     setup.init(done);
+    setup.init(done);
   });
 
   it("should update job", function (done) {

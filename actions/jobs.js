@@ -1,5 +1,6 @@
 var _ = require('underscore');
 var ObjectID = require('mongodb').ObjectID;
+var amqp = require('amqp');
 
 exports.action = {
   name: "jobsFetch",
@@ -119,6 +120,117 @@ exports.jobsCreate = {
       }
 
       next(connection, true);
+    });
+  }
+};
+
+exports.jobsSubmit = {
+  name: "jobsSubmit",
+  description: "Submits a job. Method: PUT",
+  inputs: {
+    required: ['id'],
+    optional: [],
+  },
+  authenticated: false,
+  outputExample: {},
+  version: 1.0,
+  run: function(api, connection, next) {
+    var selector;
+
+    try {
+      selector = { _id: new ObjectID(connection.params.id) };
+    } catch(err) {
+      connection.rawConnection.responseHttpCode = 400;
+      connection.response = {
+        success: false,
+        message: "Invalid id"
+      };
+
+      next(connection, true);
+      return;
+    }
+
+    api.mongo.collections.jobs.findOne(selector, function(err, doc) {
+      if (!err && doc) {
+        if (doc.status == "running") {
+          connection.rawConnection.responseHttpCode = 200;
+          connection.response = {
+            success: true,
+            message: "Job already running",
+            data: doc
+          };
+
+          next(connection, true);
+        } else {
+          var serverSelector = {
+            languages: doc.language,
+            platform: doc.platform,
+            status: 'available'
+          };
+
+          api.mongo.collections.servers.findAndModify(serverSelector, {}, { $set: { jobId: doc._id, status: 'reserved' } }, { new: true, w:1 }, function(err, server) {
+            if (!err && server) {
+              var rabbitMq = amqp.createConnection({ url: api.configData.rabbitmq.url });
+              var message = {
+                job_id: server.jobId,
+                type: doc.language
+              };
+
+              // Publish message
+              rabbitMq.on('ready', function () {
+                rabbitMq.publish('thurgood-dev-queue', message);
+                rabbitMq.end();
+              });
+
+              connection.rawConnection.responseHttpCode = 200;
+              connection.response = {
+                success: true,
+                message: "Job has been successfully submitted"
+              };
+
+              next(connection, true);
+            } else if (!server) {
+              err = "Could not find any available servers. Try again in a few minutes";
+              connection.rawConnection.responseHttpCode = 500;
+              connection.error = err;
+              connection.response = {
+                success: false,
+                message: err
+              };
+
+              next(connection, true);
+            } else {
+              connection.rawConnection.responseHttpCode = 500;
+              connection.error = err;
+              connection.response = {
+                success: false,
+                message: err
+              };
+
+              next(connection, true);
+            }
+          });
+        }
+      } else if (!doc) {
+        err = "Job not found"
+        connection.rawConnection.responseHttpCode = 500;
+        connection.error = err;
+        connection.response = {
+          success: false,
+          message: err
+        };
+
+        next(connection, true);
+      } else {
+        connection.rawConnection.responseHttpCode = 500;
+        connection.error = err;
+        connection.response = {
+          success: false,
+          message: err
+        };
+
+        next(connection, true);
+      }
     });
   }
 };
