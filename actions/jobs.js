@@ -1,6 +1,8 @@
 var _ = require('underscore');
 var ObjectID = require('mongodb').ObjectID;
 var amqp = require('amqp');
+var syslogProducer = require('glossy').Produce;
+var glossy = new syslogProducer({ type: 'BSD' });
 
 exports.action = {
   name: "jobsFetch",
@@ -86,7 +88,7 @@ exports.jobsCreate = {
   description: "Creates a new job. Method: POST",
   inputs: {
     required: [],
-    optional: ['status', 'email', 'platform', 'language', 'papertrailSystem', 'userId', 'codeUrl', 'options', 'startTime', 'endTime'],
+    optional: ['status', 'email', 'platform', 'language', 'loggerId', 'userId', 'codeUrl', 'options', 'startTime', 'endTime'],
   },
   authenticated: false,
   outputExample: {},
@@ -97,7 +99,23 @@ exports.jobsCreate = {
     // Assign parameters
     _.each(jobDoc, function(value, key) {
       if (_.contains(Object.keys(connection.params), key)) {
-        jobDoc[key] = connection.params[key];
+        // Parse loggerId as ObjectId not string
+        if (key == 'loggerId') {
+          try {
+            jobDoc[key] = new ObjectID(connection.params[key]);
+          } catch(err) {
+            connection.rawConnection.responseHttpCode = 400;
+            connection.response = {
+              success: false,
+              message: "Invalid loggerId"
+            };
+
+            next(connection, true);
+            return;
+          }
+        } else {
+          jobDoc[key] = connection.params[key];
+        }
       }
     });
 
@@ -120,6 +138,98 @@ exports.jobsCreate = {
       }
 
       next(connection, true);
+    });
+  }
+};
+
+exports.jobsMessage = {
+  name: "jobsMessage",
+  description: "Sends a message to the job's logger. Method: POST",
+  inputs: {
+    required: ['id', 'message'],
+    optional: ['facility', 'severity'],
+  },
+  authenticated: false,
+  outputExample: {},
+  version: 1.0,
+  run: function(api, connection, next) {
+    var selector;
+
+    try {
+      selector = { _id: new ObjectID(connection.params.id) };
+    } catch(err) {
+      connection.rawConnection.responseHttpCode = 400;
+      connection.response = {
+        success: false,
+        message: "Invalid id"
+      };
+
+      next(connection, true);
+      return;
+    }
+
+    // Find job's logger
+    api.mongo.collections.jobs.findOne(selector, function(err, job) {
+      if (!err && job) {
+        api.mongo.collections.loggerSystems.findOne({ _id: job.loggerId }, function(err, logger) {
+          if (!err && logger) {
+            // Send message
+            glossy.produce({
+              facility: connection.params.facility,
+              severity: connection.params.severity || 'info',
+              host: logger.syslogHostname + ":" + logger.syslogPort,
+              date: new Date(),
+              message: connection.params.message
+            }, function(syslogMsg){
+              connection.rawConnection.responseHttpCode = 200;
+              connection.response = {
+                success: true,
+                message: syslogMsg
+              };
+
+              next(connection, true);
+            });
+          } else if (!logger) {
+            err = "Logger not found";
+            connection.rawConnection.responseHttpCode = 500;
+            connection.error = err;
+            connection.response = {
+              success: false,
+              message: err
+            };
+
+            next(connection, true);
+          } else {
+            connection.rawConnection.responseHttpCode = 500;
+            connection.error = err;
+            connection.response = {
+              success: false,
+              message: err
+            };
+
+            next(connection, true);
+          }
+        });
+      } else if (!job) {
+        err = "Job not found";
+        connection.rawConnection.responseHttpCode = 500;
+        connection.error = err;
+        connection.response = {
+          success: false,
+          message: err
+        };
+
+        next(connection, true);
+      } else {
+        connection.rawConnection.responseHttpCode = 500;
+        connection.error = err;
+        connection.response = {
+          success: false,
+          message: err
+        };
+
+        next(connection, true);
+      }
     });
   }
 };

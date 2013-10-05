@@ -54,6 +54,7 @@ exports.routes = {
   post: [
     { path: "/:apiVersion/servers", action: "serversCreate" },
     { path: "/:apiVersion/accounts", action: "accountsCreate" },
+    { path: "/:apiVersion/jobs/:id/message", action: "jobsMessage" },
     { path: "/:apiVersion/jobs", action: "jobsCreate" }
   ],
 

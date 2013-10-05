@@ -15,7 +15,8 @@ describe("POST /jobs", function () {
       userId: 'jeff',
       status: 'pending',
       platform: 'Heroku',
-      language: 'Java'
+      language: 'Java',
+      loggerId: '525043aa130cd46f0b000001'
     };
 
     request.post({ url: setup.testUrl + "/jobs", form: params }, function (err, response, body) {
@@ -159,6 +160,26 @@ describe("GET /jobs/:id", function () {
         assert.ok(key == 'userId' || key == 'status' || key == '_id');
       });
 
+      done();
+    });
+  });
+});
+
+describe("PUT /jobs/:id/message", function () {
+  before(function (done) {
+    setup.init(done);
+  });
+
+  it("should send message", function (done) {
+    var params = {
+      message: 'Hello world',
+      facility: 'test',
+      severity: 'info'
+    };
+
+    request.post({ url: setup.testUrl + "/jobs/" + testingJobId + "/message", form: params }, function (err, response, body) {
+      body = JSON.parse(body);
+      assert.ok(body.success);
       done();
     });
   });
