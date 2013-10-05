@@ -3,20 +3,20 @@
  * @type {Object}
  */
 exports.server = {
-  name: null,
-  status: null,
-  instanceUrl: null,
-  operatingSystem: null,
+  _id: null,
+  createdAt: null,
   installedServices: null,
+  instanceUrl: null,
+  jobId: null,
   languages: null,
+  name: null,
+  operatingSystem: null,
+  password: null,
   platform: null,
   repoName: null,
-  username: null,
-  password: null,
-  jobId: null,
-  createdAt: null,
+  status: null,
   updatedAt: null,
-  _id: null
+  username: null
 };
 
 /**
@@ -24,19 +24,19 @@ exports.server = {
  * @type {Object}
  */
 exports.job = {
-  status: null,
-  email: null,
-  platform: null,
-  language: null,
-  papertrailSystem: null,
-  userId: null,
+  _id: null,
   codeUrl: null,
-  options: null,
-  startTime: null,
-  endTime: null,
   createdAt: null,
+  email: null,
+  endTime: null,
+  language: null,
+  options: null,
+  papertrailSystem: null,
+  platform: null,
+  startTime: null,
   updatedAt: null,
-  _id: null
+  userId: null,
+  status: null
 };
 
 /**
@@ -44,11 +44,11 @@ exports.job = {
  * @type {Object}
  */
 exports.apiKey = {
-  description: null,
+  _id: null,
   access_key: null,
   createdAt: null,
-  updatedAt: null,
-  _id: null
+  description: null,
+  updatedAt: null
 };
 
 /**
@@ -56,13 +56,13 @@ exports.apiKey = {
  * @type {Object}
  */
 exports.loggerAccount = {
-  name: null,
-  email: null,
-  papertrailId: null,
-  papertrailApiToken: null,
+  _id: null,
   createdAt: null,
-  updatedAt: null,
-  _id: null
+  email: null,
+  name: null,
+  papertrailApiToken: null,
+  papertrailId: null,
+  updatedAt: null
 };
 
 /**
@@ -70,13 +70,13 @@ exports.loggerAccount = {
  * @type {Object}
  */
 exports.loggerSystem = {
-  name: null,
-  papertrailId: null,
+  _id: null,
+  createdAt: null,
   loggerAccountId: null,
+  name: null,
   papertrailAccountId: null,
+  papertrailId: null,
   syslogHostname: null,
   syslogPort: null,
-  createdAt: null,
-  updatedAt: null,
-  _id: null
+  updatedAt: null
 };
