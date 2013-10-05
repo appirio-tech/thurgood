@@ -101,7 +101,7 @@ exports.accountsCreate = {
     accountDoc.email = connection.params.email;
 
     var params = {
-      id: 'cs-dev-' + accountDoc.name,
+      id: new String(accountDoc._id),
       name: accountDoc.name,
       plan: "free",
       user: {

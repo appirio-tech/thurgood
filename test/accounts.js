@@ -12,8 +12,8 @@ describe("POST /accounts", function () {
 
   it("should create a new account", function (done) {
     var params = {
-      username: 'jeff',
-      email: 'jeff@thurgood.com'
+      username: 'jeffd',
+      email: 'jeffd@thurgood.com'
     };
 
     request.post({ url: setup.testUrl + "/accounts", form: params }, function (err, response, body) {
@@ -42,10 +42,10 @@ describe("GET /accounts", function () {
   });
 
   it("should return accounts by query", function (done) {
-    request.get(setup.testUrl + "/accounts?q={\"name\":\"jeff\"}", function (err, response, body) {
+    request.get(setup.testUrl + "/accounts?q={\"name\":\"jeffd\"}", function (err, response, body) {
       body = JSON.parse(body);
       assert.ok(body.success);
-      assert.ok(body.data[0].name == 'jeff');
+      assert.ok(body.data[0].name == 'jeffd');
       done();
     });
   });
