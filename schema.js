@@ -29,7 +29,6 @@ exports.job = {
   platform: null,
   language: null,
   papertrailSystem: null,
-  jobId: null,
   userId: null,
   codeUrl: null,
   options: null,
