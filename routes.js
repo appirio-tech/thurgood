@@ -41,4 +41,24 @@ example:
 // ROUTES //
 ////////////
 
-exports.routes = {};
+exports.routes = {
+  get: [
+    { path: "/:apiVersion/servers/:id", action: "serversFetch" },
+    { path: "/:apiVersion/servers", action: "serversFetch" },
+    { path: "/:apiVersion/accounts/:id", action: "accountsFetch" },
+    { path: "/:apiVersion/accounts", action: "accountsFetch" }
+  ],
+
+  post: [
+    { path: "/:apiVersion/servers", action: "serversCreate" },
+    { path: "/:apiVersion/accounts", action: "accountsCreate" }
+  ],
+
+  put: [
+    { path: "/:apiVersion/servers/:id", action: "serversUpdate" }
+  ],
+
+  delete: [
+    { path: "/:apiVersion/accounts/:id", action: "accountsDelete" }
+  ]
+};
