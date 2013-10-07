@@ -101,7 +101,11 @@ exports.serversCreate = {
     // Assign parameters
     _.each(serverDoc, function(value, key) {
       if (_.contains(Object.keys(connection.params), key)) {
-        serverDoc[key] = connection.params[key];
+        try {
+          serverDoc[key] = JSON.parse(connection.params[key]);
+        } catch(err) {
+          serverDoc[key] = connection.params[key];
+        }
       }
     });
 
@@ -132,8 +136,8 @@ exports.serversUpdate = {
   name: "serversUpdate",
   description: "Updates a server. Method: PUT",
   inputs: {
-    required: [],
-    optional: ['id', 'name', 'status', 'instanceUrl', 'operatingSystem', 'installedServices', 'languages', 'platform', 'repoName', 'username', 'password', 'jobId'],
+    required: ['id'],
+    optional: ['name', 'status', 'instanceUrl', 'operatingSystem', 'installedServices', 'languages', 'platform', 'repoName', 'username', 'password', 'jobId'],
   },
   authenticated: false,
   outputExample: {},
@@ -145,7 +149,11 @@ exports.serversUpdate = {
     // Create a document with the new values
     _.each(connection.params, function(paramValue, paramKey) {
       if (paramKey != 'id' && _.contains(Object.keys(api.mongo.schema.server), paramKey)) {
-        serverDoc[paramKey] = paramValue;
+        try {
+          serverDoc[paramKey] = JSON.parse(paramValue);
+        } catch(err) {
+          serverDoc[paramKey] = paramValue;
+        }
       }
     });
 

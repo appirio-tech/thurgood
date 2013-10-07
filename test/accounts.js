@@ -7,7 +7,7 @@ var testingAccountId;
 
 describe("POST /accounts", function () {
   before(function (done) {
-     setup.init(done);
+    setup.init(done);
   });
 
   it("should create a new account", function (done) {
@@ -29,7 +29,7 @@ describe("POST /accounts", function () {
 
 describe("GET /accounts", function () {
   before(function (done) {
-     setup.init(done);
+    setup.init(done);
   });
 
   it("should return all accounts", function (done) {
@@ -127,7 +127,7 @@ describe("GET /accounts", function () {
 
 describe("GET /accounts/:id", function () {
   before(function (done) {
-     setup.init(done);
+    setup.init(done);
   });
 
   it("should return account by id", function (done) {
@@ -158,7 +158,7 @@ describe("GET /accounts/:id", function () {
 
 describe("DELETE /accounts/:id", function () {
   before(function (done) {
-     setup.init(done);
+    setup.init(done);
   });
 
   it("should delete account", function (done) {

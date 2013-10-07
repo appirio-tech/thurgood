@@ -112,7 +112,7 @@ exports.accountsCreate = {
   description: "Creates a new account. Method: POST",
   inputs: {
     required: ['username', 'email'],
-    optional: [],
+    optional: ['papertrailId'],
   },
   authenticated: false,
   outputExample: {},
@@ -122,9 +122,10 @@ exports.accountsCreate = {
     var accountDoc = api.mongo.schema.new(api.mongo.schema.loggerAccount);
     accountDoc.name = connection.params.username;
     accountDoc.email = connection.params.email;
+    accountDoc.papertrailId = connection.params.papertrailId || accountDoc.name;
 
     var params = {
-      id: new String(accountDoc._id),
+      id: accountDoc.papertrailId,
       name: accountDoc.name,
       plan: "free",
       user: {

@@ -2,7 +2,7 @@ var MongoClient = require('mongodb').MongoClient;
 var ObjectID = require('mongodb').ObjectID;
 var Schema = require('../schema.js');
 
-exports.mongoDb = function (api, next) {
+exports.mongodb = function (api, next) {
   api.mongo = {};
   api.mongo.collections = {};
   api.mongo.schema = {};
@@ -21,11 +21,7 @@ exports.mongoDb = function (api, next) {
       api.mongo.collections.loggerSystems = db.collection('loggerSystems');
 
       // Define document schemas
-      api.mongo.schema.server = Schema.server;
-      api.mongo.schema.job = Schema.job;
-      api.mongo.schema.apiKey = Schema.apiKey;
-      api.mongo.schema.loggerAccount = Schema.loggerAccount;
-      api.mongo.schema.loggerSystem = Schema.loggerSystem;
+      api.mongo.schema = Schema;
 
       /**
        * Sets a schema's id and timestamps
