@@ -47,7 +47,7 @@ exports.routes = {
     { path: "/:apiVersion/servers", action: "serversFetch" },
     { path: "/:apiVersion/accounts/:id", action: "accountsFetch" },
     { path: "/:apiVersion/accounts", action: "accountsFetch" },
-    { path: "/:apiVersion/loggers/:id", action: "loggersFetch" }
+    { path: "/:apiVersion/loggers/:id", action: "loggersFetch" },
     { path: "/:apiVersion/jobs/:id", action: "jobsFetch" },
     { path: "/:apiVersion/jobs", action: "jobsFetch" }
   ],
@@ -55,7 +55,7 @@ exports.routes = {
   post: [
     { path: "/:apiVersion/servers", action: "serversCreate" },
     { path: "/:apiVersion/accounts", action: "accountsCreate" },
-    { path: "/:apiVersion/loggers", action: "loggersCreate" }
+    { path: "/:apiVersion/loggers", action: "loggersCreate" },
     { path: "/:apiVersion/jobs/:id/message", action: "jobsMessage" },
     { path: "/:apiVersion/jobs", action: "jobsCreate" }
   ],
