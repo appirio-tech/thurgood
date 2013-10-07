@@ -14,7 +14,7 @@ configData.general = {
   apiVersion: "0.0.1",
   serverName: "Thurgood API",
   // id: "myActionHeroServer",                                    // id can be set here, or generated dynamically.  be sure that every server you run as a unique ID (which will happen when genrated dynamically)
-  serverToken: "change-me",                                       // A unique token to your application which servers will use to authenticate to eachother
+  serverToken: process.env.SERVER_TOKEN,                                       // A unique token to your application which servers will use to authenticate to eachother
   welcomeMessage : "Hello! Welcome to the Thurgood!",        // The welcome message seen by TCP and webSocket clients upon connection
   flatFileDirectory: __dirname + "/public/",                      // The directory which will be the root for the /public route
   flatFileNotFoundMessage: "Sorry, that file is not found :(",    // The body message to acompany 404 (file not found) errors regading flat files
@@ -127,7 +127,7 @@ configData.servers = {
 /////////////
 
 configData.mongo = {
-  serverUri: "mongodb://thurgood:thurgood@paulo.mongohq.com:10067/app18484458"
+  serverUri: process.env.MONGODB_SERVER_URI
 };
 
 ////////////////
@@ -135,8 +135,8 @@ configData.mongo = {
 ////////////////
 
 configData.papertrail = {
-  username: "cloudspokes",
-  password: "239f45c2eu4d709m3c56684e827508d6"
+  username: process.env.PAPERTRAIL_DIST_USERNAME,
+  password: process.env.PAPERTRAIL_DIST_PASSWORD
 };
 
 //////////////
@@ -144,9 +144,9 @@ configData.papertrail = {
 //////////////
 
 configData.rabbitmq = {
-  rxUrl: "amqp://KsFd5NW4:EXKgmHYcw3OLzaMJybkFbsRqNJgmJ6N-@swift-thunder-5.bigwig.lshift.net:10079/LsQARvoFyPd1",
-  txUrl: "amqp://KsFd5NW4:EXKgmHYcw3OLzaMJybkFbsRqNJgmJ6N-@swift-thunder-5.bigwig.lshift.net:10078/LsQARvoFyPd1",
-  url: "amqp://KsFd5NW4:EXKgmHYcw3OLzaMJybkFbsRqNJgmJ6N-@swift-thunder-5.bigwig.lshift.net:10078/LsQARvoFyPd1"
+  rxUrl: process.env.RABBITMQ_RX_URL,
+  txUrl: process.env.RABBITMQ_TX_URL,
+  url: process.env.RABBITMQ_URL
 };
 
 //////////////////////////////////

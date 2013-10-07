@@ -135,7 +135,7 @@ exports.accountsCreate = {
     };
 
     // Create Papertrail account
-    request.post({ url: "https://papertrailapp.com/api/v1/distributors/accounts", form: params, auth: api.configData.papertrail }, function (err, response, body) {
+    request.post({ url: process.env.PAPERTRAIL_DIST_URL + "/accounts", form: params, auth: api.configData.papertrail }, function (err, response, body) {
       if (err) {
         connection.rawConnection.responseHttpCode = 500;
         connection.error = err;
@@ -216,7 +216,7 @@ exports.accountsDelete = {
     // Delete account from database and Papertrail
     accountsCollection.findAndModify(selector, {}, {}, { remove: true }, function(err, doc) {
       if (!err && doc) {
-        request.del({ url: "https://papertrailapp.com/api/v1/distributors/accounts/" + doc.papertrailId, auth: api.configData.papertrail }, function (err, response, body) {
+        request.del({ url: process.env.PAPERTRAIL_DIST_URL + "/accounts/" + doc.papertrailId, auth: api.configData.papertrail }, function (err, response, body) {
           if (!err) {
             connection.rawConnection.responseHttpCode = 200;
             connection.response = {
