@@ -87,8 +87,8 @@ exports.jobsCreate = {
   name: "jobsCreate",
   description: "Creates a new job. Method: POST",
   inputs: {
-    required: [],
-    optional: ['status', 'email', 'platform', 'language', 'loggerId', 'userId', 'codeUrl', 'options', 'startTime', 'endTime'],
+    required: ['email', 'platform', 'language', 'userId', 'codeUrl'],
+    optional: ['loggerId', 'options'],
   },
   authenticated: false,
   outputExample: {},
@@ -118,6 +118,9 @@ exports.jobsCreate = {
         }
       }
     });
+
+    // always set the status as 'created'
+    jobDoc['status'] = 'created';
 
     // Insert document
     api.mongo.collections.jobs.insert(jobDoc, { w:1 }, function(err, result) {
