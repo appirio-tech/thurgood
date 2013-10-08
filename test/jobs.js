@@ -13,17 +13,17 @@ describe("POST /jobs", function () {
   it("should create a new job", function (done) {
     var params = {
       userId: 'jeff',
-      status: 'pending',
       platform: 'Heroku',
       language: 'Java',
-      loggerId: '525043aa130cd46f0b000001'
+      loggerId: '525043aa130cd46f0b000001',
+      email: 'jeff@cs.com',
+      codeUrl: 'https://www.example.com/src.zip'
     };
 
     request.post({ url: setup.testUrl + "/jobs", form: params }, function (err, response, body) {
       body = JSON.parse(body);
       assert.ok(body.success);
       assert.ok(body.data[0].userId == params.userId);
-      assert.ok(body.data[0].status == params.status);
       testingJobId = body.data[0]._id;
       done();
     });

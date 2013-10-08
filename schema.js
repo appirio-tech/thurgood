@@ -1,11 +1,25 @@
 /**
+ * Use the schema to set a field's type. This will be used for parameter parsing
+ *  - [] or {}          = json
+ *  - new ObjectID()    = MongoDB object id
+ *  - null              = any primitive type
+ *  - any other value   = this is the default value that the field will have for newly created
+ *                        documents unless it is overwritten by a parameter (will be sent as-is)
+ *                        
+ * Exceptions: _id, createdAt and updatedAt will be overwritten
+ * when the document is created so their values here don't matter
+ */
+
+var ObjectID = require('mongodb').ObjectID;
+
+/**
  * Schema document for the servers collection
  * @type {Object}
  */
 exports.server = {
   _id: null,
   createdAt: null,
-  installedServices: null,
+  installedServices: [],
   instanceUrl: null,
   jobId: null,
   languages: [],
@@ -30,13 +44,13 @@ exports.job = {
   email: null,
   endTime: null,
   language: null,
-  options: null,
-  loggerId: null,
+  options: [],
+  loggerId: new ObjectID(),
   platform: null,
   startTime: null,
   updatedAt: null,
   userId: null,
-  status: null
+  status: 'created'
 };
 
 /**
@@ -74,7 +88,6 @@ exports.loggerSystem = {
   createdAt: null,
   loggerAccountId: null,
   name: null,
-  papertrailAccountId: null,
   papertrailId: null,
   syslogHostname: null,
   syslogPort: null,

@@ -1,52 +1,15 @@
-/* ---------------------
-routes.js 
-
-For web clients (http and https) you can define an optional RESTful mapping to help route requests to actions.
-If the client doesn't specify and action in a param, and the base route isn't a named action, the action will attempt to be discerned from this routes.js file.
-
-- routes remain optional
-- actions defiend in params directly `action=theAction` or hitting the named URL for an action `/api/theAction` will always override RESTful routing 
-- you can mix explicitly defined params with route-defined params.  If there is an overlap, the route-defined params win
-  - IE: /api/user/123?userId=456 => `connection.userId = 123`
-  - this is a change from previous versions
-- routes defined with the "all" method will be duplicated to "get", "put", "post", and "delete"
-- use ":variable" to defined "variable"
-- undefined ":variable" will match
-  - IE: "/api/user/" WILL match "/api/user/:userId"
-- routes are matched as defined here top-down
-- you can optionally define a regex match along with your route variable
-  - IE: { path:"/game/:id(^[a-z]{0,10}$)", action: "gamehandler" }
-  - be sure to double-escape when needed: { path: "/login/:userID(^\\d{3}$)", action: "login" }
-
-example:
-
-{
-  get: [
-    { path: "/users", action: "usersList" }, // (GET) /api/users
-    { path: "/search/:term/limit/:limit/offset/:offset", action: "search" }, // (GET) /api/search/car/limit/10/offset/100
-  ],
-
-  post: [
-    { path: "/login/:userID(^\\d{3}$)", action: "login" } // (POST) /api/login/123
-  ],
-
-  all: [
-    { path: "/user/:userID", action: "user" } // (*) / /api/user/123
-  ]
-}
-
----------------------- */
-
-////////////
-// ROUTES //
-////////////
 
 exports.routes = {
   get: [
     { path: "/:apiVersion/servers/:id", action: "serversFetch" },
     { path: "/:apiVersion/servers", action: "serversFetch" },
+
     { path: "/:apiVersion/accounts/:id", action: "accountsFetch" },
     { path: "/:apiVersion/accounts", action: "accountsFetch" },
+
+    { path: "/:apiVersion/loggers/:id", action: "loggersFetch" },
+    { path: "/:apiVersion/loggers", action: "loggersFetch" },
+
     { path: "/:apiVersion/jobs/:id", action: "jobsFetch" },
     { path: "/:apiVersion/jobs", action: "jobsFetch" }
   ],
@@ -54,17 +17,22 @@ exports.routes = {
   post: [
     { path: "/:apiVersion/servers", action: "serversCreate" },
     { path: "/:apiVersion/accounts", action: "accountsCreate" },
+    { path: "/:apiVersion/loggers", action: "loggersCreate" },
+    
     { path: "/:apiVersion/jobs/:id/message", action: "jobsMessage" },
     { path: "/:apiVersion/jobs", action: "jobsCreate" }
   ],
 
   put: [
     { path: "/:apiVersion/servers/:id", action: "serversUpdate" },
+    { path: "/:apiVersion/loggers/:id", action: "loggersUpdate" },
+    
     { path: "/:apiVersion/jobs/:id/submit", action: "jobsSubmit" },
     { path: "/:apiVersion/jobs/:id", action: "jobsUpdate" }
   ],
 
   delete: [
-    { path: "/:apiVersion/accounts/:id", action: "accountsDelete" }
+    { path: "/:apiVersion/accounts/:id", action: "accountsDelete" },
+    { path: "/:apiVersion/loggers/:id", action: "loggersDelete" }
   ]
 };
