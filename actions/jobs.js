@@ -23,6 +23,66 @@ exports.action = {
 };
 
 /**
+ * GET /jobs/:id/complete
+ */
+exports.jobsComplete = {
+  name: "jobsComplete",
+  description: "Sets a job's status as completed. Method: GET",
+  inputs: {
+    required: ['id'],
+    optional: [],
+  },
+  authenticated: false,
+  outputExample: {},
+  version: 1.0,
+  run: function(api, connection, next) {
+    var selector;
+
+    // Validate id and build selector
+    try {
+      selector = { _id: new ObjectID(connection.params.id) };
+    } catch(err) {
+      api.response.error(connection, "Id is not a valid ObjectID", undefined, 400);
+      return next(connection, true);
+    }
+
+    var newDoc = {
+      status: 'complete',
+      endTime: new Date().getTime(),
+      updatedAt: new Date().getTime()
+    };
+
+    // Modify document
+    api.mongo.collections.jobs.findAndModify(selector, {}, { $set: newDoc }, { new: true, w:1 }, function(err, job) {
+      if (!err && job) {
+        var newDoc = {
+          jobId: null,
+          status: 'available',
+          updatedAt: new Date().getTime()
+        };
+
+        // Find server and release it
+        api.mongo.collections.servers.findAndModify({ jobId: job._id }, {}, { $set: newDoc }, { new: true, w:1 }, function(err, server) {
+          if (!err) {
+            api.response.success(connection, "Job updated and server released");
+          } else {
+            api.response.error(connection, err);
+          }
+
+          next(connection, true);
+        });
+      } else if (!job) {
+        api.response.error(connection, "Job not found");
+        next(connection, true);
+      } else {
+        api.response.error(connection, err);
+        next(connection, true);
+      }
+    });
+  }
+};
+
+/**
  * POST /jobs
  */
 exports.jobsCreate = {

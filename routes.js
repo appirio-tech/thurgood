@@ -10,6 +10,7 @@ exports.routes = {
     { path: "/:apiVersion/loggers/:id", action: "loggersFetch" },
     { path: "/:apiVersion/loggers", action: "loggersFetch" },
 
+    { path: "/:apiVersion/jobs/:id/complete", action: "jobsComplete" },
     { path: "/:apiVersion/jobs/:id", action: "jobsFetch" },
     { path: "/:apiVersion/jobs", action: "jobsFetch" }
   ],

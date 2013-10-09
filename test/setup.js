@@ -2,7 +2,7 @@ var configData = require('../config').configData;
 var actionHeroPrototype = require('actionHero').actionHeroPrototype;
 
 // Silence logging
-//configData.logger.transports = [];
+configData.logger.transports = [];
 
 module.exports = {
   testUrl: "http://localhost:" + configData.servers.web.port + "/api/1",

@@ -210,6 +210,20 @@ describe("PUT /jobs/:id/submit", function () {
   });
 });
 
+describe("GET /jobs/:id/complete", function () {
+  before(function (done) {
+    setup.init(done);
+  });
+
+  it("should mark job as complete and release server", function (done) {
+    request.get(setup.testUrl + "/jobs/" + testingJobId + "/complete", function (err, response, body) {
+      body = JSON.parse(body);
+      assert.ok(body.success);
+      done();
+    });
+  });
+});
+
 describe("PUT /jobs/:id", function () {
   before(function (done) {
     setup.init(done);
