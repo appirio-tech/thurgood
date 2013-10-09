@@ -23,6 +23,16 @@ exports.response = function (api, next) {
   };
 
   /**
+   * Return an error response with status code 400 Bad Request
+   * @param  {[type]} connection [description]
+   * @param  {[type]} err        Error string or object
+   * @return {[type]}            [description]
+   */
+  api.response.badRequest = function(connection, err) {
+    api.response.error(connection, err, undefined, 400);
+  };
+
+  /**
    * Return a success response
    * @param  {[type]} connection [description]
    * @param  {[type]} message    Success message

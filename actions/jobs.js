@@ -42,7 +42,7 @@ exports.jobsComplete = {
     try {
       selector = { _id: new ObjectID(connection.params.id) };
     } catch(err) {
-      api.response.error(connection, "Id is not a valid ObjectID", undefined, 400);
+      api.response.badRequest(connection, "Id is not a valid ObjectID");
       return next(connection, true);
     }
 
@@ -120,7 +120,7 @@ exports.jobsMessage = {
     try {
       selector = { _id: new ObjectID(connection.params.id) };
     } catch(err) {
-      api.response.error(connection, "Id is not a valid ObjectID", undefined, 400);
+      api.response.badRequest(connection, "Id is not a valid ObjectID");
       return next(connection, true);
     }
 
@@ -179,7 +179,7 @@ exports.jobsSubmit = {
     try {
       selector = { _id: new ObjectID(connection.params.id) };
     } catch(err) {
-      api.response.error(connection, "Id is not a valid ObjectID", undefined, 400);
+      api.response.badRequest(connection, "Id is not a valid ObjectID");
       return next(connection, true);
     }
 
