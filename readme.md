@@ -19,5 +19,5 @@ You should now be able to go to http:://localhost:3001 and see the welcome messa
 
 The Angular frontend should be available from http://localhost:3001.
 
-**Please see the [wiki](https://github.com/cloudspokes/thurgood/wiki) for complete documentation.**
+**Please see the [wiki](https://github.com/cloudspokes/thurgood/wiki) for complete documentation.** The documentation provides sample cURL statements for API calls with a Token that is passed in the header. At this time, the token is not being used so it can be safely be submitted.
 
