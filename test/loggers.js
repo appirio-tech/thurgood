@@ -3,25 +3,6 @@ var assert = require('assert');
 var request = require('request');
 var setup = require('./setup.js');
 var querystring = require("querystring");
-<<<<<<< HEAD
-var testingAccountId;
-
-describe("POST /loggers", function () {
-  before(function (done) {
-     setup.init(done);
-  });
-
-  it("creates a new logger", function (done) {
-    var params = {
-      name: 'jeff',
-      loggerAccountId: '14',
-      papertrailAccountId: "cs-dev-chang1"
-    };
-
-    request.post({ url: setup.testUrl + "/loggers", form: params }, function (err, response, body) {
-      body = JSON.parse(body);
-      assert.ok(body.success);
-=======
 
 var testingLoggerId, testingAccount;
 
@@ -66,35 +47,10 @@ describe("GET /loggers", function () {
       body = JSON.parse(body);
       assert.ok(body.success);
       assert.ok(body.data.length >= 0);
->>>>>>> ac21d324ef4da79799e5c329f71c2ecf89b0d85c
       done();
     });
   });
 
-<<<<<<< HEAD
-  it("deletes logger", function (done) {
-    var params = {
-      name: 'jeff',
-      loggerAccountId: '14',
-      papertrailAccountId: "cs-dev-chang1"
-    };
-    // creates first
-    request.post({ url: setup.testUrl + "/loggers", form: params }, function (err, response, body) {
-      var data = JSON.parse(body);
-      var papertrailId = data.data.papertrailId;
-      // then deletes
-      request.del({ url: setup.testUrl + "/loggers/" + papertrailId }, function (err, response, body) {
-        body = JSON.parse(body);
-        assert.ok(body.success);
-        done();
-      });
-    });
-
-  });
-
-});
-
-=======
   it("should return loggers by query", function (done) {
     request.get(setup.testUrl + "/loggers?limit=2&q={\"name\":\"jeff3l\"}", function (err, response, body) {
       body = JSON.parse(body);
@@ -250,4 +206,3 @@ describe("DELETE /loggers/:id", function () {
     });
   });
 });
->>>>>>> ac21d324ef4da79799e5c329f71c2ecf89b0d85c
