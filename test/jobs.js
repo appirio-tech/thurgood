@@ -13,17 +13,17 @@ describe("POST /jobs", function () {
   it("should create a new job", function (done) {
     var params = {
       userId: 'jeff',
-      status: 'pending',
       platform: 'Heroku',
       language: 'Java',
-      loggerId: '525043aa130cd46f0b000001'
+      loggerId: '525043aa130cd46f0b000001',
+      email: 'jeff@cs.com',
+      codeUrl: 'https://www.example.com/src.zip'
     };
 
     request.post({ url: setup.testUrl + "/jobs", form: params }, function (err, response, body) {
       body = JSON.parse(body);
       assert.ok(body.success);
       assert.ok(body.data[0].userId == params.userId);
-      assert.ok(body.data[0].status == params.status);
       testingJobId = body.data[0]._id;
       done();
     });
@@ -203,6 +203,20 @@ describe("PUT /jobs/:id/submit", function () {
 
   it("should submit job", function (done) {
     request.put({ url: setup.testUrl + "/jobs/" + testingJobId + "/submit" }, function (err, response, body) {
+      body = JSON.parse(body);
+      assert.ok(body.success);
+      done();
+    });
+  });
+});
+
+describe("GET /jobs/:id/complete", function () {
+  before(function (done) {
+    setup.init(done);
+  });
+
+  it("should mark job as complete and release server", function (done) {
+    request.get(setup.testUrl + "/jobs/" + testingJobId + "/complete", function (err, response, body) {
       body = JSON.parse(body);
       assert.ok(body.success);
       done();

@@ -1,7 +1,3 @@
-////////////
-// ROUTES //
-////////////
-
 exports.routes = {
   get: [
     { path: "/:apiVersion/servers/:id", action: "serversFetch" },
@@ -9,6 +5,8 @@ exports.routes = {
     { path: "/:apiVersion/accounts/:id", action: "accountsFetch" },
     { path: "/:apiVersion/accounts", action: "accountsFetch" },
     { path: "/:apiVersion/loggers/:id", action: "loggersFetch" },
+    { path: "/:apiVersion/loggers", action: "loggersFetch" },
+    { path: "/:apiVersion/jobs/:id/complete", action: "jobsComplete" },
     { path: "/:apiVersion/jobs/:id", action: "jobsFetch" },
     { path: "/:apiVersion/jobs", action: "jobsFetch" }
   ],
@@ -23,6 +21,7 @@ exports.routes = {
 
   put: [
     { path: "/:apiVersion/servers/:id", action: "serversUpdate" },
+    { path: "/:apiVersion/loggers/:id", action: "loggersUpdate" },
     { path: "/:apiVersion/jobs/:id/submit", action: "jobsSubmit" },
     { path: "/:apiVersion/jobs/:id", action: "jobsUpdate" }
   ],

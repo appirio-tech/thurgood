@@ -135,8 +135,12 @@ configData.mongo = {
 ////////////////
 
 configData.papertrail = {
-  username: process.env.PAPERTRAIL_DIST_USERNAME,
-  password: process.env.PAPERTRAIL_DIST_PASSWORD
+  accountsUrl: process.env.PAPERTRAIL_DIST_URL + "/accounts",
+  systemsUrl: process.env.PAPERTRAIL_DIST_URL + "/systems",
+  auth: {
+    username: process.env.PAPERTRAIL_DIST_USERNAME,
+    password: process.env.PAPERTRAIL_DIST_PASSWORD
+  }
 };
 
 //////////////
@@ -144,9 +148,10 @@ configData.papertrail = {
 //////////////
 
 configData.rabbitmq = {
-  rxUrl: process.env.RABBITMQ_RX_URL,
   txUrl: process.env.RABBITMQ_TX_URL,
-  url: process.env.RABBITMQ_URL
+  rxUrl: process.env.RABBITMQ_RX_URL,
+  url: process.env.RABBITMQ_URL,
+  queue: "thurgood-dev-queue"
 };
 
 //////////////////////////////////

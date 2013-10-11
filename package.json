@@ -19,6 +19,7 @@
     "q": "latest",
     "amqp": "~0.1.7",
     "glossy": "~0.1.5",
+    "q": "~0.9.7",
     "underscore": "~1.5.2"
   },
   "devDependencies": {
