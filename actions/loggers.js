@@ -28,8 +28,8 @@ exports.loggersCreate = {
   name: "loggersCreate",
   description: "Creates a new logger. Method: POST",
   inputs: {
-    required: ['name', 'loggerAccountId', 'papertrailId'],
-    optional: [],
+    required: ['name', 'loggerAccountId'],
+    optional: ['papertrailId'],
   },
   authenticated: false,
   outputExample: {},
