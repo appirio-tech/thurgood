@@ -1,0 +1,66 @@
+<h2>Jobs list</h2>
+
+<div ng-show="loading">Loading . . .</div>
+
+<alert ng-show="errorMsg" type="'error'" close="errorMsg=null">{{errorMsg}}</alert>
+
+<div  ng-hide="loading">
+	<pagination total-items="(jobs|filter:searchText).length" items-per-page="pageSize" page="currentPage" max-size="3" class="pagination-small" boundary-links="true" rotate="false"></pagination>
+
+	<table style="width:100%">
+		<tr>
+			<td>
+				Show <select ng-model="pageSize" 
+						ng-options="value for value in numberOfRecordsOptions"></select> entries
+			</td>
+			<td style="text-align:right">
+				Search <input ng-model="searchText" type="text" placeholder="Search jobs..."/>
+			</td>
+		</tr>
+	</table>
+	<table class="table table-hover" style="width:100%">
+		<thead>
+			<tr>
+				<th>
+					<a style="cursor:pointer;" ng-click="setOrderBy('_id')">Job ID</a>
+					<i class="icon-chevron-down" ng-show="sortOrder=='-_id'"></i> 
+					<i class="icon-chevron-up" 	 ng-show="sortOrder=='_id'"></i> 
+				</th>
+				<th>
+					<a style="cursor:pointer;" ng-click="setOrderBy('platform')">Platform</a>
+					<i class="icon-chevron-down" ng-show="sortOrder=='-platform'"></i> 
+					<i class="icon-chevron-up" 	 ng-show="sortOrder=='platform'"></i>
+				</th>
+				<th>
+					<a style="cursor:pointer;" ng-click="setOrderBy('language')">Language</a>
+					<i class="icon-chevron-down" ng-show="sortOrder=='-language'"></i> 
+					<i class="icon-chevron-up" 	 ng-show="sortOrder=='language'"></i>
+				</th>
+				<th>
+					<a style="cursor:pointer;" ng-click="setOrderBy('status')">Status</a>
+					<i class="icon-chevron-down" ng-show="sortOrder=='-status'"></i> 
+					<i class="icon-chevron-up" 	 ng-show="sortOrder=='status'"></i>
+				</th>
+				<th>
+					<a style="cursor:pointer;" ng-click="setOrderBy('updatedAt')">Last Modified</a>
+					<i class="icon-chevron-down" ng-show="sortOrder=='-updatedAt'"></i> 
+					<i class="icon-chevron-up" 	 ng-show="sortOrder=='updatedAt'"></i>
+				</th>
+				<th>Action</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="job in jobs| filter:searchText  |orderBy: sortOrder |startFrom: ((currentPage-1)*pageSize) |limitTo: pageSize ">
+				<td> <a href="#/job/{{job._id}}">{{job._id}}</a> </td>
+				<td>{{job.platform}}</td>
+				<td>{{job.language}}</td>
+				<td>{{job.status}}</td>
+				<td>{{job.updatedAt|date:'MM/dd/yyyy @ h:mm:ssa'}}</td>
+				<td> <button type="button" class="btn btn-info" ng-click="submitJob()">Re-Submit</button> </td>
+			</tr>
+		</tbody>
+	</table>
+
+	<!-- pagination -->
+	<pagination total-items="(jobs|filter:searchText).length" items-per-page="pageSize" page="currentPage" max-size="3" class="pagination-small" boundary-links="true" rotate="false"></pagination>
+</div>

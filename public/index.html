@@ -1,3 +1,62 @@
-<h1>Welcome to Thurgood</h1>
-<p>Time to get to work.</p>
-  
+<!DOCTYPE html>
+<html ng-app="thurgoodApp">
+	<head>
+		<meta charset="utf-8">
+	    <title>Thurgood console admin</title>
+	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	    <meta name="description" content="">
+	    <meta name="author" content="">
+
+		<!-- Bootstrap Css -->
+
+		<link href="/css/bootstrap.css" rel="stylesheet"></link>
+		<!--
+		<link href="/css/bootstrap-responsive.css" rel="stylesheet"></link>
+		-->
+		<!-- custom css -->
+		<link href="/css/body.css" rel="stylesheet"></link>
+		<!-- Angular JS -->
+		<script src="/js/angular.min.js" language="javascript"></script>
+		<!-- Angular UI with Bootstrap -->
+		<script src="/js/ui-bootstrap-tpls-0.6.0.js" language="javascript"></script>
+
+		<!-- main app -->
+		<script src="/js/app.js" language="javascript"></script>
+		<script src="/js/services.js" language="javascript"></script>
+		<script src="/js/controllers.js" language="javascript"></script>
+	</head>
+	<body ng-controller="GlobalCtrl">
+		
+		<div class="container">
+
+			<!-- menu -->
+			<div class="masthead">
+				<h3 class="muted">Thurgood console admin</h3>
+				<div class="navbar">
+					<div class="navbar-inner">
+						<div class="container">
+							<ul class="nav">
+								<li class="active"><a href="#/">Home</a></li>
+								<li class="active"><a href="#/jobs">Jobs</a></li>
+							</ul>
+						</div>
+					</div>
+				</div><!-- /.navbar -->
+			</div>
+
+
+			<div ng-view></div>
+
+			<hr/>
+
+			<div class="footer">
+				<p>&copy; Cloudspokes 2013</p>
+			</div>
+
+		</div> <!-- /container -->
+
+   
+
+	</body>
+</html>
+ 
