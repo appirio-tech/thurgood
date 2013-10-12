@@ -72,7 +72,7 @@ exports.loggersCreate = {
       var logger = api.mongo.schema.new(api.mongo.schema.loggerSystem);
       logger.name = connection.params.name;
       logger.loggerAccountId = connection.params.loggerAccountId;
-      logger.papertrailId = connection.params.papertrailId;
+      logger.papertrailId = connection.params.papertrailId || new String(logger._id);
       return logger;
     }
 
