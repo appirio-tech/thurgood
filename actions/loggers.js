@@ -1,6 +1,7 @@
 var ObjectID = require('mongodb').ObjectID;
 var Q = require("q");
 var papertrail = require("../lib/papertrail");
+var crypto = require('crypto');
 
 /**
  * GET /loggers
@@ -44,16 +45,24 @@ exports.loggersCreate = {
       return next(connection, true);
     }
 
-    // Check if the logger of loggerAccountId exists and respond with it, or create a new one
-    collection.findOne({ loggerAccountId: connection.params.loggerAccountId }, function(err, doc) {
-      if (!err && doc) {
-        return respondOk(doc);
-      } else if (!doc) {
+    // first check if the logger of papertrailId exists
+    // if exists, respond with it.
+    // if not exists, create one.
+    if(connection.params.papertrailId) {
+      var selector = { papertrailId: connection.params.papertrailId };
+      collection.findOne(selector, function(err, doc) {
+        if (doc) {
+          console.log("[LoggerCreate] logger exists, respond with it");
+          return respondOk(doc);
+        }
+
         createLogger();
-      } else {
-        respondError(err);
-      }
-    });
+      });      
+    }
+    else {
+      createLogger();
+    }
+
 
     // Create a logger 
     // 1. create logger on papertrail
@@ -72,7 +81,7 @@ exports.loggersCreate = {
       var logger = api.mongo.schema.new(api.mongo.schema.loggerSystem);
       logger.name = connection.params.name;
       logger.loggerAccountId = connection.params.loggerAccountId;
-      logger.papertrailId = connection.params.papertrailId || new String(logger._id);
+      logger.papertrailId = connection.params.papertrailId || crypto.randomBytes(16).toString('hex');
       return logger;
     }
 
