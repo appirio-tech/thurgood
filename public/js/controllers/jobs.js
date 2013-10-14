@@ -1,7 +1,6 @@
 'use strict';
 
-angular.module('thurgoodApp.controllers', [])
-  .controller('JobsCtrl', function($scope, $http, $filter, ngTableParams) {
+ctrlModule.controller('JobsCtrl', function($scope, $http, $filter, ngTableParams) {
     var data = [];          // holding whole jobs data
     var filteredData = [];  // holding filtered jobs data
 
