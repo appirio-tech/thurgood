@@ -1,0 +1,61 @@
+<h1>Jobs</h1>
+
+<!-- Count per page -->
+<div class="btn-group">
+    <button type="button"
+        ng-class="{'active':tableParams.count() == 10}"
+        ng-click="changeCount(10)" class="btn btn-default btn-small">10</button>
+    <button type="button"
+        ng-class="{'active':tableParams.count() == 25}"
+        ng-click="changeCount(25)" class="btn btn-default btn-small">25</button>
+    <button type="button"
+        ng-class="{'active':tableParams.count() == 50}"
+        ng-click="changeCount(50)" class="btn btn-default btn-small">50</button>
+    <button type="button"
+        ng-class="{'active':tableParams.count() == 100}"
+        ng-click="changeCount(100)" class="btn btn-default btn-small">100</button>
+</div>
+
+
+<div class="pull-right">
+  <div class="input-prepend">
+  <span class="add-on"><i class="icon-search"></i></span>
+  <input class="input-medium" type="text" placeholder="Search" ng-model="query" ng-enter="search()">
+  </div>
+</div> 
+
+<div loading-container="loading">
+  <table class="table table-hover table-striped table-bordered" ng-table="tableParams" template-pagination="custom/pager">
+    <tr ng-repeat="job in jobs">
+     <td data-title="'Job ID'">{{job._id}}</td>
+     <td data-title="'Platform'" sortable="platform">{{job.platform}}</td>
+     <td data-title="'Language'" sortable="language">{{job.language}}</td>
+     <td data-title="'Status'" sortable="status">{{job.status}}</td>
+     <td data-title="'Last Modified'" sortable="updatedAt">{{job.updatedAt | date:'yyyy-MM-ddTHH:mm:ss'}}</td>
+     <td data-title="'Action'">
+      <button class="btn btn-info" ng-click="resubmit(job)">Re-Submit</button>
+     </td>
+    </tr>
+  </table>
+</div>
+<br/>
+<br/>
+
+<!-- Custom template -->
+<script type="text/ng-template" id="custom/pager">
+<div class="clearfix">
+  <p class="pull-left">
+    <strong>Showing {{currentStart()}} to {{currentEnd()}} of {{filteredCount()}} entries(filtered from {{totalCount()}} entries)</strong>
+  </p>
+  <ul class="pager ng-cloak pull-right" style="width: 170px;margin:0">
+    <li ng-repeat="page in pages"
+         ng-class="{'disabled': !page.active, 'previous': page.type == 'prev', 'next': page.type == 'next'}"
+         ng-show="page.type == 'prev' || page.type == 'next'" ng-switch="page.type">
+     
+        <a ng-switch-when="prev" ng-click="goToPage(page.number)" href="">« Previous</a>
+     
+        <a ng-switch-when="next" ng-click="goToPage(page.number)" href="">Next »</a>
+    </li>
+  </ul>
+</div>
+</script>

@@ -1,0 +1,33 @@
+.app-view {
+  margin-top: 50px;
+}
+
+/* TODO : 
+    ng-table header renders two div, while demo shows only one div, 
+    So you will see the two sorting arrows without the below patch.
+    cannot figure out why...
+    walk around : hide one.
+*/
+.ng-table th.sortable div[ng-if='template'] {
+  display: none;
+}
+
+
+/* loading container */
+.loading-container {
+    position: relative;
+}
+.loading-container .loading:before, .loading-container .loading:after {
+    content: " ";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    min-height: 50px;
+    min-width: 50px;
+}
+.loading-container .loading:before {
+    background-color: white;
+    opacity: 0.5;
+}
