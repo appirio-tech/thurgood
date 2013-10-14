@@ -1,0 +1,61 @@
+<h2>Job Detail</h2>
+
+<div ng-show="loading">Loading . . .</div>
+
+<alert ng-show="errorMsg" type="'error'" close="errorMsg=null">{{errorMsg}}</alert>
+
+<table class="table-hover" ng-hide="loading && job" style="width:80%">
+	<tr>
+		<td class="field-name">Job ID:</td>
+		<td class="field-value">{{job._id}}</td>
+	</tr>
+	<tr>
+		<td class="field-name">Code URL:</td>
+		<td class="field-value">{{job.codeUrl}}</td>
+	</tr>
+	<tr>
+		<td class="field-name">Created:</td>
+		<td class="field-value">{{job.createdAt|date:'MM/dd/yyyy h:mm:ssa'}}</td>
+	</tr>
+	<tr>
+		<td class="field-name">Email:</td>
+		<td class="field-value">{{job.email}}</td>
+	</tr>
+	<tr>
+		<td class="field-name">End Time:</td>
+		<td class="field-value">{{job.endTime|date:'MM/dd/yyyy h:mm:ssa'}}</td>
+	</tr>
+	<tr>
+		<td class="field-name">Language:</td>
+		<td class="field-value">{{job.language}}</td>
+	</tr>
+	<tr>
+		<td class="field-name">Logger ID:</td>
+		<td class="field-value">{{job.loggerId}}</td>
+	</tr>
+	<tr>
+		<td class="field-name">Options:</td>
+		<td class="field-value">{{job.options}}</td>
+	</tr>
+
+	<tr>
+		<td class="field-name">Platform:</td>
+		<td class="field-value">{{job.platform}}</td>
+	</tr>
+	<tr>
+		<td class="field-name">Start time:</td>
+		<td class="field-value">{{job.startTime|date:'MM/dd/yyyy h:mm:ssa'}}</td>
+	</tr>
+	<tr>
+		<td class="field-name">Status:</td>
+		<td class="field-value">{{job.status}}</td>
+	</tr>
+	<tr>
+		<td class="field-name">Modified:</td>
+		<td class="field-value">{{job.updatedAt|date:'MM/dd/yyyy h:mm:ssa'}}</td>
+	</tr>
+	<tr>
+		<td class="field-name">User ID:</td>
+		<td class="field-value">{{job.userId}}</td>
+	</tr>
+</table>
