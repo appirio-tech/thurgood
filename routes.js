@@ -16,6 +16,7 @@ exports.routes = {
     { path: "/:apiVersion/accounts", action: "accountsCreate" },
     { path: "/:apiVersion/loggers", action: "loggersCreate" },
     { path: "/:apiVersion/jobs/:id/message", action: "jobsMessage" },
+    { path: "/:apiVersion/jobs/:id/publish", action: "jobsPublish" }, 
     { path: "/:apiVersion/jobs", action: "jobsCreate" }
   ],
 

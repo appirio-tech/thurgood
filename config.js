@@ -23,7 +23,7 @@ configData.general = {
   defaultLimit: 100,                                              // defaultLimit & defaultOffset are useful for limiting the length of response lists. 
   defaultOffset: 0,
   workers : 5,                                                    // The number of internal "workers" (timers) this node will have.
-  developmentMode: false,                                         // watch for changes in actions and tasks, and reload/restart them on the fly
+  developmentMode: true,                                         // watch for changes in actions and tasks, and reload/restart them on the fly
   pidFileDirectory: process.cwd() + "/pids/",                     // the location of the directory to keep pidfiles
   simultaneousActions: 5                                          // how many pending actions can a single connection be working on 
 };
@@ -148,10 +148,8 @@ configData.papertrail = {
 //////////////
 
 configData.rabbitmq = {
-  txUrl: process.env.RABBITMQ_TX_URL,
-  rxUrl: process.env.RABBITMQ_RX_URL,
   url: process.env.RABBITMQ_URL,
-  queue: "thurgood-dev-queue"
+  queue: process.env.RABBITMQ_QUEUE
 };
 
 //////////////////////////////////
