@@ -1,0 +1,18 @@
+<div class="row-fluid">
+    <div class="span12">
+        <h4>Jobs in Your Account are</h4>
+        <div class="row-fluid">
+            <div class="span6">
+                <form >
+
+                    <div class="input-append">
+                         <input class="span10" type="text" placeholder="Search..." ng-model="filterOptions.filterText">
+                         <button class="btn" type="button" ng-click="getPagedData()" title="Find"><i class="icon-search"></i></button>
+                         <button class="btn" type="button" ng-click="clearFilter()" title="Reset filter and page"><i class="icon-remove"></i></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="gridStyle " ng-grid="gridOptions"></div>
+    </div>
+</div>
