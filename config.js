@@ -92,7 +92,7 @@ configData.servers = {
   "web" : {
     secure: false,                       // HTTP or HTTPS?
     serverOptions: {},                   // passed to https.createServer if secure=ture. Should contain SSL certificates
-    port: 3001,                          // Port or Socket
+    port: process.env.PORT || 3001,         // Port or Socket
     bindIP: "0.0.0.0",                   // which IP to listen on (use 0.0.0.0 for all)
     httpHeaders : {},                    // Any additional headers you want actionHero to respond with
     urlPathForActions : "api",           // route which actions will be served from; secondary route against this route will be treated as actions, IE: /api/?action=test == /api/test/
