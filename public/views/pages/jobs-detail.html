@@ -1,0 +1,78 @@
+<div class="page-header">
+  <button type="button" class="btn btn-primary pull-right" ng-show="job._id">Delete</button>
+  <button type="button" class="btn btn-primary pull-right" ng-show="job._id">Edit</button>
+  <a href="javascript:history.back()" class="back"><i class="icon-chevron-left"></i></a>
+  <h1>Jobs/{{jobId}}</h1>
+</div>
+
+<div class="alert alert-danger detail" ng-show="!loading && error">
+  <h2>{{error}}</h2>
+</div>
+<div class="well detail" ng-show="(loading && !error) || job._id">
+  <div class="loading" ng-show="loading && !error">
+    <h2>Loading...</h2>
+  </div>
+  <form class="form-horizontal" ng-show="job._id">
+    <fieldset>
+      <div class="form-group">
+        <span class="col-lg-2 control-label detail-key">Job ID</span>
+        <span class="col-lg-10 detail-value">{{job._id}}</span>
+      </div>
+      <div class="form-group">
+        <span class="col-lg-2 control-label detail-key">Platform</span>
+        <span class="col-lg-10 detail-value">{{job.platform}}</span>
+      </div>
+      <div class="form-group">
+        <span class="col-lg-2 control-label detail-key">Language</span>
+        <span class="col-lg-10 detail-value">{{job.language}}</span>
+      </div>
+      <div class="form-group">
+        <span class="col-lg-2 control-label detail-key">Status</span>
+        <span class="col-lg-10 detail-value">{{job.status}}</span>
+      </div>
+      <div class="form-group">
+        <span class="col-lg-2 control-label detail-key">Code URL</span>
+        <span class="col-lg-10 detail-value"><a href="{{job.codeUrl}}" ng-show="job.codeUrl && job.codeUrl != 'null'" target="_blank">{{job.codeUrl}}</a>{{!(job.codeUrl && job.codeUrl != 'null')?'null':''}}</span>
+      </div>
+      <div class="form-group">
+        <span class="col-lg-2 control-label detail-key">User ID</span>
+        <span class="col-lg-10 detail-value">{{job.userId}}</span>
+      </div>
+      <div class="form-group">
+        <span class="col-lg-2 control-label detail-key">User Email</span>
+        <span class="col-lg-10 detail-value">{{job.email}}</span>
+      </div>
+      <div class="form-group">
+        <span class="col-lg-2 control-label detail-key">Start Time</span>
+        <span class="col-lg-10 detail-value">{{job.startTime}}</span>
+      </div>
+      <div class="form-group">
+        <span class="col-lg-2 control-label detail-key">End Time</span>
+        <span class="col-lg-10 detail-value">{{job.endTime}}</span>
+      </div>
+      <div class="form-group">
+        <span class="col-lg-2 control-label detail-key">Created At</span>
+        <span class="col-lg-10 detail-value">{{job.createdAt}}</span>
+      </div>
+      <div class="form-group">
+        <span class="col-lg-2 control-label detail-key">Updated At</span>
+        <span class="col-lg-10 detail-value">{{job.updatedAt}}</span>
+      </div>
+      <div class="form-group">
+        <span class="col-lg-2 control-label detail-key">Logger ID</span>
+        <span class="col-lg-10 detail-value"><a href="#/loggers/{{job.loggerId}}" ng-show="job.loggerId && job.loggerId != 'null'" target="_blank">{{job.loggerId}}</a>{{!(job.loggerId && job.loggerId != 'null')?'null':''}}</span>
+      </div>
+      <div class="form-group">
+        <span class="col-lg-2 control-label detail-key">Options</span>
+        <span class="col-lg-10 detail-value">{{job.options}}</span>
+      </div>
+      <!-- For editing
+      <div class="form-group">
+        <div class="col-lg-10 col-lg-offset-2">
+          <button class="btn btn-default">Cancel</button> 
+          <button type="submit" class="btn btn-primary">Submit</button> 
+        </div>
+      </div> -->
+    </fieldset>
+  </form>
+</div>
