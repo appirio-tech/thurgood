@@ -20,12 +20,12 @@
     "amqp": "~0.1.7",
     "glossy": "~0.1.5",
     "q": "~0.9.7",
-    "underscore": "~1.5.2"
+    "underscore": "~1.5.2",
+    "request": "~2.27.0"
   },
   "devDependencies": {
     "mocha": "~1.13.0",
-    "assert": "~0.4.9",
-    "request": "~2.27.0"
+    "assert": "~0.4.9"
   },
   "scripts": {
     "start": "node ./node_modules/.bin/actionHero start",
