@@ -67,9 +67,9 @@ configData.logger.transports.push(function(api, winston){
 
 configData.redis = {
   fake: true,
-  host: "127.0.0.1",
-  port: 6379,
-  password: null,
+  host: process.env.REDIS_HOST || "127.0.0.1",
+  port: process.env.REDIS_PORT || 6379,
+  password: process.env.REDIS_PASSWORD || null,
   options: null,
   DB: 0,
 };
