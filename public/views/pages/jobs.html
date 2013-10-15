@@ -1,0 +1,41 @@
+<div class="page-header">
+  <button type="button" class="btn btn-primary pull-right">Create</button>
+  <input type="text" class="form-control pull-right search" ng-model="searchText" placeholder="Search">
+  <h1>Jobs{{totalItems >= 0 ? ' (' + totalItems + ')' : ''}}</h1>
+</div>
+
+<table ng-table="tableParams" template-pagination="ngTable/pagination" class="table table-striped table-bordered table-hover">
+  <tr ng-repeat="row in tableRows">
+    <td data-title="'Job ID'" sortable="_id"><a href="#/jobs/{{row._id}}">{{row._id}}</a></td>
+    <td data-title="'Platform'" sortable="platform">{{row.platform}}</td>
+    <td data-title="'Language'" sortable="language">{{row.language}}</td>
+    <td data-title="'Status'" sortable="status">{{row.status}}</td>
+    <td data-title="'Last Modified'" sortable="updatedAt">{{row.updatedAt}}</td>
+    <td data-title="'Action'"><button type="button" class="btn btn-info btn-xs">Re-Submit</button></td>
+  </tr>
+</table>
+
+<!-- Custom pagination template -->
+<script type="text/ng-template" id="ngTable/pagination">
+  <div class="well loading" ng-show="(loading || params.total === 0) && !error">
+    <h2>{{loading ? 'Loading...' : 'No jobs found.'}}</h2>
+  </div>
+  <div class="alert alert-danger" ng-show="!loading && error">
+    <h2>{{error}}</h2>
+  </div>
+  <ul class="pager ng-cloak" ng-show="params.total > 0">
+    <li ng-repeat="page in pages" ng-class="{'disabled': !page.active, 'previous': page.type == 'prev', 'next': page.type == 'next'}" ng-show="page.type == 'prev' || page.type == 'next'" ng-switch="page.type">
+      <a ng-switch-when="prev" ng-click="goToPage(page.number)" class="btn btn-primary btn-pagination">« Previous</a>
+      <a ng-switch-when="next" ng-click="goToPage(page.number)" class="btn btn-primary btn-pagination">Next »</a>
+    </li>
+    <li>
+      <!-- Count per page -->
+      <div class="btn-group">
+        <button type="button" ng-class="{'active':params.count == 10}" ng-click="changeCount(10)" class="btn btn-primary">10</button>
+        <button type="button" ng-class="{'active':params.count == 25}" ng-click="changeCount(25)" class="btn btn-primary">25</button>
+        <button type="button" ng-class="{'active':params.count == 50}" ng-click="changeCount(50)" class="btn btn-primary">50</button>
+        <button type="button" ng-class="{'active':params.count == 100}" ng-click="changeCount(100)" class="btn btn-primary">100</button>
+      </div>
+    </li>
+  </ul>
+</script>
