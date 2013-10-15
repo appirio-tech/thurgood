@@ -186,61 +186,52 @@ exports.jobsSubmit = {
     // Find document
     api.mongo.collections.jobs.findOne(selector, function(err, doc) {
       if (!err && doc) {
-        if (doc.status != "pending") {
-          api.response.success(connection, "Job already submitted", doc);
-          next(connection, true);
-        } else {
-          var serverSelector = {
-            languages: doc.language,
-            platform: doc.platform,
-            status: 'available'
-          };
+        // can submit a job no matter the current status
+        var serverSelector = {
+          languages: doc.language,
+          platform: doc.platform,
+          status: 'available'
+        };
 
-          var newDoc = {
-            jobId: doc._id,
-            status: 'reserved',
-            updatedAt: new Date().getTime()
-          };
+        var newDoc = {
+          jobId: doc._id,
+          status: 'reserved',
+          updatedAt: new Date().getTime()
+        };
 
-          // Find server and reserve it
-          api.mongo.collections.servers.findAndModify(serverSelector, {}, { $set: newDoc }, { new: true, w:1 }, function(err, server) {
-            if (!err && server) {
-              var rabbitMq = amqp.createConnection({ url: api.configData.rabbitmq.url });
-              var message = {
-                job_id: server.jobId,
-                type: doc.language
-              };
+        // Find server and reserve it
+        api.mongo.collections.servers.findAndModify(serverSelector, {}, { $set: newDoc }, { new: true, w:1 }, function(err, server) {
+          if (!err && server) {
+            var message = {
+              job_id: server.jobId,
+              type: doc.language
+            };
 
-              var newDoc = {
-                status: 'submitted',
-                updatedAt: new Date().getTime()
-              };
+            var newDoc = {
+              status: 'submitted',
+              updatedAt: new Date().getTime()
+            };
 
-              // Set job status to submitted
-              api.mongo.collections.jobs.update({ _id: doc._id }, { $set: newDoc }, { w:1 }, function(err, result) {
-                if (!err) {
-                  // Publish message
-                  rabbitMq.on('ready', function () {
-                    rabbitMq.publish(api.configData.rabbitmq.queue, message);
-                    rabbitMq.end();
-                  });
+            // Set job status to submitted
+            api.mongo.collections.jobs.update({ _id: doc._id }, { $set: newDoc }, { w:1 }, function(err, result) {
+              if (!err) {
+                // Publish message
+                api.configData.rabbitmq.connection.publish(api.configData.rabbitmq.queue, message);
+                api.response.success(connection, "Job has been successfully submitted");
+              } else {
+                api.response.error(connection, err);
+              }
 
-                  api.response.success(connection, "Job has been successfully submitted");
-                } else {
-                  api.response.error(connection, err);
-                }
-
-                next(connection, true);
-              });
-            } else if (!server) {
-              api.response.error(connection, "Could not find any available servers. Try again in a few minutes");
               next(connection, true);
-            } else {
-              api.response.error(connection, err);
-              next(connection, true);
-            }
-          });
-        }
+            });
+          } else if (!server) {
+            api.response.error(connection, "Could not find any available servers. Try again in a few minutes");
+            next(connection, true);
+          } else {
+            api.response.error(connection, err);
+            next(connection, true);
+          }
+        });
       } else if (!doc) {
         api.response.error(connection, "Job not found");
         next(connection, true);
@@ -267,5 +258,25 @@ exports.jobsUpdate = {
   version: 1.0,
   run: function(api, connection, next) {
     api.mongo.update(api, connection, next, api.mongo.collections.jobs, api.mongo.schema.job);
+  }
+};
+
+/**
+ * POST /jobs/:id/publish
+ */
+exports.jobsMessage = {
+  name: "jobsPublish",
+  description: "Publishes a message to the queue. Method: POST",
+  inputs: {
+    required: ['message'],
+    optional: [],
+  },
+  authenticated: false,
+  outputExample: {},
+  version: 1.0,
+  run: function(api, connection, next) {
+    api.configData.rabbitmq.connection.publish(api.configData.rabbitmq.queue, connection.params.message);  
+    api.response.success(connection, "Message successfully published.");
+    next(connection, true);
   }
 };
