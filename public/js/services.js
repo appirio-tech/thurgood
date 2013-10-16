@@ -25,7 +25,8 @@ thurgood.factory('Servers', ['$resource', function($resource) {
         query: {
             method: 'GET',
             params: {
-                fields: '{"name":1,"installedServices":1,"languages":1,"operatingSystem":1,"platform":1,"status";1}'
+                fields: '{"name":1,"installedServices":1,"languages":1,"operatingSystem":1,"platform":1,"status";1}',
+                limit: 10000
             }
         }
     });
