@@ -279,4 +279,68 @@ thurgood.controller('ServersCtrl', ['$scope', '$filter', '$location', 'Servers',
 
     return stringOutput;
   };
+
+  //Change the path to allow creation of server
+  $scope.createServer = function () {
+    $location.path('/server/create');
+  };
+}]);
+
+/**
+ * Controller for the Server Create / Edit page
+ */
+thurgood.controller('ServerCreateCtrl', ['$scope', '$timeout', '$http', 'Servers', function ($scope, $timeout, $http, Servers) {
+  'use strict';
+
+  $scope.newServerData = {
+    installedServices: [],
+    instanceUrl: "",
+    jobId: null,
+    languages: [],
+    name: "",
+    operatingSystem: null,
+    password: null,
+    platform: null,
+    repoName: null,
+    status: "available",
+    username: null
+  };
+
+  $scope.creationSuccess = false;
+
+  $scope.creationError = false;
+
+  $scope.newRecordId = null;
+
+  //Create the new server record
+  $scope.createServer = function () {
+    //Ensure mandatory fields are provided
+    if ($scope.newServerData.name === "") {
+      return;
+    }
+
+    var newRecord = JSON.parse(JSON.stringify($scope.newServerData));
+    newRecord.installedServices = JSON.stringify(newRecord.installedServices);
+    newRecord.languages = JSON.stringify(newRecord.languages);
+
+    var record = new Servers(newRecord);
+
+    record.$save(function (res) {
+      if (!res.success) {
+        $scope.creationError = true;
+
+        $timeout(function () {
+          $scope.creationError = false;
+        }, 3000);
+      } else {
+        $scope.creationSuccess = true;
+        $scope.newRecordId = res.data[0]._id;
+
+        $timeout(function () {
+          $scope.creationSuccess = false;
+          $scope.newRecordId = null;
+        }, 7000);
+      }
+    });
+  };
 }]);
