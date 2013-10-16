@@ -3,7 +3,6 @@
   <input type="text" class="form-control pull-right search" ng-model="searchText" placeholder="Search">
   <h1>Servers{{totalItems >= 0 ? ' (' + totalItems + ')' : ''}}</h1>
 </div>
-
 <table ng-table="tableParams" template-pagination="ngTable/pagination" class="table table-striped table-bordered table-hover">
   <tr ng-repeat="row in tableRows">
     <td data-title="'Server ID'" sortable="_id"><a href="#/servers/{{row._id}}">{{row._id}}</a></td>
@@ -13,7 +12,7 @@
     <td data-title="'Languages'" sortable="languages">{{row.languages.length > 0 ? row.languages.join(",") : ""}}</td>
     <td data-title="'Repo Name'" sortable="repoName">{{row.repoName}}</td>
     <td data-title="'Last Modified'" sortable="updatedAt">{{row.updatedAt}}</td>
-    <td data-title="'Action'"><a href="#/servers">New</a>|<a href="#/servers/{{row._id}}">Edit</a></td>
+    <td data-title="'Action'"><a href="#/servers/{{row._id}}">Edit</a></td>
   </tr>
 </table>
 
