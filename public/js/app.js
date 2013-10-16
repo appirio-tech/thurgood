@@ -33,5 +33,9 @@ angular
       controller: 'ServersCtrl',
       reloadOnSearch: false
     })
+    .when('/server/create', {
+      templateUrl: '/views/pages/server-create.html',
+      controller: 'ServerCreateCtrl'
+    })
     .otherwise({redirectTo: '/'});
 }]);
