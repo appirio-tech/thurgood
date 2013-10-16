@@ -1,0 +1,28 @@
+******************
+**Challenge 2970**
+******************
+    This challenge requires creation of new servers
+
+To create a new server, go to the server list page and click on the Create Server
+button next to the Search filter.
+
+*****************
+**Files Changed**
+*****************
+public/js/app.js
+    New route to create server added
+
+public/js/services.js
+    New action to create server added
+
+public/js/controllers.js
+    New controller for the creation of server added.
+    Also, new function to change the location to creation of server from listing the server added
+
+public/views/pages/server-create.html
+    New template for creation of server added
+
+public/views/pages/servers.html
+    Code to direct user to creation of server from server list page added
+
+@callmekatootie
