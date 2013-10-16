@@ -23,7 +23,7 @@ thurgood.controller('JobsCtrl', ['$scope', '$filter', '$location', 'Jobs', 'ngTa
   // Handle errors
   var errorHandler = function(err) {
     $scope.loading = false;
-    $scope.error = err.data.error || err.error || err.message || "Unknown error. Please contact developer.";
+    $scope.error = err.data.error || err.error || err.message || "Unknown error. Please contact support.";
   };
 
   // API request successful
@@ -126,7 +126,7 @@ thurgood.controller('JobsDetailCtrl', ['$scope', '$location', 'Jobs', function($
   // Handle errors
   var errorHandler = function(err) {
     $scope.loading = false;
-    $scope.error = err.data.error || err.error || err.message || "Unknown error. Please contact developer.";
+    $scope.error = err.data.error || err.error || err.message || "Unknown error. Please contact support.";
   };
 
   // API request successful
@@ -171,7 +171,7 @@ thurgood.controller('ServersCtrl', ['$scope', '$filter', '$location', 'Servers',
   // Handle errors
   var errorHandler = function(err) {
     $scope.loading = false;
-    $scope.error = err.data.error || err.error || err.message || "Unknown error. Please contact developer.";
+    $scope.error = err.data.error || err.error || err.message || "Unknown error. Please contact support.";
   };
 
   // API request successful
