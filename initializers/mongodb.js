@@ -152,8 +152,6 @@ function get(api, connection, next, collection) {
 function create(api, connection, next, collection, schema) {
   var doc = newSchema(schema);
 
-  console.log('params', connection.params, 'docSchema', doc);
-
   // Assign parameters
   _.each(doc, function(value, key) {
     // If schema field is found in params
@@ -184,9 +182,6 @@ function create(api, connection, next, collection, schema) {
       }
     }
   });
-
-  console.log('assigned params', doc);
-
   // Insert document
   collection.insert(doc, { w:1 }, function(err, result) {
     api.response.auto(connection, err, "Document created successfully", result, 201);
