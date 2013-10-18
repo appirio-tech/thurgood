@@ -90,7 +90,7 @@ exports.jobsCreate = {
   description: "Creates a new job. Method: POST",
   inputs: {
     required: ['email', 'platform', 'language', 'userId', 'codeUrl'],
-    optional: ['loggerId', 'options'],
+    optional: ['loggerId', 'logger', 'options'],
   },
   authenticated: false,
   outputExample: {},
