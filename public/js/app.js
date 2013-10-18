@@ -41,5 +41,9 @@ angular
       templateUrl: '/views/pages/server-create.html',
       controller: 'ServerCreateCtrl'
     })
+    .when('/server/:id', {
+      templateUrl: '/views/pages/server-maintain.html',
+      controller: 'ServerMaintainCtrl'
+    })
     .otherwise({redirectTo: '/'});
 }]);

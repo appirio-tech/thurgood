@@ -1,11 +1,11 @@
 <div class="page-header">
-  <button type="button" class="btn btn-primary pull-right" ng-click="createServer()">Create</button>
+  <a type="button" class="btn btn-primary pull-right" href="#/server/create">Create</a>
   <input type="text" class="form-control pull-right search" ng-model="searchText" placeholder="Search">
   <h1>Servers{{totalItems >= 0 ? ' (' + totalItems + ')' : ''}}</h1>
 </div>
 
 <table ng-table="tableParams" template-pagination="ngTable/pagination" class="table table-striped table-bordered table-hover">
-  <tr ng-repeat="row in tableRows">
+  <tr ng-repeat="row in tableRows" ng-click="displayServerDetails(row._id)" class="hand-cursor">
     <td data-title="'Name'" sortable="name">{{row.name}}</td>
     <td data-title="'Installed Services'" sortable="installedServices">{{getStringFromArray(row.installedServices)}}</td>
     <td data-title="'Languages'" sortable="languages">{{getStringFromArray(row.languages)}}</td>

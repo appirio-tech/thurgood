@@ -31,6 +31,12 @@ thurgood.factory('Servers', ['$resource', function ($resource) {
         },
         create: {
             method: 'POST'
+        },
+        update: {
+            method: 'PUT',
+            params: {
+                id: '@id'
+            }
         }
     });
 }]);

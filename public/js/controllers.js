@@ -298,12 +298,19 @@ thurgood.controller('ServersCtrl', ['$scope', '$filter', '$location', 'Servers',
   $scope.createServer = function () {
     $location.path('/server/create');
   };
+
+  //Display the details of the server
+  $scope.displayServerDetails = function (serverId) {
+    $location.path('/server/' + serverId);
+    $location.search("");
+    $location.hash("");
+  };
 }]);
 
 /**
- * Controller for the Server Create / Edit page
+ * Controller for the Server Create page
  */
-thurgood.controller('ServerCreateCtrl', ['$scope', '$timeout', '$http', 'Servers', function ($scope, $timeout, $http, Servers) {
+thurgood.controller('ServerCreateCtrl', ['$scope', '$timeout', 'Servers', function ($scope, $timeout, Servers) {
   'use strict';
 
   $scope.newServerData = {
@@ -354,6 +361,111 @@ thurgood.controller('ServerCreateCtrl', ['$scope', '$timeout', '$http', 'Servers
           $scope.creationSuccess = false;
           $scope.newRecordId = null;
         }, 7000);
+      }
+    });
+  };
+}]);
+
+/**
+ * Controller for the Server Display / Edit page
+ */
+thurgood.controller('ServerMaintainCtrl', ['$scope', '$routeParams', '$timeout', '$route', 'Servers', function ($scope, $routeParams, $timeout, $route, Servers) {
+  'use strict';
+
+  var serverId = $routeParams.id;
+
+  if (angular.isUndefined(serverId)) {
+    $scope.invalidServerId = true;
+  }
+
+  $scope.loading = true;
+  $scope.error = false;
+
+  $scope.mode = "display";
+
+  $scope.updateSuccess = false;
+  $scope.updateError = false;
+
+  $scope.editServer = {};
+
+  var promise = Servers.get({id: serverId}).$promise;
+
+  // Handle errors
+  var errorHandler = function(err) {
+    $scope.loading = false;
+    $scope.error = err.data.error || err.error || err.message || "Unknown error. Please contact developer.";
+  };
+
+  promise.then(function (response) {
+    if (response.success === false) {
+      errorHandler(res);
+      return;
+    }
+
+    var server = {};
+
+    angular.forEach(response.data[0], function(value, key) {
+      this[key] = value ? value : null;
+    }, server);
+
+    $scope.server = server;
+    $scope.loading = false;
+  });
+
+  //Convert the array to string where entries are seperated by a comma
+  $scope.getStringFromArray = function (arrayParam) {
+    var stringOutput = '';
+
+    if (!angular.isArray(arrayParam)) {
+      return arrayParam;
+    }
+
+    for (var i = 0; i < arrayParam.length; i++) {
+      if (stringOutput !== '') {
+        stringOutput = stringOutput + ", ";
+      }
+
+      stringOutput = stringOutput + arrayParam[i];
+    }
+
+    return stringOutput;
+  };
+
+  //Set the mode (display / edit)
+  $scope.changeMode = function (newMode) {
+    $scope.mode = newMode;
+
+    if ($scope.mode === "edit") {
+      $scope.editServer = JSON.parse(JSON.stringify($scope.server));
+    }
+  };
+
+  //Update the server
+  $scope.updateServer = function () {
+    if (angular.isUndefined($scope.editServer._id)) {
+      return;
+    }
+
+    var updateServer = JSON.parse(JSON.stringify($scope.editServer));
+
+    updateServer.installedServices = JSON.stringify(updateServer.installedServices);
+    updateServer.languages = JSON.stringify(updateServer.languages);
+
+    Servers.update({id: $scope.editServer._id}, updateServer, function (value) {
+      if (!value.success) {
+        $scope.updateError = true;
+
+        $timeout(function () {
+          $scope.updateError = false;
+        }, 3000);
+      } else {
+        $scope.updateSuccess = true;
+
+        $timeout(function () {
+          $scope.updateSuccess = false;
+
+          $route.reload();
+        }, 3000);
       }
     });
   };
