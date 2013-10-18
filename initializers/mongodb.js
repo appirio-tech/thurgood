@@ -47,6 +47,7 @@ exports.mongodb = function (api, next) {
  * @return {schema}        [description]
  */
 function newSchema(schema) {
+  schema = _.extend({}, schema);
   schema._id = new ObjectID();
   schema.createdAt = new Date().getTime();
   schema.updatedAt = new Date().getTime();
@@ -181,7 +182,6 @@ function create(api, connection, next, collection, schema) {
       }
     }
   });
-
   // Insert document
   collection.insert(doc, { w:1 }, function(err, result) {
     api.response.auto(connection, err, "Document created successfully", result, 201);
