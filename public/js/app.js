@@ -28,6 +28,10 @@ angular
       templateUrl: '/views/pages/jobs-detail.html',
       controller: 'JobsDetailCtrl'
     })
+    .when('/jobs/:id/events', {
+      templateUrl: '/views/pages/jobs-events.html',
+      controller: 'JobsEventsCtrl'
+    })    
     .when('/servers', {
       templateUrl: '/views/pages/servers.html',
       controller: 'ServersCtrl',

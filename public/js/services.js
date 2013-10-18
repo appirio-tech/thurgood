@@ -9,7 +9,7 @@ var thurgood = angular.module('thurgoodServices', ['ngResource']);
  */
 thurgood.factory('Jobs', ['$resource', function ($resource) {
   return $resource('/api/1/jobs/:id', {id:'@id'}, {
-    query:    {method:'GET',  params:{fields:'{"platform":1,"language":1,"status":1,"updatedAt":1}'}},
+    query:    {method:'GET',  params:{fields:'{"platform":1,"language":1,"status":1,"updatedAt":1}', limit: 10000}},
     complete: {method:'GET',  url:'/api/1/jobs/:id/complete'},
     message:  {method:'POST', url:'/api/1/jobs/:id/message'},
     submit:   {method:'PUT',  url:'/api/1/jobs/:id/submit'}
@@ -32,5 +32,11 @@ thurgood.factory('Servers', ['$resource', function ($resource) {
         create: {
             method: 'POST'
         }
+    });
+}]);
+
+thurgood.factory('Pt', ['$resource', function ($resource) {
+    return $resource('/api/1/pt/token/:key', {key:'@key'}, {
+        query: { method: 'GET' }
     });
 }]);

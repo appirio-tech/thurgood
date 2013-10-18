@@ -117,20 +117,16 @@ thurgood.controller('JobsCtrl', ['$scope', '$filter', '$location', 'Jobs', 'ngTa
 /**
  * Controller for a job's detail page
  */
-thurgood.controller('JobsDetailCtrl', ['$scope', '$location', 'Jobs', function($scope, $location, Jobs) {
-  var jobId = $location.path().substring(6);
-  var promise = Jobs.get({id: jobId}).$promise;
+thurgood.controller('JobsDetailCtrl', ['$scope', '$routeParams', 'Jobs', 'Pt', function($scope, $routeParams, Jobs, Pt) {
+  var jobId = $routeParams.id;
+  var job = {};
   $scope.jobId = jobId;
   $scope.loading = true;
 
-  // Handle errors
-  var errorHandler = function(err) {
-    $scope.loading = false;
-    $scope.error = err.data.error || err.error || err.message || "Unknown error. Please contact support.";
-  };
-
-  // API request successful
-  promise.then(function(res) {
+  //  fetch the job
+  var jobPromise = Jobs.get({id: jobId}).$promise;
+  // chain the token as a promise
+  var tokenPromise = jobPromise.then(function(res) {
     if (res.success === false) {
       errorHandler(res);
       return;
@@ -144,21 +140,39 @@ thurgood.controller('JobsDetailCtrl', ['$scope', '$location', 'Jobs', function($
     res.data[0].updatedAt = res.data[0].updatedAt ? new Date(res.data[0].updatedAt).toISOString() : 'null';
     res.data[0].startTime = res.data[0].startTime ? new Date(res.data[0].startTime).toISOString() : 'null';
     res.data[0].endTime = res.data[0].endTime ? new Date(res.data[0].endTime).toISOString() : 'null';
-    res.data[0].options = res.data[0].options ? JSON.stringify(res.data[0].options) : 'null';
-
-    var job = {};
+    res.data[0].options = res.data[0].options ? JSON.stringify(res.data[0].options) : 'null'; 
 
     angular.forEach(res.data[0], function(value, key) {
       this[key] = value ? value : 'null';
     }, job);
 
-    $scope.loading = false;
-    $scope.job = job;
-    $scope.error = undefined;
+    // return the token promise
+    return Pt.get({key: res.data[0].userId}).$promise;
   });
 
-  // API request error
-  promise.catch(errorHandler);
+  tokenPromise.then(function(res) {
+    if (res.success === false) {
+      errorHandler(res);
+      return;
+    }
+
+    $scope.error = undefined;
+    $scope.loading = false;
+    $scope.job = job;
+    $scope.timestamp = parseInt(new Date().getTime() / 1000);    
+    $scope.token = res.message;
+    $scope.distributor = "CloudSpokes";
+  });
+
+  // Handle errors
+  var errorHandler = function(err) {
+    $scope.loading = false;
+    $scope.error = err.data.error || err.error || err.message || "Unknown error. Please contact support.";
+  };
+
+  // // API request error
+  jobPromise.catch(errorHandler);
+  tokenPromise.catch(errorHandler);
 }]);
 
 /**
@@ -343,4 +357,58 @@ thurgood.controller('ServerCreateCtrl', ['$scope', '$timeout', '$http', 'Servers
       }
     });
   };
+}]);
+
+/**
+ * Controller for a job's events page
+ */
+thurgood.controller('JobsEventsCtrl', ['$scope', '$routeParams', 'Jobs', 'Pt', function($scope, $routeParams, Jobs, Pt) {
+  var jobId = $routeParams.id;
+  var job = {};
+  $scope.jobId = jobId;
+  $scope.loading = true;
+
+  //  fetch the job
+  var jobPromise = Jobs.get({id: jobId}).$promise;
+  // chain the token as a promise
+  var tokenPromise = jobPromise.then(function(res) {
+    if (res.success === false) {
+      errorHandler(res);
+      return;
+    }
+
+    // Save original document
+    $scope.jobRaw = res.data[0];
+
+    angular.forEach(res.data[0], function(value, key) {
+      this[key] = value ? value : 'null';
+    }, job);
+
+    // return the token promise
+    return Pt.get({key: res.data[0].userId}).$promise;
+  });
+
+  tokenPromise.then(function(res) {
+    if (res.success === false) {
+      errorHandler(res);
+      return;
+    }
+
+    $scope.error = undefined;
+    $scope.loading = false;
+    $scope.job = job;
+    $scope.timestamp = parseInt(new Date().getTime() / 1000);    
+    $scope.token = res.message;
+    $scope.distributor = "CloudSpokes";
+  });
+
+  // Handle errors
+  var errorHandler = function(err) {
+    $scope.loading = false;
+    $scope.error = err.data.error || err.error || err.message || "Unknown error. Please contact support.";
+  };
+
+  // // API request error
+  jobPromise.catch(errorHandler);
+  tokenPromise.catch(errorHandler);
 }]);
