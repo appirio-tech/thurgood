@@ -26,16 +26,6 @@
         <div class="col-lg-6">
             <input type="text" class="form-control" id="instanceUrl" placeholder="Example: http://login.salesforce.com" ng-model="newServerData.instanceUrl" required>
         </div>
-    </div>    
-
-    <div class="form-group">
-        <label for="platform" class="col-lg-2 control-label detail-key">
-            Platform <span class="text-danger">*</span>
-        </label>
-
-        <div class="col-lg-4">
-            <input type="text" class="form-control" id="platform" placeholder="Testing platform (e.g. salesforce.com)" ng-model="newServerData.platform" required>
-        </div>
     </div>
 
     <div class="form-group">
@@ -46,7 +36,17 @@
         <div class="col-lg-4">
             <input type="text" class="form-control" id="repoName" placeholder="Repo where the code will be pushed to." ng-model="newServerData.repoName" required>
         </div>
-    </div>   
+    </div>       
+
+    <div class="form-group">
+        <label for="platform" class="col-lg-2 control-label detail-key">
+            Platform <span class="text-danger">*</span>
+        </label>
+
+        <div class="col-lg-4">
+            <input type="text" class="form-control" id="platform" placeholder="Testing platform (e.g. salesforce.com)" ng-model="newServerData.platform" required>
+        </div>
+    </div>
 
     <div class="form-group">
         <label for="languages" class="col-lg-2 control-label detail-key">
