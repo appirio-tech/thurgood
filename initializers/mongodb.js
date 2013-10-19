@@ -171,17 +171,18 @@ function create(api, connection, next, collection, schema) {
         try {
           doc[key] = new ObjectID(connection.params[key]);
         } catch(err) {
-          api.response.error(connection, "Parameter loggerId is not a valid ObjectID", undefined, 400);
+          api.response.error(connection, "Parameter " + key + " is not a valid ObjectID", undefined, 400);
           return next(connection, true);
         }
       }
 
-      // Otherwise use it's value as-is
+      // Otherwise use its value as-is
       else {
         doc[key] = connection.params[key];
       }
     }
   });
+
   // Insert document
   collection.insert(doc, { w:1 }, function(err, result) {
     api.response.auto(connection, err, "Document created successfully", result, 201);

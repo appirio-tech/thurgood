@@ -96,7 +96,23 @@ exports.jobsCreate = {
   outputExample: {},
   version: 1.0,
   run: function(api, connection, next) {
-    api.mongo.create(api, connection, next, api.mongo.collections.jobs, api.mongo.schema.job);
+    // If logger name is provided, use it to search for id
+    if (!connection.params.loggerId && connection.params.logger) {
+      api.mongo.collections.loggerSystems.findOne({ name: connection.params.logger }, { _id:1 }, function(err, logger) {
+        if (!err && logger) {
+          connection.params.loggerId = new String(logger._id);
+          api.mongo.create(api, connection, next, api.mongo.collections.jobs, api.mongo.schema.job);
+        } else if (!logger) {
+          api.response.error(connection, "Logger not found", undefined, 404);
+          next(connection, true);
+        } else {
+          api.response.error(connection, err);
+          next(connection, true);
+        }
+      });
+    } else {
+      api.mongo.create(api, connection, next, api.mongo.collections.jobs, api.mongo.schema.job);
+    }
   }
 };
 
