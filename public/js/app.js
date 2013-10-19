@@ -8,6 +8,8 @@ angular
   'ngResource',
   'ngRoute',
   'ngTable',
+  'ui.bootstrap',
+  'ui.bootstrap.modal',
   'thurgoodControllers',
   'thurgoodServices',
   'thurgoodDirectives'

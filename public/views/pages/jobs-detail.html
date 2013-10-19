@@ -1,6 +1,5 @@
 <div class="page-header">
-  <button type="button" class="btn btn-primary pull-right" ng-show="job._id">Delete</button>
-  <button type="button" class="btn btn-primary pull-right" ng-show="job._id">Edit</button>
+  <button type="button" class="btn btn-primary pull-right" ng-show="job._id" ng-click="editModal()">Edit</button>
   <a href="javascript:history.back()" class="back"><i class="icon-chevron-left"></i></a>
   <h1>Jobs/{{jobId}}</h1>
 </div>
@@ -66,13 +65,87 @@
         <span class="col-lg-2 control-label detail-key">Options</span>
         <span class="col-lg-10 detail-value">{{job.options}}</span>
       </div>
-      <!-- For editing
-      <div class="form-group">
-        <div class="col-lg-10 col-lg-offset-2">
-          <button class="btn btn-default">Cancel</button> 
-          <button type="submit" class="btn btn-primary">Submit</button> 
-        </div>
-      </div> -->
     </fieldset>
   </form>
 </div>
+
+<!-- Modal template -->
+<script type="text/ng-template" id="jobsEditModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Update job</h3>
+      </div>
+      <div class="modal-body mModal">
+        <div class="alert alert-{{status == 'Updating job...' || status == 'SUCCESS' ? 'success' : 'danger'}} mModal" ng-show="status">
+          <h4><span ng-show="status == 'SUCCESS'">Job <a href="#/jobs/{{jobId}}" ng-click="cancel()">{{jobId}}</a> updated successfully!</span>{{status == 'SUCCESS' ? '' : status}}</h4>
+        </div>
+        <div class="form-horizontal">
+          <div class="form-group">
+            <span class="col-lg-3 control-label mModal-key">Code URL</span>
+            <div class="col-lg-9 s3Upload">
+              <div>
+                <input type="text" class="form-control mModal-input" ng-model="job.codeUrl" placeholder="Code URL">
+              </div>
+              <form id="s3UploadForm" action="//cs-thurgood-jobsupload.s3.amazonaws.com/" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="key" value="thurgood/{{job.id}}-${filename}">
+                <input type="hidden" name="acl" value="public-read">
+                <input type="hidden" name="AWSAccessKeyId" value="AKIAIPSE5AIYKGE6T7WA"> 
+                <input type="hidden" name="policy" value="ewogICJleHBpcmF0aW9uIjogIjIwMTUtMDEtMDFUMTI6MDA6MDAuMDAwWiIsCiAgImNvbmRpdGlvbnMiOiBbCiAgICB7ImJ1Y2tldCI6ICJjcy10aHVyZ29vZC1qb2JzdXBsb2FkIiB9LAogICAgeyJhY2wiOiAicHVibGljLXJlYWQiIH0sCiAgICBbInN0YXJ0cy13aXRoIiwgIiRrZXkiLCAidGh1cmdvb2QvIl0sCiAgXQp9">
+                <input type="hidden" name="signature" value="+ZtmNFaLTSs0I8JkbpVBS4NpXiY=">
+                <input type="submit">
+                <div class="clickArea">
+                  <input type="file" name="file" onchange="angular.element(this).scope().fileNameChanged(this.files[0])">
+                  <button class="btn btn-primary" ng-click="uploadFile()"><i class="icon-cloud-upload"></i></button>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="form-group">
+            <span class="col-lg-3 control-label mModal-key">Platform</span>
+            <div class="col-lg-9">
+              <input type="text" class="form-control mModal-input" ng-model="job.platform" placeholder="Platform">
+            </div>
+          </div>
+          <div class="form-group">
+            <span class="col-lg-3 control-label mModal-key">Language</span>
+            <div class="col-lg-9">
+              <input type="text" class="form-control mModal-input" ng-model="job.language" placeholder="Language">
+            </div>
+          </div>
+          <div class="form-group">
+            <span class="col-lg-3 control-label mModal-key">User ID</span>
+            <div class="col-lg-9">
+              <input type="text" class="form-control mModal-input" ng-model="job.userId" placeholder="User ID">
+            </div>
+          </div>
+          <div class="form-group">
+            <span class="col-lg-3 control-label mModal-key">User Email</span>
+            <div class="col-lg-9">
+              <input type="text" class="form-control mModal-input" ng-model="job.email" placeholder="User Email">
+            </div>
+          </div>
+          <div class="form-group">
+            <span class="col-lg-3 control-label mModal-key">Logger ID</span>
+            <div class="col-lg-9">
+              <input type="text" class="form-control mModal-input" ng-model="job.loggerId" placeholder="Logger ID (optional)">
+            </div>
+          </div>
+          <div class="form-group">
+            <span class="col-lg-3 control-label mModal-key">Options</span>
+            <div class="col-lg-9">
+              <input type="text" class="form-control mModal-input" ng-model="job.options" placeholder="Options (optional)">
+            </div>
+          </div>
+        </div>
+        <div class="alert alert-danger mModal" ng-show="uploadWarning">
+          <h4>{{uploadWarning}}</h4>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary{{status == 'Updating job...' ? ' disabled' : ''}}" ng-click="update()">Update</button>
+        <button class="btn btn-primary" ng-click="cancel()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</script>
