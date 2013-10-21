@@ -59,7 +59,7 @@ exports.accountsCreate = {
         body = JSON.parse(body);
         if (!body.id || !body.api_token) {
           // Check if the account already exists
-          api.mongo.collections.loggerAccounts.findOne({}, function(err, account) {
+          api.mongo.collections.loggerAccounts.findOne({ name: connection.params.username }, function(err, account) {
             if (!err && account) {
               api.response.success(connection, "Account already exists", account, 200);
             } else {
