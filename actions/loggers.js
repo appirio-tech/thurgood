@@ -63,7 +63,6 @@ exports.loggersCreate = {
       createLogger();
     }
 
-
     // Create a logger 
     // 1. create logger on papertrail
     // 2. create logger in the db
