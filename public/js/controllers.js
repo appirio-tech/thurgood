@@ -24,7 +24,7 @@ thurgood.controller('JobsCtrl', ['$scope', '$filter', '$location', '$modal', 'Jo
   // Handle errors
   var errorHandler = function(err) {
     $scope.loading = false;
-    $scope.error = (err.data && err.data.error) || err.error || err.message || "Unknown error. Please contact developer.";
+    $scope.error = (err.data && err.data.error) || err.error || err.message || "Unknown error. Please contact support.";
   };
 
   // Show job creation modal
@@ -49,7 +49,7 @@ thurgood.controller('JobsCtrl', ['$scope', '$filter', '$location', '$modal', 'Jo
 
         // Handle api errors
         var errorHandler = function(err) {
-          var error = (err.data && err.data.error) || err.error || err.message || "Unknown error. Please contact developer.";
+          var error = (err.data && err.data.error) || err.error || err.message || "Unknown error. Please contact support.";
           $scope.status = translateError(error);
         };
 
@@ -236,7 +236,7 @@ thurgood.controller('JobsDetailCtrl', ['$scope', '$location', '$modal', 'Jobs', 
   // Handle errors
   var errorHandler = function(err) {
     $scope.loading = false;
-    var error = (err.data && err.data.error) || err.error || err.message || "Unknown error. Please contact developer.";
+    var error = (err.data && err.data.error) || err.error || err.message || "Unknown error. Please contact support.";
     $scope.error = translateError(error);
   };
 
@@ -277,7 +277,7 @@ thurgood.controller('JobsDetailCtrl', ['$scope', '$location', '$modal', 'Jobs', 
 
           // Handle api errors
           var errorHandler = function(err) {
-            var error = (err.data && err.data.error) || err.error || err.message || "Unknown error. Please contact developer.";
+            var error = (err.data && err.data.error) || err.error || err.message || "Unknown error. Please contact support.";
             $scope.status = translateError(error);
           };
 
@@ -355,11 +355,381 @@ thurgood.controller('JobsDetailCtrl', ['$scope', '$location', '$modal', 'Jobs', 
       job[key] = value ? value : 'null';
     });
 
+    // return the token promise
+    return Pt.get({key: res.data[0].userId}).$promise;
+  });
+
+  tokenPromise.then(function(res) {
+    if (res.success === false) {
+      errorHandler(res);
+      return;
+    }
+
+    $scope.error = undefined;
     $scope.loading = false;
     $scope.job = job;
+    $scope.timestamp = parseInt(new Date().getTime() / 1000);    
+    $scope.token = res.message;
+    $scope.distributor = "CloudSpokes";
+  });
+
+  // Handle errors
+  var errorHandler = function(err) {
+    $scope.loading = false;
+    $scope.error = err.data.error || err.error || err.message || "Unknown error. Please contact support.";
+  };
+
+  // // API request error
+  jobPromise.catch(errorHandler);
+  tokenPromise.catch(errorHandler);
+}]);
+
+/**
+ * Controller for the Servers page
+ */
+thurgood.controller('ServersCtrl', ['$scope', '$filter', '$location', 'Servers', 'ngTableParams', function($scope, $filter, $location, Servers, ngTableParams) {
+  var promise = Servers.query().$promise;
+  $scope.loading = true;
+
+  // Handle errors
+  var errorHandler = function(err) {
+    $scope.loading = false;
+    $scope.error = err.data.error || err.error || err.message || "Unknown error. Please contact support.";
+  };
+
+  // API request successful
+  promise.then(function(res) {
+    if (res.success === false) {
+      errorHandler(res);
+      return;
+    }
+
+    var searchedData = res.data;
+    $scope.loading = false;
+    $scope.totalItems = res.data.length;
     $scope.error = undefined;
+
+    // Format dates
+    for (i = 0; i < res.data.length; i++) {
+      res.data[i].updatedAt = new Date(res.data[i].updatedAt).toISOString();
+    }
+
+    // Setup ngTable
+    $scope.tableParams = new ngTableParams(
+      // Merge default params with url
+      angular.extend({
+        page: 1,
+        total: res.data.length,
+        count: 10,
+        sorting: {updatedAt: 'desc'}
+      },
+      $location.search())
+    );
+
+    // Watch for changes of the table parameters
+    $scope.$watch('tableParams', function(params) {
+      // Put params in url
+      $location.search(
+        angular.extend({
+          page: 1,
+          total: res.data.length,
+          count: 10,
+          sorting: {updatedAt: 'desc'}
+        },
+        params.url())
+      );
+
+      // Use built-in angular filter
+      var orderedData = params.sorting ? $filter('orderBy')(searchedData, params.orderBy()) : searchedData;
+
+      // Slice array data on pages
+      $scope.tableRows = orderedData.slice(
+        (params.page - 1) * params.count,
+        params.page * params.count
+      );
+    }, true);
+
+    // Watch for changes of the search input value
+    var searchTextWatcher = function(searchText) {
+      if (searchText === undefined)
+        return;
+
+      // Put query in url
+      $location.search(
+        angular.extend({
+          page: 1,
+          total: res.data.length,
+          count: 10,
+          sorting: {updatedAt: 'desc'}
+        },
+        {search: searchText})
+      );
+
+      // Use built-in angular filter
+      searchedData = $filter('filter')(res.data, searchText);
+
+      // Update table params
+      $scope.tableParams.page = 1;
+      $scope.tableParams.total= searchedData.length;
+    };
+
+    // Set watcher
+    $scope.$watch('searchText', searchTextWatcher, true);
+
+    // Load last search
+    $scope.searchText = $location.search().search;
+    searchTextWatcher($scope.searchText);
   });
 
   // API request error
   promise.catch(errorHandler);
+
+  //Convert the array to string where entries are seperated by a comma
+  $scope.getStringFromArray = function (arrayParam) {
+    var stringOutput = '';
+
+    if (!angular.isArray(arrayParam)) {
+      return arrayParam;
+    }
+
+    for (var i = 0; i < arrayParam.length; i++) {
+      if (stringOutput !== '') {
+        stringOutput = stringOutput + ", ";
+      }
+
+      stringOutput = stringOutput + arrayParam[i];
+    }
+
+    return stringOutput;
+  };
+
+  //Change the path to allow creation of server
+  $scope.createServer = function () {
+    $location.path('/server/create');
+  };
+
+  //Display the details of the server
+  $scope.displayServerDetails = function (serverId) {
+    $location.path('/server/' + serverId);
+    $location.search("");
+    $location.hash("");
+  };
+}]);
+
+/**
+ * Controller for the Server Create page
+ */
+thurgood.controller('ServerCreateCtrl', ['$scope', '$timeout', 'Servers', function ($scope, $timeout, Servers) {
+  'use strict';
+
+  $scope.newServerData = {
+    installedServices: [],
+    instanceUrl: "",
+    jobId: null,
+    languages: [],
+    name: "",
+    operatingSystem: null,
+    password: null,
+    platform: null,
+    repoName: null,
+    status: "available",
+    username: null
+  };
+
+  $scope.creationSuccess = false;
+
+  $scope.creationError = false;
+
+  $scope.newRecordId = null;
+
+  //Create the new server record
+  $scope.createServer = function () {
+    //Ensure mandatory fields are provided
+    if ($scope.newServerData.name === "") {
+      return;
+    }
+
+    var newRecord = JSON.parse(JSON.stringify($scope.newServerData));
+    newRecord.installedServices = JSON.stringify(newRecord.installedServices);
+    newRecord.languages = JSON.stringify(newRecord.languages);
+
+    var record = new Servers(newRecord);
+
+    record.$save(function (res) {
+      if (!res.success) {
+        $scope.creationError = true;
+
+        $timeout(function () {
+          $scope.creationError = false;
+        }, 3000);
+      } else {
+        $scope.creationSuccess = true;
+        $scope.newRecordId = res.data[0]._id;
+
+        $timeout(function () {
+          $scope.creationSuccess = false;
+          $scope.newRecordId = null;
+        }, 7000);
+      }
+    });
+  };
+}]);
+
+/**
+ * Controller for the Server Display / Edit page
+ */
+thurgood.controller('ServerMaintainCtrl', ['$scope', '$routeParams', '$timeout', '$route', 'Servers', function ($scope, $routeParams, $timeout, $route, Servers) {
+  'use strict';
+
+  var serverId = $routeParams.id;
+
+  if (angular.isUndefined(serverId)) {
+    $scope.invalidServerId = true;
+  }
+
+  $scope.loading = true;
+  $scope.error = false;
+
+  $scope.mode = "display";
+
+  $scope.updateSuccess = false;
+  $scope.updateError = false;
+
+  $scope.editServer = {};
+
+  var promise = Servers.get({id: serverId}).$promise;
+
+  // Handle errors
+  var errorHandler = function(err) {
+    $scope.loading = false;
+    $scope.error = err.data.error || err.error || err.message || "Unknown error. Please contact support.";
+  };
+
+  promise.then(function (response) {
+    if (response.success === false) {
+      errorHandler(res);
+      return;
+    }
+
+    var server = {};
+
+    angular.forEach(response.data[0], function(value, key) {
+      this[key] = value ? value : null;
+    }, server);
+
+    $scope.server = server;
+    $scope.loading = false;
+  });
+
+  //Convert the array to string where entries are seperated by a comma
+  $scope.getStringFromArray = function (arrayParam) {
+    var stringOutput = '';
+
+    if (!angular.isArray(arrayParam)) {
+      return arrayParam;
+    }
+
+    for (var i = 0; i < arrayParam.length; i++) {
+      if (stringOutput !== '') {
+        stringOutput = stringOutput + ", ";
+      }
+
+      stringOutput = stringOutput + arrayParam[i];
+    }
+
+    return stringOutput;
+  };
+
+  //Set the mode (display / edit)
+  $scope.changeMode = function (newMode) {
+    $scope.mode = newMode;
+
+    if ($scope.mode === "edit") {
+      $scope.editServer = JSON.parse(JSON.stringify($scope.server));
+    }
+  };
+
+  //Update the server
+  $scope.updateServer = function () {
+    if (angular.isUndefined($scope.editServer._id)) {
+      return;
+    }
+
+    var updateServer = JSON.parse(JSON.stringify($scope.editServer));
+
+    updateServer.installedServices = JSON.stringify(updateServer.installedServices);
+    updateServer.languages = JSON.stringify(updateServer.languages);
+
+    Servers.update({id: $scope.editServer._id}, updateServer, function (value) {
+      if (!value.success) {
+        $scope.updateError = true;
+
+        $timeout(function () {
+          $scope.updateError = false;
+        }, 3000);
+      } else {
+        $scope.updateSuccess = true;
+
+        $timeout(function () {
+          $scope.updateSuccess = false;
+
+          $route.reload();
+        }, 3000);
+      }
+    });
+  };
+}]);
+
+/**
+ * Controller for a job's events page
+ */
+thurgood.controller('JobsEventsCtrl', ['$scope', '$routeParams', 'Jobs', 'Pt', function($scope, $routeParams, Jobs, Pt) {
+  var jobId = $routeParams.id;
+  var job = {};
+  $scope.jobId = jobId;
+  $scope.loading = true;
+
+  //  fetch the job
+  var jobPromise = Jobs.get({id: jobId}).$promise;
+  // chain the token as a promise
+  var tokenPromise = jobPromise.then(function(res) {
+    if (res.success === false) {
+      errorHandler(res);
+      return;
+    }
+
+    // Save original document
+    $scope.jobRaw = res.data[0];
+
+    angular.forEach(res.data[0], function(value, key) {
+      this[key] = value ? value : 'null';
+    }, job);
+
+    // return the token promise
+    return Pt.get({key: res.data[0].userId}).$promise;
+  });
+
+  tokenPromise.then(function(res) {
+    if (res.success === false) {
+      errorHandler(res);
+      return;
+    }
+
+    $scope.error = undefined;
+    $scope.loading = false;
+    $scope.job = job;
+    $scope.timestamp = parseInt(new Date().getTime() / 1000);    
+    $scope.token = res.message;
+    $scope.distributor = "CloudSpokes";
+  });
+
+  // Handle errors
+  var errorHandler = function(err) {
+    $scope.loading = false;
+    $scope.error = err.data.error || err.error || err.message || "Unknown error. Please contact support.";
+  };
+
+  // // API request error
+  jobPromise.catch(errorHandler);
+  tokenPromise.catch(errorHandler);
 }]);

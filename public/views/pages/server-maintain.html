@@ -1,0 +1,266 @@
+<div class="row" ng-show="invalidServerId">
+    <div class="alert alert-danger">
+        Unknown Server Id. Check the route.
+    </div>
+</div>
+
+<div class="page-header">
+    <h1>
+        Display Server
+    </h1>
+    <a class="btn btn-primary pull-right" href="#/servers">
+        Back to List
+    </a>
+    <button type="button" class="btn btn-primary pull-right" ng-click="changeMode('edit')" ng-show="mode == 'display'">
+        <i class="icon-edit"></i> Edit
+    </button>
+    <button type="button" class="btn btn-primary pull-right" ng-click="changeMode('display')" ng-show="mode == 'edit'">
+        <i class="icon-remove"></i> Cancel Edit
+    </button>
+</div>
+
+<div class="alert alert-danger detail" ng-show="!loading && error">
+    <h2>{{error}}</h2>
+</div>
+
+<div class="well detail" ng-show="(loading && !error) || (server._id && mode == 'display')">
+    <div class="loading" ng-show="loading && !error">
+        <h2>Loading...</h2>
+    </div>
+
+    <div class="form-horizontal" ng-show="server._id">
+
+        <div class="form-group">
+            <label class="col-lg-2 detail-key control-label">Server Name</label>
+            <div class="col-lg-10 detail-value">
+                {{server.name}}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-lg-2 detail-key control-label">Current Job Id</label>
+            <div class="col-lg-10 detail-value">
+                {{server.jobId}}
+            </div>
+        </div>                
+
+        <div class="form-group">
+            <label class="col-lg-2 detail-key control-label">Instance Url</label>
+            <div class="col-lg-10 detail-value">
+                <a ng-href="{{server.instanceUrl}}" ng-show="server.instanceUrl != null">{{server.instanceUrl}}</a>
+                <span ng-show="server.instanceUrl == null">Not Available</span>
+            </div>
+        </div> 
+
+        <div class="form-group">
+            <label class="col-lg-2 detail-key control-label">Github Repo Name</label>
+            <div class="col-lg-10 detail-value">
+                {{server.repoName}}
+            </div>
+        </div>     
+
+        <div class="form-group">
+            <label class="col-lg-2 detail-key control-label">Platform</label>
+            <div class="col-lg-10 detail-value">
+                {{server.platform}}
+            </div>
+        </div>     
+
+        <div class="form-group">
+            <label class="col-lg-2 detail-key control-label">Languages</label>
+            <div class="col-lg-10 detail-value">
+                {{getStringFromArray(server.languages)}}
+            </div>
+        </div>     
+
+        <div class="form-group">
+            <label class="col-lg-2 detail-key control-label">Installed Services</label>
+            <div class="col-lg-10 detail-value">
+                {{getStringFromArray(server.installedServices)}}
+            </div>
+        </div>        
+
+        <div class="form-group">
+            <label class="col-lg-2 detail-key control-label">Operating System</label>
+            <div class="col-lg-10 detail-value">
+                {{server.operatingSystem}}
+            </div>
+        </div> 
+
+        <div class="form-group">
+            <label class="col-lg-2 detail-key control-label">Username</label>
+            <div class="col-lg-10 detail-value">
+                {{server.username}}
+            </div>
+        </div>       
+
+        <div class="form-group">
+            <label class="col-lg-2 detail-key control-label">Password</label>
+            <div class="col-lg-10 detail-value">
+                {{server.password}}
+            </div>
+        </div>        
+
+        <div class="form-group">
+            <label class="col-lg-2 detail-key control-label">Status</label>
+            <div class="col-lg-10 detail-value">
+                <span ng-class="{'text-success': server.status == 'available', 'text-danger': server.status == 'reserved'}">{{server.status}}</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-lg-2 detail-key control-label">Created At</label>
+            <div class="col-lg-10 detail-value">
+                {{server.createdAt | date:'MM/dd/yy'}}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-lg-2 detail-key control-label">Updated At</label>
+            <div class="col-lg-10 detail-value">
+                {{server.updatedAt | date:'MM/dd/yy'}}
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<form class="form-horizontal" role="form" ng-show="editServer._id && mode == 'edit'">
+
+    <div class="form-group">
+        <label for="name" class="col-lg-2 control-label detail-key">
+            Server Name <span class="text-danger">*</span>
+        </label>
+
+        <div class="col-lg-4">
+            <input type="text" class="form-control" id="name" placeholder="Server display name" ng-model="editServer.name" required>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="jobId" class="col-lg-2 control-label detail-key">
+            Current Job Id
+        </label>
+
+        <div class="col-lg-4">
+            <input type="text" class="form-control" id="jobId" placeholder="The ID of the Job utilizing this server" ng-model="editServer.jobId">
+        </div>
+    </div>    
+
+    <div class="form-group">
+        <label for="instanceUrl" class="col-lg-2 control-label detail-key">
+            Instance Url
+        </label>
+
+        <div class="col-lg-6">
+            <input type="text" class="form-control" id="instanceUrl" placeholder="Example: http://login.salesforce.com" ng-model="editServer.instanceUrl">
+        </div>
+    </div> 
+
+    <div class="form-group">
+        <label for="repoName" class="col-lg-2 control-label detail-key">
+            Github Repo Name
+        </label>
+
+        <div class="col-lg-4">
+            <input type="text" class="form-control" id="repoName" placeholder="Repo where the code will be pushed to." ng-model="editServer.repoName">
+        </div>
+    </div>   
+
+    <div class="form-group">
+        <label for="platform" class="col-lg-2 control-label detail-key">
+            Platform
+        </label>
+
+        <div class="col-lg-4">
+            <input type="text" class="form-control" id="platform" placeholder="Testing platform (e.g. salesforce.com)" ng-model="editServer.platform">
+        </div>
+    </div>    
+
+    <div class="form-group">
+        <label for="languages" class="col-lg-2 control-label detail-key">
+            Languages
+        </label>
+
+        <div class="col-lg-6">
+            <input type="text" class="form-control" id="languages" placeholder="Enter languages seperated by a comma" ng-list ng-model="editServer.languages">
+        </div>
+    </div>    
+
+    <div class="form-group">
+        <label for="installedServices" class="col-lg-2 control-label detail-key">
+            Installed Services
+        </label>
+
+        <div class="col-lg-6">
+            <input type="text" class="form-control" id="installedServices" placeholder="Enter services seperated by a comma" ng-list ng-model="editServer.installedServices">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="operatingSystem" class="col-lg-2 control-label detail-key">
+            Operating System
+        </label>
+
+        <div class="col-lg-4">
+            <input type="text" class="form-control" id="operatingSystem" placeholder="Enter the operating system" ng-model="editServer.operatingSystem">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="username" class="col-lg-2 control-label detail-key">
+            Username
+        </label>
+
+        <div class="col-lg-3">
+            <input type="text" ng-model="editServer.username" id="username" class="form-control" placeholder="Username for the testing instance">
+        </div>
+    </div>    
+
+    <div class="form-group">
+        <label for="password" class="col-lg-2 control-label detail-key">
+            Password
+        </label>
+
+        <div class="col-lg-3">
+            <input type="password" class="form-control" id="password" placeholder="Password for the testing instance" ng-model="editServer.password">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="status" class="col-lg-2 control-label detail-key">
+            Status <span class="text-danger">*</span>
+        </label>
+
+        <div class="col-lg-2">
+            <select ng-model="editServer.status" class="form-control">
+                <option value="available">Available</option>
+                <option value="reserved">Reserved</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-lg-offset-2 col-lg-10">
+            <button type="submit" class="btn btn-primary" ng-click="updateServer()">
+                Update
+            </button>
+        </div>
+    </div>
+
+    <div class="form-group" ng-show="updateSuccess">
+        <div class="col-lg-offset-2 col-lg-6">
+            <div class="alert alert-success">
+                Record updated successfully. Reloading...
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group" ng-show="updateError">
+        <div class="col-lg-offset-2 col-lg-6">
+            <div class="alert alert-danger">
+                Error in updating record. Try again.
+            </div>
+        </div>
+    </div>
+</form>

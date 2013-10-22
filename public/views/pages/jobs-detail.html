@@ -1,5 +1,15 @@
+<form action="https://papertrailapp.com/distributors/session" method="post" id="papertrail">
+<input type="hidden" name="account_id" value="{{job.userId}}">
+<input type="hidden" name="user_id" value="{{job.userId}}">
+<input type="hidden" name="timestamp" value="{{timestamp}}">
+<input type="hidden" name="token" value="{{token}}"> 
+<input type="hidden" name="distributor" value="{{distributor}}">
+<input type="hidden" name="email" value="{{job.email}}">
+</form>
+
 <div class="page-header">
   <button type="button" class="btn btn-primary pull-right" ng-show="job._id" ng-click="editModal()">Edit</button>
+  <button type="button" class="btn btn-primary pull-right" onclick="document.forms['papertrail'].submit();">Event Viewer</button>
   <a href="javascript:history.back()" class="back"><i class="icon-chevron-left"></i></a>
   <h1>Jobs/{{jobId}}</h1>
 </div>
@@ -17,6 +27,10 @@
         <span class="col-lg-2 control-label detail-key">Job ID</span>
         <span class="col-lg-10 detail-value">{{job._id}}</span>
       </div>
+      <div class="form-group">
+        <span class="col-lg-2 control-label detail-key">Options</span>
+        <span class="col-lg-10 detail-value">{{job.options}}</span>
+      </div>      
       <div class="form-group">
         <span class="col-lg-2 control-label detail-key">Platform</span>
         <span class="col-lg-10 detail-value">{{job.platform}}</span>

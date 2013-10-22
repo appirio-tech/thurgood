@@ -236,3 +236,7 @@ h1 {
 .pager>li.disabled>a.btn-pagination:hover {
   background-color: #1e2a36;
 }
+
+.hand-cursor {
+  cursor: pointer;
+}
