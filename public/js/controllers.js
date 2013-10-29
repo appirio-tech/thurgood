@@ -221,11 +221,11 @@ thurgood.controller('JobsCtrl', ['$scope', '$filter', '$location', '$modal', 'Jo
 /**
  * Controller for a job's detail page
  */
-thurgood.controller('JobsDetailCtrl', ['$scope', '$location', '$modal', 'Jobs', function($scope, $location, $modal, Jobs) {
-  var jobId = $location.path().substring(6);
-  var promise = Jobs.get({id: jobId}).$promise;
+thurgood.controller('JobsDetailCtrl', ['$scope', '$routeParams', '$modal', 'Jobs', 'Pt', function($scope, $routeParams, $modal, Jobs, Pt) {
+  var jobId = $routeParams.id;
+  var job = {};
   $scope.jobId = jobId;
-  $scope.loading = true;
+  $scope.loading = true;  
 
   // Change server error messages to user friendly strings
   var translateError = function(err) {
@@ -240,9 +240,11 @@ thurgood.controller('JobsDetailCtrl', ['$scope', '$location', '$modal', 'Jobs', 
     $scope.error = translateError(error);
   };
 
-  // API request successful
-  promise.then(function(res) {
-    if (res.success != true) {
+  //  fetch the job promise
+  var jobPromise = Jobs.get({id: jobId}).$promise;
+    // chain the token as a promise
+  var tokenPromise = jobPromise.then(function(res) {
+    if (res.success === false) {
       errorHandler(res);
       return;
     }
@@ -343,7 +345,7 @@ thurgood.controller('JobsDetailCtrl', ['$scope', '$location', '$modal', 'Jobs', 
     };
 
     // Format fields
-    var job = res.data[0];
+    job = res.data[0];
     job.createdAt = job.createdAt ? new Date(job.createdAt).toISOString() : 'null';
     job.updatedAt = job.updatedAt ? new Date(job.updatedAt).toISOString() : 'null';
     job.startTime = job.startTime ? new Date(job.startTime).toISOString() : 'null';
@@ -354,30 +356,23 @@ thurgood.controller('JobsDetailCtrl', ['$scope', '$location', '$modal', 'Jobs', 
     angular.forEach(job, function(value, key) {
       job[key] = value ? value : 'null';
     });
+    $scope.job = job;
 
     // return the token promise
     return Pt.get({key: res.data[0].userId}).$promise;
-  });
+  });    
 
   tokenPromise.then(function(res) {
     if (res.success === false) {
       errorHandler(res);
       return;
     }
-
     $scope.error = undefined;
     $scope.loading = false;
-    $scope.job = job;
     $scope.timestamp = parseInt(new Date().getTime() / 1000);    
     $scope.token = res.message;
     $scope.distributor = "CloudSpokes";
   });
-
-  // Handle errors
-  var errorHandler = function(err) {
-    $scope.loading = false;
-    $scope.error = err.data.error || err.error || err.message || "Unknown error. Please contact support.";
-  };
 
   // // API request error
   jobPromise.catch(errorHandler);
