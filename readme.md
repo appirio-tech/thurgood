@@ -12,6 +12,7 @@ npm install
 touch .env
 # copy the contents from .env-example to .env
 # add in any settings emailed from support@cloudspokes.com
+# start redis
 foreman start
 ```
 
