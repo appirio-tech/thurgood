@@ -1,5 +1,4 @@
 var S = require('string');
-var myIP = require('my-ip');
 
 exports.middleware = function(api, next){
 
