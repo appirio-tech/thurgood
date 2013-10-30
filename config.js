@@ -25,7 +25,8 @@ configData.general = {
   workers : 5,                                                    // The number of internal "workers" (timers) this node will have.
   developmentMode: true,                                         // watch for changes in actions and tasks, and reload/restart them on the fly
   pidFileDirectory: process.cwd() + "/pids/",                     // the location of the directory to keep pidfiles
-  simultaneousActions: 5                                          // how many pending actions can a single connection be working on 
+  simultaneousActions: 5,                                          // how many pending actions can a single connection be working on 
+  skipAuthorization: process.env.SKIP_AUTH || false // determined if the middleware check for an API Key should be skipped
 };
 
 /////////////
