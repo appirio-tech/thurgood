@@ -21,8 +21,7 @@
     "glossy": "~0.1.5",
     "underscore": "~1.5.2",
     "request": "~2.27.0",
-    "string": "~1.6.0",
-    "my-ip": "~1.1.0"
+    "string": "~1.6.0"
   },
   "devDependencies": {
     "mocha": "~1.13.0",

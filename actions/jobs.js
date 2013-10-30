@@ -14,7 +14,7 @@ exports.action = {
     required: [],
     optional: ['q', 'fields', 'sort', 'limit', 'skip', 'id'],
   },
-  authenticated: true,
+  authenticated: false,
   outputExample: {},
   version: 1.0,
   run: function(api, connection, next) {
