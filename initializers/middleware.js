@@ -7,9 +7,6 @@ exports.middleware = function(api, next){
   var authorization = function(connection, actionTemplate, next){
     if(actionTemplate.authenticated === true){
 
-      console.log(connection.remoteIP);
-      console.log(myIP());
-
       // if for dev we want to skip the API Key authentication for protected routes
       if (api.configData.general.skipAuthorization === true) { return next(connection, true); }
 
