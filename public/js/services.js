@@ -1,7 +1,9 @@
 /**
  * Angular services
  */
-var thurgood = angular.module('thurgoodServices', ['ngResource']);
+var thurgood = angular.module('thurgoodServices', ['ngResource', 'config']).config(function($httpProvider, APIKEY){
+  $httpProvider.defaults.headers.common['Authorization'] = 'Token token=' + APIKEY;
+});
 
 /**
  * Resource for the /jobs endpoint
