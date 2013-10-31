@@ -16,9 +16,12 @@ touch .env
 foreman start
 ```
 
-You should now be able to go to http:://localhost:3001 and see the welcome message. The API routes are all at /api/1. So going to http://localhost:3001/api/1/jobs will display all of the current jobs.
+You should now be able to go to [http://localhost:5000](http://localhost:5000) and see the welcome page. The API routes are all at /api/1. So going to [http://localhost:5000/api/1/jobs](http://localhost:5000/api/1/jobs) will display all of the current jobs.
 
-The Angular frontend should be available from http://localhost:3001.
+The Angular frontend should be available from [http://localhost:5000](http://localhost:5000).
+
+## API Keys
+An API key is required for each call to the API. See the [API Keys page](https://github.com/cloudspokes/thurgood/wiki/API-Keys) for more info.
 
 **Please see the [wiki](https://github.com/cloudspokes/thurgood/wiki) for complete documentation.** The documentation provides sample cURL statements for API calls with a Token that is passed in the header. At this time, the token is not being used so it can be safely be submitted.
 
