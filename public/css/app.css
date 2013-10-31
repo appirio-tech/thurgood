@@ -35,6 +35,109 @@ h1 {
   margin-bottom: 10px;
 }
 
+.s3Upload [type="submit"] {
+  display: none;
+}
+
+.s3Upload .clickArea {
+  width: 100%;
+  height: 43px;
+  overflow: hidden;
+}
+
+.s3Upload .clickArea button {
+  width: 100%;
+  height: 43px;
+}
+
+.s3Upload .clickArea input[type="file"] {
+  width: 60px;
+  height: 43px;
+  opacity: 0;
+  position: absolute;
+}
+
+.s3Upload .clickArea :hover {
+  cursor: pointer;
+}
+
+.s3Upload>div {
+  display: inline-block;
+  width: 86%;
+}
+
+.s3Upload>form {
+  width: 12%;
+  float: right;
+}
+
+@media (max-width: 1200px) {
+  .s3Upload>form {
+    margin-top: 7px;
+  }
+}
+
+@media (max-width: 478px) {
+  .s3Upload>div {
+    width: 78%;
+  }
+
+  .s3Upload>form {
+    width: 20%;
+  }
+}
+
+/* Modal */
+.modal {
+  display: block;
+}
+
+.modal-body:before, .modal-body:after {
+  display: table;
+  content: " ";
+}
+
+.modal-header:before, .modal-header:after {
+  display: table;
+  content: " ";
+}
+
+.modal-content {
+  background-color: rgb(253, 253, 253);
+}
+
+.modal-footer {
+  margin-top: -15px;
+}
+
+.mModal .mModal-key {
+  font-weight: bold;
+  width: 22%;
+}
+
+.mModal h4.delete {
+  margin-bottom: 15px;
+}
+
+@media (max-width: 1200px) {
+  .mModal .mModal-input {
+    margin-top: 7px;
+  }
+}
+
+.mModal h4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.mModal .alert {
+  margin-bottom: 20px
+}
+
+.mModal .alert[ng-show="uploadWarning"] {
+  margin-bottom: 10px;
+}
+
 /* Page header */
 .page-header {
   padding-bottom: 20px;
@@ -132,4 +235,8 @@ h1 {
 
 .pager>li.disabled>a.btn-pagination:hover {
   background-color: #1e2a36;
+}
+
+.hand-cursor {
+  cursor: pointer;
 }

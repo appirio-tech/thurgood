@@ -9,7 +9,7 @@ exports.action = {
     required: [],
     optional: ['q', 'fields', 'sort', 'limit', 'skip', 'status', 'id'],
   },
-  authenticated: false,
+  authenticated: true,
   outputExample: {},
   version: 1.0,
   run: function(api, connection, next) {
@@ -27,7 +27,7 @@ exports.serversCreate = {
     required: [],
     optional: ['name', 'status', 'instanceUrl', 'operatingSystem', 'installedServices', 'languages', 'platform', 'repoName', 'username', 'password', 'jobId'],
   },
-  authenticated: false,
+  authenticated: true,
   outputExample: {},
   version: 1.0,
   run: function(api, connection, next) {
@@ -45,7 +45,7 @@ exports.serversUpdate = {
     required: ['id'],
     optional: ['name', 'status', 'instanceUrl', 'operatingSystem', 'installedServices', 'languages', 'platform', 'repoName', 'username', 'password', 'jobId'],
   },
-  authenticated: false,
+  authenticated: true,
   outputExample: {},
   version: 1.0,
   run: function(api, connection, next) {

@@ -14,7 +14,7 @@ exports.action = {
     required: [],
     optional: ['q', 'fields', 'sort', 'limit', 'skip', 'id'],
   },
-  authenticated: false,
+  authenticated: true,
   outputExample: {},
   version: 1.0,
   run: function(api, connection, next) {
@@ -32,7 +32,7 @@ exports.jobsComplete = {
     required: ['id'],
     optional: [],
   },
-  authenticated: false,
+  authenticated: true,
   outputExample: {},
   version: 1.0,
   run: function(api, connection, next) {
@@ -90,13 +90,29 @@ exports.jobsCreate = {
   description: "Creates a new job. Method: POST",
   inputs: {
     required: ['email', 'platform', 'language', 'userId', 'codeUrl'],
-    optional: ['loggerId', 'options'],
+    optional: ['loggerId', 'logger', 'options'],
   },
-  authenticated: false,
+  authenticated: true,
   outputExample: {},
   version: 1.0,
   run: function(api, connection, next) {
-    api.mongo.create(api, connection, next, api.mongo.collections.jobs, api.mongo.schema.job);
+    // If logger name is provided, use it to search for id
+    if (!connection.params.loggerId && connection.params.logger) {
+      api.mongo.collections.loggerSystems.findOne({ name: connection.params.logger }, { _id:1 }, function(err, logger) {
+        if (!err && logger) {
+          connection.params.loggerId = new String(logger._id);
+          api.mongo.create(api, connection, next, api.mongo.collections.jobs, api.mongo.schema.job);
+        } else if (!logger) {
+          api.response.error(connection, "Logger not found", undefined, 404);
+          next(connection, true);
+        } else {
+          api.response.error(connection, err);
+          next(connection, true);
+        }
+      });
+    } else {
+      api.mongo.create(api, connection, next, api.mongo.collections.jobs, api.mongo.schema.job);
+    }
   }
 };
 
@@ -110,7 +126,7 @@ exports.jobsMessage = {
     required: ['id', 'message'],
     optional: ['facility', 'severity'],
   },
-  authenticated: false,
+  authenticated: true,
   outputExample: {},
   version: 1.0,
   run: function(api, connection, next) {
@@ -169,7 +185,7 @@ exports.jobsSubmit = {
     required: ['id'],
     optional: [],
   },
-  authenticated: false,
+  authenticated: true,
   outputExample: {},
   version: 1.0,
   run: function(api, connection, next) {
@@ -253,7 +269,7 @@ exports.jobsUpdate = {
     required: ['id'],
     optional: ['status', 'email', 'platform', 'language', 'papertrailSystem', 'userId', 'codeUrl', 'options', 'startTime', 'endTime'],
   },
-  authenticated: false,
+  authenticated: true,
   outputExample: {},
   version: 1.0,
   run: function(api, connection, next) {
@@ -271,7 +287,7 @@ exports.jobsMessage = {
     required: ['message'],
     optional: [],
   },
-  authenticated: false,
+  authenticated: true,
   outputExample: {},
   version: 1.0,
   run: function(api, connection, next) {

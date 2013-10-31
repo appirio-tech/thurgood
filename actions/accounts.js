@@ -13,7 +13,7 @@ exports.action = {
     required: [],
     optional: ['q', 'fields', 'sort', 'limit', 'skip', 'id'],
   },
-  authenticated: false,
+  authenticated: true,
   outputExample: {},
   version: 1.0,
   run: function(api, connection, next) {
@@ -31,7 +31,7 @@ exports.accountsCreate = {
     required: ['username', 'email'],
     optional: ['papertrailId'],
   },
-  authenticated: false,
+  authenticated: true,
   outputExample: {},
   version: 1.0,
   run: function(api, connection, next) {
@@ -58,8 +58,16 @@ exports.accountsCreate = {
       } else {
         body = JSON.parse(body);
         if (!body.id || !body.api_token) {
-          api.response.error(connection, body.message);
-          next(connection, true);
+          // Check if the account already exists
+          api.mongo.collections.loggerAccounts.findOne({ name: connection.params.username }, function(err, account) {
+            if (!err && account) {
+              api.response.success(connection, "Account already exists", account, 200);
+            } else {
+              api.response.error(connection, body.message);
+            }
+
+            next(connection, true);
+          });
         } else {
           accountDoc.papertrailId = body.id;
           accountDoc.papertrailApiToken = body.api_token;
@@ -90,7 +98,7 @@ exports.accountsDelete = {
     required: ['id'],
     optional: [],
   },
-  authenticated: false,
+  authenticated: true,
   outputExample: {},
   version: 1.0,
   run: function(api, connection, next) {

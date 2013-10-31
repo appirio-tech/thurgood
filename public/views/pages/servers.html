@@ -1,25 +1,26 @@
 <div class="page-header">
-  <button type="button" class="btn btn-primary pull-right">Create</button>
+  <a type="button" class="btn btn-primary pull-right" href="#/server/create">Create</a>
   <input type="text" class="form-control pull-right search" ng-model="searchText" placeholder="Search">
   <h1>Servers{{totalItems >= 0 ? ' (' + totalItems + ')' : ''}}</h1>
 </div>
+
 <table ng-table="tableParams" template-pagination="ngTable/pagination" class="table table-striped table-bordered table-hover">
-  <tr ng-repeat="row in tableRows">
-    <td data-title="'Server ID'" sortable="_id"><a href="#/servers/{{row._id}}">{{row._id}}</a></td>
-    <td data-title="'Job ID'" sortable="jobId">{{row.jobId}}</td>
-    <td data-title="'Server Name'" sortable="name">{{row.name}}</td>
+  <tr ng-repeat="row in tableRows" ng-click="displayServerDetails(row._id)" class="hand-cursor">
+    <td data-title="'Name'" sortable="name"><a ng-click="displayServerDetails(row._id)">{{row.name}}</a></td>
+    <td data-title="'Installed Services'" sortable="installedServices">{{getStringFromArray(row.installedServices)}}</td>
+    <td data-title="'Languages'" sortable="languages">{{getStringFromArray(row.languages)}}</td>
+    <td data-title="'Operating System'" sortable="operatingSystem">{{row.operatingSystem}}</td>
     <td data-title="'Platform'" sortable="platform">{{row.platform}}</td>
-    <td data-title="'Languages'" sortable="languages">{{row.languages.length > 0 ? row.languages.join(",") : ""}}</td>
-    <td data-title="'Repo Name'" sortable="repoName">{{row.repoName}}</td>
-    <td data-title="'Last Modified'" sortable="updatedAt">{{row.updatedAt}}</td>
-    <td data-title="'Action'"><a href="#/servers/{{row._id}}">Edit</a></td>
+    <td data-title="'Status'" sortable="status">
+      <span ng-class="{'text-success': row.status == 'available', 'text-danger': row.status == 'reserved'}">{{row.status}}</span>
+    </td>
   </tr>
 </table>
 
 <!-- Custom pagination template -->
 <script type="text/ng-template" id="ngTable/pagination">
   <div class="well loading" ng-show="(loading || params.total === 0) && !error">
-    <h2>{{loading ? 'Loading...' : 'No jobs found.'}}</h2>
+    <h2>{{loading ? 'Loading...' : 'No servers found.'}}</h2>
   </div>
   <div class="alert alert-danger" ng-show="!loading && error">
     <h2>{{error}}</h2>

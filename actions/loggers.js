@@ -14,7 +14,7 @@ exports.action = {
     required: [],
     optional: ['q', 'fields', 'sort', 'limit', 'skip', 'id'],
   },
-  authenticated: false,
+  authenticated: true,
   outputExample: {},
   version: 1.0,
   run: function(api, connection, next) {
@@ -32,7 +32,7 @@ exports.loggersCreate = {
     required: ['name', 'loggerAccountId'],
     optional: ['papertrailId'],
   },
-  authenticated: false,
+  authenticated: true,
   outputExample: {},
   version: 1.0,
   run: function(api, connection, next) {
@@ -62,7 +62,6 @@ exports.loggersCreate = {
     else {
       createLogger();
     }
-
 
     // Create a logger 
     // 1. create logger on papertrail
@@ -115,7 +114,7 @@ exports.loggersUpdate = {
     required: ['id'],
     optional: ['name'],
   },
-  authenticated: false,
+  authenticated: true,
   outputExample: {},
   version: 1.0,
   run: function(api, connection, next) {
@@ -133,7 +132,7 @@ exports.loggersDelete = {
     required: ['id'],
     optional: [],
   },
-  authenticated: false,
+  authenticated: true,
   outputExample: {},
   version: 1.0,
   run: function(api, connection, next) {

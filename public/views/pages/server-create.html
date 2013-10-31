@@ -1,0 +1,138 @@
+<div class="page-header">
+    <h1>
+        Create a Server
+    </h1>
+    <a type="button" class="btn btn-primary pull-right" href="#/servers">Back to List</a>
+    <span class="text-danger">*</span><span class="text-muted"> Entries are mandatory</span>
+</div>
+
+<form class="form-horizontal" role="form">
+
+    <div class="form-group">
+        <label for="name" class="col-lg-2 control-label detail-key">
+            Server nNme <span class="text-danger">*</span>
+        </label>
+
+        <div class="col-lg-4">
+            <input type="text" class="form-control" id="name" placeholder="Server display name" ng-model="newServerData.name" required>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="instanceUrl" class="col-lg-2 control-label detail-key">
+            Instance Url <span class="text-danger">*</span>
+        </label>
+
+        <div class="col-lg-6">
+            <input type="text" class="form-control" id="instanceUrl" placeholder="Example: http://login.salesforce.com" ng-model="newServerData.instanceUrl" required>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="repoName" class="col-lg-2 control-label detail-key">
+            Github Repo Name <span class="text-danger">*</span>
+        </label>
+
+        <div class="col-lg-4">
+            <input type="text" class="form-control" id="repoName" placeholder="Repo where the code will be pushed to." ng-model="newServerData.repoName" required>
+        </div>
+    </div>       
+
+    <div class="form-group">
+        <label for="platform" class="col-lg-2 control-label detail-key">
+            Platform <span class="text-danger">*</span>
+        </label>
+
+        <div class="col-lg-4">
+            <input type="text" class="form-control" id="platform" placeholder="Testing platform (e.g. salesforce.com)" ng-model="newServerData.platform" required>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="languages" class="col-lg-2 control-label detail-key">
+            Languages  <span class="text-danger">*</span>
+        </label>
+
+        <div class="col-lg-6">
+            <input type="text" class="form-control" id="languages" placeholder="Enter languages seperated by a comma" ng-list ng-model="newServerData.languages" required>
+        </div>
+    </div> 
+
+    <div class="form-group">
+        <label for="installedServices" class="col-lg-2 control-label detail-key">
+            Installed Services
+        </label>
+
+        <div class="col-lg-6">
+            <input type="text" class="form-control" id="installedServices" placeholder="Enter services seperated by a comma" ng-list ng-model="newServerData.installedServices">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="operatingSystem" class="col-lg-2 control-label detail-key">
+            Operating System
+        </label>
+
+        <div class="col-lg-4">
+            <input type="text" class="form-control" id="operatingSystem" placeholder="Enter the operating system" ng-model="newServerData.operatingSystem">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="username" class="col-lg-2 control-label detail-key">
+            Username
+        </label>
+
+        <div class="col-lg-3">
+            <input type="text" ng-model="newServerData.username" id="username" class="form-control" placeholder="Username for the testing instance">
+        </div>
+    </div>    
+
+    <div class="form-group">
+        <label for="password" class="col-lg-2 control-label detail-key">
+            Password
+        </label>
+
+        <div class="col-lg-3">
+            <input type="password" class="form-control" id="password" placeholder="Password for the testing instance" ng-model="newServerData.password">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="status" class="col-lg-2 control-label detail-key">
+            Status <span class="text-danger">*</span>
+        </label>
+
+        <div class="col-lg-2">
+            <select ng-model="newServerData.status" class="form-control">
+                <option value="available">Available</option>
+                <option value="reserved">Reserved</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-lg-offset-2 col-lg-10">
+            <button type="submit" class="btn btn-primary" ng-click="createServer()">
+                Create
+            </button>
+        </div>
+    </div>
+
+    <div class="form-group" ng-show="creationSuccess">
+        <div class="col-lg-offset-2 col-lg-6">
+            <div class="alert alert-success">
+                New server record created successfully.<br>
+                Id of the new record is {{newRecordId}}
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group" ng-show="creationError">
+        <div class="col-lg-offset-2 col-lg-6">
+            <div class="alert alert-danger">
+                Error creating a new server record. Try again.
+            </div>
+        </div>
+    </div>
+</form>
