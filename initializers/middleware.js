@@ -8,7 +8,7 @@ exports.middleware = function(api, next){
     if(actionTemplate.authenticated === true){
 
       // if for dev we want to skip the API Key authentication for protected routes
-      if (api.configData.general.skipAuthorization === true) { return next(connection, true); }
+      if (api.configData.general.skipAuthorization === "true") { return next(connection, true); }
 
       var redis = api.redis.client;
       var authorization = connection.rawConnection.req.headers.authorization;   
