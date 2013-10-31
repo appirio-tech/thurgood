@@ -7,7 +7,7 @@ exports.action = {
     required: ['key'],
     optional: [],
   },
-  authenticated: false,
+  authenticated: true,
   outputExample: {},
   version: 1.0,
   run: function(api, connection, next) {
