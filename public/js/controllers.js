@@ -91,11 +91,23 @@ thurgood.controller('JobsCtrl', ['$scope', '$filter', '$location', '$modal', 'Jo
 
         // Upload file
         $scope.fileNameChanged = function(file) {
-          document.getElementById("s3UploadForm").submit();
-          var url = 'https://s3-us-west-2.amazonaws.com/cs-thurgood-jobsupload/thurgood/' + $scope.timestamp + '-' + file.name;
-          $scope.job.codeUrl = url;
-          $scope.uploadWarning = 'Note: please make sure the file has finished uploading before pressing Create!';
-          $scope.$apply();
+          $http.post('/api/1/awssignature', {redirect_url: $location.absUrl()}).success(function(res){
+
+            if (res.success != true) {
+              errorHandler(res);
+              return;
+            }
+
+            $scope.policy = res.aws.policy;
+            $scope.signature = res.aws.signature;
+            $scope.$apply();
+
+            document.getElementById("s3UploadForm").submit();
+            var url = 'https://s3-us-west-2.amazonaws.com/cs-thurgood-jobsupload/thurgood/' + $scope.timestamp + '-' + file.name;
+            $scope.job.codeUrl = url;
+            $scope.uploadWarning = 'Note: please make sure the file has finished uploading before pressing Create!';
+            $scope.$apply();
+          });
         };
       }
     });
@@ -334,11 +346,23 @@ thurgood.controller('JobsDetailCtrl', ['$scope', '$routeParams', '$modal', 'Jobs
 
           // Upload file
           $scope.fileNameChanged = function(file) {
-            document.getElementById("s3UploadForm").submit();
-            var url = 'https://s3-us-west-2.amazonaws.com/cs-thurgood-jobsupload/thurgood/' + $scope.job.id + '-' + file.name;
-            $scope.job.codeUrl = detailScope.job.codeUrl = url;
-            $scope.uploadWarning = 'Note: please make sure the file has finished uploading before pressing Upload!';
-            $scope.$apply();
+            $http.post('/api/1/awssignature', {redirect_url: $location.absUrl()}).success(function(res){
+
+              if (res.success != true) {
+                errorHandler(res);
+                return;
+              }
+
+              $scope.policy = res.aws.policy;
+              $scope.signature = res.aws.signature;
+              $scope.$apply();
+
+              document.getElementById("s3UploadForm").submit();
+              var url = 'https://s3-us-west-2.amazonaws.com/cs-thurgood-jobsupload/thurgood/' + $scope.job.id + '-' + file.name;
+              $scope.job.codeUrl = detailScope.job.codeUrl = url;
+              $scope.uploadWarning = 'Note: please make sure the file has finished uploading before pressing Create!';
+              $scope.$apply();
+            });
           };
         }
       });

@@ -153,6 +153,16 @@ configData.rabbitmq = {
   queue: process.env.RABBITMQ_QUEUE
 };
 
+//////////////
+// AWS //
+//////////////
+
+configData.aws = {
+  secret_key: process.env.AWS_SECRET_KEY
+};
+
+//////////////////////////////////
+
 //////////////////////////////////
 
 exports.configData = configData;
