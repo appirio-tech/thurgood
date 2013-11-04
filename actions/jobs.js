@@ -2,6 +2,8 @@ var ObjectID = require('mongodb').ObjectID;
 var amqp = require('amqp');
 var syslogProducer = require('glossy').Produce;
 var glossy = new syslogProducer({ type: 'BSD' });
+var request = require('request');
+var loggers = require('./loggers')
 
 /**
  * GET /jobs
@@ -103,8 +105,66 @@ exports.jobsCreate = {
           connection.params.loggerId = new String(logger._id);
           api.mongo.create(api, connection, next, api.mongo.collections.jobs, api.mongo.schema.job);
         } else if (!logger) {
-          api.response.error(connection, "Logger not found", undefined, 404);
-          next(connection, true);
+          api.mongo.collections.loggerAccounts.findOne({ name: connection.params.userId, email: connection.params.email }, {}, function(err, account) {
+            if(!err && account) {
+              var loggerConnection = new api.connection({
+                type: 'task',
+                remotePort: '0',
+                remoteIP: '0',
+                rawConnection: {}
+              });
+
+              loggerConnection.params = {
+                action: "loggersCreate",
+                apiVersion: 1,
+                name: connection.params.logger,
+                loggerAccountId: new String(account._id)
+              };
+
+              runLocalAction(api, connection, loggerConnection, next, function(id) {
+                connection.params.loggerId = id;
+                api.mongo.create(api, connection, next, api.mongo.collections.jobs, api.mongo.schema.job);
+              });
+            } else if (!account) {
+              var accountConnection = new api.connection({
+                type: 'task',
+                remotePort: '0',
+                remoteIP: '0',
+                rawConnection: {}
+              });
+
+              accountConnection.params = {
+                action: "accountsCreate",
+                apiVersion: 1,
+                username: connection.params.userId,
+                email: connection.params.email
+              };
+
+              runLocalAction(api, connection, accountConnection, next, function(id) {
+                var loggerConnection = new api.connection({
+                  type: 'task',
+                  remotePort: '0',
+                  remoteIP: '0',
+                  rawConnection: {}
+                });
+
+                loggerConnection.params = {
+                  action: "loggersCreate",
+                  apiVersion: 1,
+                  name: connection.params.logger,
+                  loggerAccountId: id
+                };
+
+                runLocalAction(api, connection, loggerConnection, next, function(id) {
+                  connection.params.loggerId = id;
+                  api.mongo.create(api, connection, next, api.mongo.collections.jobs, api.mongo.schema.job);
+                });
+              });
+            } else {
+              api.response.error(connection, err);
+              next(connection, true);
+            }
+          });
         } else {
           api.response.error(connection, err);
           next(connection, true);
@@ -112,6 +172,18 @@ exports.jobsCreate = {
       });
     } else {
       api.mongo.create(api, connection, next, api.mongo.collections.jobs, api.mongo.schema.job);
+    }
+
+    function runLocalAction(api, connection, actionConnection, next, cascadeCreate) {
+      var actionProcessor = new api.actionProcessor({connection: actionConnection, callback: function(internalConnection, cont) {
+        if (internalConnection.error) {
+          api.response.error(connection, internalConnection.error);
+          next(connection, true);
+        } else {
+          cascadeCreate(new String(internalConnection.response.data[0]._id));
+        }
+      }});
+      actionProcessor.processAction();
     }
   }
 };
