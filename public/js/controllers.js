@@ -218,6 +218,108 @@ thurgood.controller('JobsCtrl', ['$scope', '$filter', '$location', '$modal', 'Jo
   promise.catch(errorHandler);
 }]);
 
+
+/**
+ * Controller for the servers page
+ */
+thurgood.controller('ServersCtrl', ['$scope', '$filter', '$location', 'Servers', 'ngTableParams', function($scope, $filter, $location, Servers, ngTableParams) {
+  var promise = Servers.query().$promise;
+  $scope.loading = true;
+
+  // Handle errors
+  var errorHandler = function(err) {
+    $scope.loading = false;
+    $scope.error = err.data.error || err.error || err.message || "Unknown error. Please contact developer.";
+  };
+
+  // API request successful
+  promise.then(function(res) {
+    if (res.success === false) {
+      errorHandler(res);
+      return;
+    }
+
+    var searchedData = res.data;
+    $scope.loading = false;
+    $scope.totalItems = res.data.length;
+    $scope.error = undefined;
+
+    // Format dates
+    for (i = 0; i < res.data.length; i++) {
+      res.data[i].updatedAt = new Date(res.data[i].updatedAt).toISOString();
+    }
+
+    // Setup ngTable
+    $scope.tableParams = new ngTableParams(
+      // Merge default params with url
+      angular.extend({
+        page: 1,
+        total: res.data.length,
+        count: 10,
+        sorting: {updatedAt: 'desc'}
+      },
+      $location.search())
+    );
+
+    // Watch for changes of the table parameters
+    $scope.$watch('tableParams', function(params) {
+      // Put params in url
+      $location.search(
+        angular.extend({
+          page: 1,
+          total: res.data.length,
+          count: 10,
+          sorting: {updatedAt: 'desc'}
+        },
+        params.url())
+      );
+
+      // Use built-in angular filter
+      var orderedData = params.sorting ? $filter('orderBy')(searchedData, params.orderBy()) : searchedData;
+
+      // Slice array data on pages
+      $scope.tableRows = orderedData.slice(
+        (params.page - 1) * params.count,
+        params.page * params.count
+      );
+    }, true);
+
+    // Watch for changes of the search input value
+    var searchTextWatcher = function(searchText) {
+      if (searchText === undefined)
+        return;
+
+      // Put query in url
+      $location.search(
+        angular.extend({
+          page: 1,
+          total: res.data.length,
+          count: 10,
+          sorting: {updatedAt: 'desc'}
+        },
+        {search: searchText})
+      );
+
+      // Use built-in angular filter
+      searchedData = $filter('filter')(res.data, searchText);
+
+      // Update table params
+      $scope.tableParams.page = 1;
+      $scope.tableParams.total= searchedData.length;
+    };
+
+    // Set watcher
+    $scope.$watch('searchText', searchTextWatcher, true);
+
+    // Load last search
+    $scope.searchText = $location.search().search;
+    searchTextWatcher($scope.searchText);
+  });
+
+  // API request error
+  promise.catch(errorHandler);
+}]);
+
 /**
  * Controller for a job's detail page
  */

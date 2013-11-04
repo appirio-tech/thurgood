@@ -2,6 +2,7 @@ var ObjectID = require('mongodb').ObjectID;
 var amqp = require('amqp');
 var syslogProducer = require('glossy').Produce;
 var glossy = new syslogProducer({ type: 'BSD' });
+var request = require('request');
 
 /**
  * GET /jobs
@@ -102,9 +103,104 @@ exports.jobsCreate = {
         if (!err && logger) {
           connection.params.loggerId = new String(logger._id);
           api.mongo.create(api, connection, next, api.mongo.collections.jobs, api.mongo.schema.job);
-        } else if (!logger) {
-          api.response.error(connection, "Logger not found", undefined, 404);
-          next(connection, true);
+        } else if (!logger) { // logger not found
+
+          // find an existing account using userId and email from job parameters
+          api.mongo.collections.loggerAccounts.findOne({ name: connection.params.userId, email: connection.params.email}, function(err, account) {
+            if (!err && account) {
+              var accountId = new String(account._id);
+              var logger_name = connection.params.logger
+
+              var params = {
+                name: logger_name,
+                loggerAccountId: accountId
+              };            
+
+              // Create logger
+              request.post({ url: 'http://thurgood-staging.herokuapp.com/api/1/loggers', form: params, auth: api.configData.papertrail.auth }, function (err, response, body) {
+                if (err) {
+                  api.response.error(connection, err);
+                  next(connection, true);                
+                } else {
+
+                  try {
+                    body = JSON.parse(body);
+                    api.log(["[Logger ID]", body.data[0]._id], "debug");
+
+                    if (body.message) {
+                      api.log(["[Job with Logger] Create Logger Error: ", body.message], "error");
+                      return deferred.reject(body.message);
+                    }
+
+                    connection.params.loggerId = body.data[0]._id;
+                    api.mongo.create(api, connection, next, api.mongo.collections.jobs, api.mongo.schema.job);
+
+                  } catch (err){
+                    api.response.error(connection, "Error creating logger for job ");
+                    next(connection, true);             
+                  }
+                }
+              });
+            } else if(!account) { //Account not found
+                var params = {
+                  username: connection.params.userId,
+                  email: connection.params.email
+                };  
+
+                // Create new Account              
+                request.post({ url: 'http://thurgood-staging.herokuapp.com/api/1/accounts', form: params, auth: api.configData.papertrail.auth }, function (err, response, body) {
+                  if (err) {
+                    api.response.error(connection, err);
+                    next(connection, true);
+                  } else {
+                    try {
+                      body = JSON.parse(body);
+                      api.log(["[Account ID]", body.data[0]._id], "debug");
+
+                      var accountId = body.data[0]._id;
+
+                      var params = {
+                        name: connection.params.logger,
+                        loggerAccountId: accountId
+                      };            
+
+                      // Create new logger with the account created
+                      request.post({ url: 'http://thurgood-staging.herokuapp.com/api/1/loggers', form: params, auth: api.configData.papertrail.auth }, function (err, response, body) {
+                        if (err) {
+                          api.response.error(connection, err);
+                          next(connection, true);                
+                        } else {
+
+                          try {
+                            body = JSON.parse(body);
+                            api.log(["[Logger ID]", body.data[0]._id], "debug");
+
+                            if (body.message) {
+                              api.log(["[Job with Logger] Create Logger Error: ", body.message], "error");
+                              return deferred.reject(body.message);
+                            }
+
+                            connection.params.loggerId = body.data[0]._id;
+                            api.mongo.create(api, connection, next, api.mongo.collections.jobs, api.mongo.schema.job);
+
+                          } catch (err){
+                            api.response.error(connection, "Error creating logger for job ");
+                            next(connection, true);             
+                          }
+
+                        }
+                      });                      
+                    } catch (err){
+                      api.response.error(connection, "Error creating logger for job ");
+                      next(connection, true);             
+                    }
+                  }
+                });
+            } else {
+              api.response.error(connection, err);
+              next(connection, true);              
+            }          
+          });
         } else {
           api.response.error(connection, err);
           next(connection, true);
