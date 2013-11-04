@@ -210,7 +210,7 @@ exports.jobsSubmit = {
         };
 
         var newDoc = {
-          jobId: doc._id,
+          jobId: doc._id.toString(),
           status: 'reserved',
           updatedAt: new Date().getTime()
         };
