@@ -153,7 +153,7 @@ exports.jobsCreate = {
       api.mongo.collections.loggerAccounts.findOne({ name: connection.params.userId, email: connection.params.email }, {}, function(err, account) {
         // if we found and existing account, just create the logger
         if(!err && account) {
-          var loggerConnection = new api.connection({ type: 'task', remotePort: '0', remoteIP: '0', rawConnection: {} });
+          var loggerConnection = new api.connection({ type: 'task', remotePort: '0', remoteIP: '0', rawConnection: {req: { headers: {authorization: "Token token=" + process.env.THIS_API_KEY}}}});
           loggerConnection.params = { action: "loggersCreate", apiVersion: 1, name: crypto.randomBytes(16).toString('hex'), loggerAccountId: new String(account._id) };
 
           runLocalAction(api, connection, loggerConnection, next, function(id) {
