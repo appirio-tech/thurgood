@@ -45,7 +45,7 @@ exports.job = {
   endTime: null,
   language: null,
   options: [],
-  loggerId: new ObjectID(),
+  loggerId: null,
   platform: null,
   startTime: null,
   updatedAt: null,
