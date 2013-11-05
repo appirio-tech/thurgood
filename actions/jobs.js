@@ -114,24 +114,24 @@ exports.jobsCreate = {
           api.mongo.collections.loggerAccounts.findOne({ name: connection.params.userId, email: connection.params.email }, {}, function(err, account) {
             // if we found and existing account, just create the logger
             if(!err && account) {
-              var loggerConnection = new api.connection({ type: 'task', remotePort: '0', remoteIP: '0', rawConnection: {} });
+              var loggerConnection = new api.connection({ type: 'task', remotePort: '0', remoteIP: '0', rawConnection: {req: { headers: {authorization: "Token token=" + process.env.THIS_API_KEY}}}});
               loggerConnection.params = { action: "loggersCreate", apiVersion: 1, name: connection.params.logger, loggerAccountId: new String(account._id) };
 
               runLocalAction(api, connection, loggerConnection, next, function(id) {
-                connection.params.loggerId = id;
+                connection.params.loggerId = id.toString();
                 api.mongo.create(api, connection, next, api.mongo.collections.jobs, api.mongo.schema.job);
               });
             // if we didn't find an account, create the account and also the logger  
             } else if (!account) {
-              var accountConnection = new api.connection({ type: 'task', remotePort: '0', remoteIP: '0', rawConnection: {} });
+              var accountConnection = new api.connection({ type: 'task', remotePort: '0', remoteIP: '0', rawConnection: {req: { headers: {authorization: "Token token=" + process.env.THIS_API_KEY}}}});
               accountConnection.params = { action: "accountsCreate", apiVersion: 1, username: connection.params.userId, email: connection.params.email };
 
               runLocalAction(api, connection, accountConnection, next, function(id) {
-                var loggerConnection = new api.connection({ type: 'task', remotePort: '0', remoteIP: '0', rawConnection: {} });
+                var loggerConnection = new api.connection({ type: 'task', remotePort: '0', remoteIP: '0', rawConnection: {req: { headers: {authorization: "Token token=" + process.env.THIS_API_KEY}}}});
                 loggerConnection.params = { action: "loggersCreate", apiVersion: 1, name: connection.params.logger, loggerAccountId: id };
 
                 runLocalAction(api, connection, loggerConnection, next, function(id) {
-                  connection.params.loggerId = id;
+                  connection.params.loggerId = id.toString();
                   api.mongo.create(api, connection, next, api.mongo.collections.jobs, api.mongo.schema.job);
                 });
               });
@@ -162,11 +162,11 @@ exports.jobsCreate = {
           });
         // if we didn't find an account, create the account and also the logger  
         } else if (!account) {
-          var accountConnection = new api.connection({ type: 'task', remotePort: '0', remoteIP: '0', rawConnection: {} });
+          var accountConnection = new api.connection({ type: 'task', remotePort: '0', remoteIP: '0', rawConnection: {req: { headers: {authorization: "Token token=" + process.env.THIS_API_KEY}}}});
           accountConnection.params = { action: "accountsCreate", apiVersion: 1, username: connection.params.userId, email: connection.params.email };
 
           runLocalAction(api, connection, accountConnection, next, function(id) {
-            var loggerConnection = new api.connection({ type: 'task', remotePort: '0', remoteIP: '0', rawConnection: {} });
+            var loggerConnection = new api.connection({ type: 'task', remotePort: '0', remoteIP: '0', rawConnection: {req: { headers: {authorization: "Token token=" + process.env.THIS_API_KEY}}}});
             loggerConnection.params = { action: "loggersCreate", apiVersion: 1, name: crypto.randomBytes(16).toString('hex'), loggerAccountId: id };
 
             runLocalAction(api, connection, loggerConnection, next, function(id) {
