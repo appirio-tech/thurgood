@@ -117,12 +117,19 @@ exports.accountsDelete = {
       if (!err && doc) {
         request.del({ url: api.configData.papertrail.accountsUrl + "/" + doc.papertrailId, auth: api.configData.papertrail.auth }, function (err, response, body) {
           if (!err) {
-            api.response.success(connection, "Account deleted successfully");
+            // Account deleted in Papertrail, now remove orphaned loggers in MongoDB
+            api.mongo.collections.loggerSystems.remove({ loggerAccountId: doc._id }, {}, function(err, numberOfRemovedDocs) {
+              if(!err) {
+                api.response.success(connection, "Account and " + numberOfRemovedDocs + " Loggers deleted successfully");
+              } else {
+                api.response.success(connection, "Account deleted successfully, but error while removing loggers");
+              }
+              next(connection, true);
+            });
           } else {
             api.response.error(connection, err);
+            next(connection, true);
           }
-          
-          next(connection, true);
         });
       } else if (!doc) {
         api.response.error(connection, "Account not found");
