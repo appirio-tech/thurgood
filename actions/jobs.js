@@ -157,7 +157,7 @@ exports.jobsCreate = {
           loggerConnection.params = { action: "loggersCreate", apiVersion: 1, name: crypto.randomBytes(16).toString('hex'), loggerAccountId: new String(account._id) };
 
           runLocalAction(api, connection, loggerConnection, next, function(id) {
-            connection.params.loggerId = id;
+            connection.params.loggerId = id.toString();
             api.mongo.create(api, connection, next, api.mongo.collections.jobs, api.mongo.schema.job);
           });
         // if we didn't find an account, create the account and also the logger  
@@ -170,7 +170,7 @@ exports.jobsCreate = {
             loggerConnection.params = { action: "loggersCreate", apiVersion: 1, name: crypto.randomBytes(16).toString('hex'), loggerAccountId: id };
 
             runLocalAction(api, connection, loggerConnection, next, function(id) {
-              connection.params.loggerId = id;
+              connection.params.loggerId = id.toString();
               api.mongo.create(api, connection, next, api.mongo.collections.jobs, api.mongo.schema.job);
             });
           });
