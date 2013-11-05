@@ -28,6 +28,42 @@ describe("POST /jobs", function () {
       done();
     });
   });
+
+  it("should create logger, if loggerName does not exist", function (done) {
+    var params = {
+      userId: 'jeffd-does-not-exist',
+      platform: 'Heroku',
+      language: 'Java',
+      logger: 'JeffsNewestLoggerWDNE',
+      email: 'jeffd-does-not-exist@thurgood.com',
+      codeUrl: 'https://www.example.com/src2.zip'
+    };
+
+    request.post({ url: setup.testUrl + "/jobs", form: params }, function (err, response, body) {
+      body = JSON.parse(body);
+      assert.ok(body.success);
+      assert.ok(body.data[0].userId == params.userId);
+
+      request.get(setup.testUrl + "/loggers/" + new String(body.data[0].loggerId), function (err, response, body) {
+        body = JSON.parse(body);
+        assert.ok(body.success);
+        var testingAccountId = body.data[0].loggerAccountId;
+
+        // Delete newly created logger
+        request.del(setup.testUrl + "/loggers/" + body.data[0]._id, function (err, response, body) {
+          body = JSON.parse(body);
+          assert.ok(body.success);
+
+          // Delete associated account
+          request.del(setup.testUrl + "/accounts/" + testingAccountId, function (err, response, body) {
+            body = JSON.parse(body);
+            assert.ok(body.success);
+            done();
+          });
+        });
+      });
+    });
+  });
 });
 
 describe("GET /jobs", function () {
