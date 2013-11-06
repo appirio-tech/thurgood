@@ -50,6 +50,7 @@ exports.job = {
   startTime: null,
   updatedAt: null,
   userId: null,
+  project: null,
   status: 'created'
 };
 
