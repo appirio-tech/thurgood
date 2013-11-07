@@ -11,7 +11,7 @@ exports.mongodb = function (api, next) {
   // Connect to the database
   MongoClient.connect(api.configData.mongo.serverUri, { server: { auto_reconnect: true } }, function(err, db) {
     if(!err) {
-      api.log("Connected to MongoDB", "notice");
+      console.log("[DEBUG] Successfully connected to MongoDB!");
       api.mongo.db = db;
 
       // Define collections
@@ -34,8 +34,8 @@ exports.mongodb = function (api, next) {
 
       next();
     } else {
-      api.log("Couldn't connect to MongoDB", "error");
-      api.log(err, "error");
+      console.log("[FATAL] ****** ERROR ****** -- Couldn't connect to MongoDB!");
+      console.log(err);
       next();
     }
   });
