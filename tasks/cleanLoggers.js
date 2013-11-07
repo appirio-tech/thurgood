@@ -11,13 +11,24 @@ exports.task = {
     var period = 90 * 24 * 60 * 60 * 1000; // 90 days
     
     // Find old loggers and delete them from database and Papertrail
-    api.mongo.collections.loggers.find({ updatedAt: { $lt: (now - period) } }, function(err, docs) {
+    api.mongo.collections.loggerSystems.find({ updatedAt: { $lt: (now - period) } }).toArray(function(err, docs) {
       if (!err) {
-        _.each(docs, function(doc) {
-          // Call DELETE /loggers/:id endpoint
+        var loggerConnection = new api.connection({ type: 'task', remotePort: '0', remoteIP: '0', rawConnection: {req: { headers: {authorization: "Token token=" + process.env.THIS_API_KEY}}}});
+        _.each(docs, function(doc) { 
+          var loggerId = doc._id.toString();
+          loggerConnection.params = { action: "loggersDelete", apiVersion: 1, id: loggerId };
+          // call the endpoint to delete the logger
+          var actionProcessor = new api.actionProcessor({connection: loggerConnection, callback: function(internalConnection, cont) {
+            if (internalConnection.error) {
+              console.log("Error deleting logger " + loggerId + ": " + internalConnection.error);
+            } else {
+              console.log(internalConnection.response.message + ": " + loggerId); 
+            }
+          }});
+          actionProcessor.processAction();  
         });
       } else {
-        api.log(err, "error");
+        console.log("[FATAL] Error cleaning loggers: " + err);
       }
     });
 
