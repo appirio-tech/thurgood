@@ -9,8 +9,9 @@
     <td data-title="'Job ID'" sortable="_id"><a href="#/jobs/{{row._id}}">{{row._id}}</a></td>
     <td data-title="'Platform'" sortable="platform">{{row.platform}}</td>
     <td data-title="'Language'" sortable="language">{{row.language}}</td>
+    <td data-title="'Project'" sortable="project">{{row.project}}</td>
+    <td data-title="'User'" sortable="userId">{{row.userId}}</td>
     <td data-title="'Status'" sortable="status">{{row.status}}</td>
-    <td data-title="'Last Modified'" sortable="updatedAt">{{row.updatedAt}}</td>
     <td data-title="'Action'"><button type="button" class="btn btn-info btn-xs" ng-click="submitJob(row._id)">{{submitStatus[row._id] || 'Submit'}}</button></td>
   </tr>
 </table>

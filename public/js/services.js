@@ -15,7 +15,7 @@ thurgood.factory('Jobs', ['$resource', function ($resource) {
       method: 'GET',
       params: {
         limit: 0,
-        fields: '{"platform":1,"language":1,"status":1,"updatedAt":1}'
+        fields: '{"platform":1,"language":1,"status":1,"updatedAt":1, "project":1, "userId":1}'
       }
     },
     update: {

@@ -136,7 +136,6 @@ thurgood.controller('JobsCtrl', ['$scope', '$filter', '$location', '$modal', 'Jo
       errorHandler(res);
       return;
     }
-
     var searchedData = res.data;
     $scope.loading = false;
     $scope.totalItems = res.data.length;

@@ -83,16 +83,13 @@ function get(api, connection, next, collection) {
 
   // Otherwise try to parse selector parameter
   else {
-    console.log(connection.params.q);
+    
     try {
       selector = JSON.parse(connection.params.q);
     } catch(err) {
-      console.log(err);
       selector = {};
     }
   }
-
-  console.log(selector);
   
   // Try to parse fields parameter
   try {
@@ -114,8 +111,6 @@ function get(api, connection, next, collection) {
     options.skip = connection.params.skip;
     options.sort = sort;
   }
-
-  console.log(options);
 
   // Find documents
   collection.find(selector, fields, options).toArray(function(err, docs) {
