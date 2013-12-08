@@ -1,12 +1,14 @@
 var Q = require("q");
 var _ = require('underscore');
 var crypto = require('crypto');
+var userRoles = require('../public/js/routingConfig').userRoles;
+var accessLevels = require('../public/js/routingConfig').accessLevels;
 
 // User email and role mapping table
 // This is a temporay solution. 
 var userRoleMap = {
-  "somebody@cloudspokes.com": "admin",
-  "user@cloudspokes.com": "user"
+  "admin@cloudspokes.com": userRoles.admin,
+  "user@cloudspokes.com": userRoles.user
 };
 
 /*
@@ -58,7 +60,7 @@ exports.users = function(api, next){
       doc = _.extend(doc, attrs);
 
       // sets role using userRoleMap table.
-      doc.role = userRoleMap[attrs.email] || "user";
+      doc.role = userRoleMap[attrs.email] || userRoles.user;
 
       // checks if the email is valid
       if(isValidEmail(attrs.email) == false) {
@@ -92,7 +94,10 @@ exports.users = function(api, next){
     },
 
     isAccessible: function(user, action) {
-      return true;
+      var role = (user && user.role) ? user.role : userRoles.anon;
+      var access = action.access || accessLevels.public;
+
+      return access.bitMask & role.bitMask;
     }
   }
 

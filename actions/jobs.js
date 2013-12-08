@@ -5,6 +5,7 @@ var glossy = new syslogProducer({ type: 'BSD' });
 var request = require('request');
 var loggers = require('./loggers');
 var crypto = require('crypto');
+var accessLevels = require('../public/js/routingConfig').accessLevels;
 
 /**
  * GET /jobs
@@ -20,6 +21,7 @@ exports.action = {
   authenticated: true,
   outputExample: {},
   version: 1.0,
+  access: accessLevels.user,
   run: function(api, connection, next) {
     api.mongo.get(api, connection, next, api.mongo.collections.jobs);
   }
