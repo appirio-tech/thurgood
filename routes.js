@@ -11,7 +11,10 @@ exports.routes = {
     { path: "/:apiVersion/jobs", action: "jobsFetch" },
     { path: "/:apiVersion/pt/token/:key", action: "ptFetchToken" },
     { path: "/auth/google/return", action: "googleAuthReturn" },
-    { path: "/auth/google", action: "googleAuthStart" }
+    { path: "/auth/google", action: "googleAuthStart" },
+    { path: "/userinfo", action: "fetchCurrentUser" },
+    { path: "/logout", action: "logout"}
+
   ],
 
   post: [

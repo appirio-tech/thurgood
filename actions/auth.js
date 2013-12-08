@@ -134,6 +134,74 @@ exports.googleAuthReturn = {
     }
 
   }
+};
+
+
+/**
+ * GET /api/userinfo
+ */
+exports.fetchCurrentUser = {
+  name: "fetchCurrentUser",
+  description: "fetches current logged in user info",
+  inputs: {
+    required: [],
+    optional: [],
+  },
+  authenticated: false,
+  outputExample: {},
+  version: 1.0,
+  run: function(api, connection, next) {
+
+    api.session.getCurrentUser(connection)
+    .then(respondOk)
+    .fail(respondError)
+    .done();
+
+    function respondOk(user) {
+      api.response.success(connection, undefined, user);
+      next(connection, true);
+    }
+
+    function respondError(err) {
+      api.response.error(connection, err);
+      next(connection, true);
+    }
+
+  }
+};
+
+/**
+ * GET /logout
+ */
+exports.logout = {
+  name: "logout",
+  description: "logout",
+  inputs: {
+    required: [],
+    optional: [],
+  },
+  authenticated: false,
+  outputExample: {},
+  version: 1.0,
+  run: function(api, connection, next) {
+
+    api.session.clear(connection)
+    .then(respondOk)
+    .fail(respondError)
+    .done();
+
+    function respondOk(user) {
+      api.response.success(connection, undefined, {});
+      next(connection, true);
+    }
+
+    function respondError(err) {
+      api.response.error(connection, err);
+      next(connection, true);
+    }
+
+  }
 }
+
 
 

@@ -6,11 +6,39 @@ var thurgood = angular.module('thurgoodControllers', []);
 /**
  * Controller for the top navigation bar
  */
-thurgood.controller('NavCtrl', ['$scope', '$location', function($scope, $location) {
+thurgood.controller('NavCtrl', ['$scope', '$location', '$http', function($scope, $location, $http) {
+
+  // get current logged-in user info
+  $http.get('/api/userinfo').success(function(res){
+    $scope.user = res.data;
+
+    // set api key
+    if($scope.user) {
+      console.log("set api key", $scope.user.apiKey);
+      $http.defaults.headers.common['Authorization'] = 'Token token=' + $scope.user.apiKey;
+    }
+  });
+
   // Check if loc matches the current location
   $scope.isActive = function(loc) {
     return loc == $location.path();
   };
+
+  $scope.loginText = function() {
+    return this.user ? "LOGOUT" : "LOGIN";
+  };
+
+  $scope.loginOrLogout = function() {
+    if(this.user) {
+      $http.get("/api/logout").success(function() {
+        $scope.user = null;
+      });
+    }
+    else {
+      window.location.pathname = "/api/auth/google"; 
+    }
+  }
+
 }]);
 
 /**
