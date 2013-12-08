@@ -20,6 +20,7 @@ exports.mongodb = function (api, next) {
       api.mongo.collections.apiKeys = db.collection('apiKeys');
       api.mongo.collections.loggerAccounts = db.collection('loggerAccounts');
       api.mongo.collections.loggerSystems = db.collection('loggerSystems');
+      api.mongo.collections.users = db.collection('users');
 
       // Define document schemas
       api.mongo.schema = Schema;

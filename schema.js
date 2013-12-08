@@ -94,3 +94,18 @@ exports.loggerSystem = {
   syslogPort: null,
   updatedAt: null
 };
+
+
+/**
+ * Schema document for the loggerSystems collection
+ * @type {Object}
+ */
+exports.user = {
+  _id: null,
+  email: null,
+  name: null,
+  apiKey: null,
+  role: "user", // anon, user, admin
+  createdAt: null,
+  updatedAt: null
+};
