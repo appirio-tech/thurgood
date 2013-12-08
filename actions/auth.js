@@ -25,7 +25,14 @@ exports.action = {
   run: function(api, connection, next) {
     // remove me : just for test
     // api.users.delete({email: "abc@cloudspokes.com"}).then(function() {console.log("db success", arguments)});
-    // api.session.getCurrentUser(connection).then(function() {console.log("session success", arguments)});
+    // api.session.getCurrentUser(connection).then(function(user) {
+    //   console.log("session success", user);
+    //   if(user) {
+    //     api.redis.client.hget("api:keys", user.apiKey, function(email) {
+    //       console.log("APIKEY", user.apiKey, "email =", email);
+    //     });
+    //   }
+    // });
     // api.session.clear(connection);
 
 
@@ -83,7 +90,6 @@ exports.googleAuthReturn = {
     if(connection.params["openid.mode"] !== "id_res") {
       return handleError(new Error("Authentication Failed"));
     }
-    
 
     var email = connection.params["openid.ext1.value.email"];
     email = "abc@cloudspokes.com"; // remove me, for test
@@ -92,10 +98,11 @@ exports.googleAuthReturn = {
     // flows
     // 1. find a user by email
     // 2. creates a user if not exist
-    // 3. add user to session.
+    // 3. sets apikey and add user to session.
     // 4. redirect to previous path
     api.users.findByEmail(email)
     .then(createUserIfNotExist)
+    .then(setApiKey)
     .then(addUserToSession)
     .then(handleSuccess)
     .fail(handleError)
@@ -103,6 +110,11 @@ exports.googleAuthReturn = {
 
     function createUserIfNotExist(user) {
       return user || api.users.create({email: email, name: fullname});
+    }
+
+    function setApiKey(user) {
+      api.redis.client.hset("api:keys", user.apiKey, user.email);
+      return user;
     }
 
     function addUserToSession(user) {
@@ -151,6 +163,15 @@ exports.fetchCurrentUser = {
   outputExample: {},
   version: 1.0,
   run: function(api, connection, next) {
+
+    // remove me, for test
+    // api.session.getCurrentUser(connection).then(function(user) {
+    //   if(user) {
+    //     api.redis.client.hget("api:keys", user.apiKey, function(err, email) {
+    //       console.log("APIKEY", user.apiKey, "email =", email);
+    //     });
+    //   }
+    // });
 
     api.session.getCurrentUser(connection)
     .then(respondOk)

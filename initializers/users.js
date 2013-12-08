@@ -89,6 +89,10 @@ exports.users = function(api, next){
       collection.findAndModify({email: user.email}, {}, {}, { remove: true }, deferred.makeNodeResolver());
 
       return deferred.promise;
+    },
+
+    isAccessible: function(user, action) {
+      return true;
     }
   }
 
