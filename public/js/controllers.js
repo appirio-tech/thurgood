@@ -6,18 +6,7 @@ var thurgood = angular.module('thurgoodControllers', []);
 /**
  * Controller for the top navigation bar
  */
-thurgood.controller('NavCtrl', ['$scope', '$location', '$http', function($scope, $location, $http) {
-
-  // get current logged-in user info
-  $http.get('/api/userinfo').success(function(res){
-    $scope.user = res.data;
-
-    // set api key
-    if($scope.user) {
-      console.log("set api key", $scope.user.apiKey);
-      $http.defaults.headers.common['Authorization'] = 'Token token=' + $scope.user.apiKey;
-    }
-  });
+thurgood.controller('NavCtrl', ['$scope', '$location', '$http', 'Auth', function($scope, $location, $http, Auth) {
 
   // Check if loc matches the current location
   $scope.isActive = function(loc) {
@@ -25,17 +14,15 @@ thurgood.controller('NavCtrl', ['$scope', '$location', '$http', function($scope,
   };
 
   $scope.loginText = function() {
-    return this.user ? "LOGOUT" : "LOGIN";
+    return Auth.isLoggedIn() ? "LOGOUT" : "LOGIN";
   };
 
   $scope.loginOrLogout = function() {
-    if(this.user) {
-      $http.get("/api/logout").success(function() {
-        $scope.user = null;
-      });
+    if(Auth.isLoggedIn()) {
+      Auth.logout();
     }
     else {
-      window.location.pathname = "/api/auth/google"; 
+      Auth.googleLogin();
     }
   }
 

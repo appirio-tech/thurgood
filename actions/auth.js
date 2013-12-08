@@ -167,6 +167,7 @@ exports.fetchCurrentUser = {
     // remove me, for test
     // api.session.getCurrentUser(connection).then(function(user) {
     //   if(user) {
+    //     console.log("debug", user);
     //     api.redis.client.hget("api:keys", user.apiKey, function(err, email) {
     //       console.log("APIKEY", user.apiKey, "email =", email);
     //     });

@@ -66,3 +66,58 @@ thurgood.factory('Pt', ['$resource', function ($resource) {
         query: { method: 'GET' }
     });
 }]);
+
+
+thurgood.factory('Auth', function($http){
+
+    var accessLevels = routingConfig.accessLevels
+        , userRoles = routingConfig.userRoles
+        , currentUser = { username: '', role: userRoles.anon };
+
+
+    function changeUser(user) {
+        _.extend(currentUser, user);
+    };
+
+    return {
+      getCurrentUser: function(success, error) {
+        $http.get('/api/userinfo').success(function(res){
+          if(res.data) {
+            currentUser = res.data;  
+            console.log("set api key", currentUser.apiKey);
+            $http.defaults.headers.common['Authorization'] = 'Token token=' + currentUser.apiKey;            
+          }
+
+          success && success(currentUser);
+          
+        }).error(error);
+      },
+
+      isLoggedIn: function(user) {
+        if(user === undefined)
+            user = currentUser;
+        return user.role.title == userRoles.user.title || user.role.title == userRoles.admin.title;
+      },
+
+      logout: function() {
+        $http.get("/api/logout").success(function() {
+          currentUser = { username: '', role: userRoles.anon };
+        });
+      },
+
+      googleLogin: function() {
+        window.location.pathname = "/api/auth/google"; 
+      },
+
+      isAccessible: function(access) {
+        access = access || accessLevels.public;
+        console.log("debug", access, currentUser.role)
+        return access.bitMask & currentUser.role.bitMask;
+      },
+
+      accessLevels: accessLevels,
+      userRoles: userRoles,
+      user: currentUser
+    };
+});
+
