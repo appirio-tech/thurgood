@@ -240,3 +240,8 @@ h1 {
 .hand-cursor {
   cursor: pointer;
 }
+
+
+.navbar .btn.login {
+  margin-top: 10px;
+}

@@ -21,7 +21,9 @@
     "glossy": "~0.1.5",
     "underscore": "~1.5.2",
     "request": "~2.27.0",
-    "string": "~1.6.0"
+    "string": "~1.6.0",
+    "openid": "*"
+    
   },
   "devDependencies": {
     "mocha": "~1.13.0",

@@ -1,5 +1,8 @@
 <nav class="navbar navbar-fixed-top navbar-default" role="navigation" ng-controller="NavCtrl">
   <div class="container">
+    
+    <a href="/api/auth/google" class="btn btn-primary pull-right login">LOGIN</a>
+
     <!-- Brand and toggle get grouped for better mobile display -->
     <div class="navbar-header">
       <button type="button" class="navbar-toggle" ng-init="navCollapsed = true" ng-click="navCollapsed = !navCollapsed">
@@ -18,5 +21,6 @@
         <li ng-class="{active:isActive('/servers')}"><a href="#/servers">Servers</a></li>
       </ul>
     </div><!-- /.navbar-collapse -->
+
   </div><!-- /.container -->
 </nav>
