@@ -68,7 +68,7 @@ thurgood.factory('Pt', ['$resource', function ($resource) {
 }]);
 
 
-thurgood.factory('Auth', function($http){
+thurgood.factory('Auth', function($http, $location){
 
     var accessLevels = routingConfig.accessLevels
         , userRoles = routingConfig.userRoles
@@ -76,14 +76,14 @@ thurgood.factory('Auth', function($http){
 
 
     function changeUser(user) {
-        _.extend(currentUser, user);
+        angular.extend(currentUser, user);
     };
 
     return {
       getCurrentUser: function(success, error) {
         $http.get('/api/userinfo').success(function(res){
           if(res.data) {
-            currentUser = res.data;  
+            changeUser(res.data);
             console.log("set api key", currentUser.apiKey);
             $http.defaults.headers.common['Authorization'] = 'Token token=' + currentUser.apiKey;            
           }
@@ -93,15 +93,16 @@ thurgood.factory('Auth', function($http){
         }).error(error);
       },
 
-      isLoggedIn: function(user) {
-        if(user === undefined)
-            user = currentUser;
+      isLoggedIn: function() {
+        var user = currentUser;
         return user.role.title == userRoles.user.title || user.role.title == userRoles.admin.title;
       },
 
       logout: function() {
         $http.get("/api/logout").success(function() {
-          currentUser = { username: '', role: userRoles.anon };
+          changeUser({username: '', role: userRoles.anon});
+          $http.defaults.headers.common['Authorization'] = 'Token token=invalid';
+          $location.path('/');
         });
       },
 
