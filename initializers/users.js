@@ -69,7 +69,12 @@ exports.users = function(api, next){
       // sets a random generated string to apiKey.
       crypto.randomBytes(16, function(ex, buf) {
         doc.apiKey = buf.toString('hex');
-        collection.insert(doc, deferred.makeNodeResolver());
+
+        console.log("[User]", "create user", doc);
+        collection.insert(doc, {safe: true}, function(err, result) {
+          if(err) { return deferred.reject(err); }
+          deferred.resolve(doc);
+        });
       });      
 
       return deferred.promise;
