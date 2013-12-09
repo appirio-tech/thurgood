@@ -7,8 +7,7 @@ var accessLevels = require('../public/js/routingConfig').accessLevels;
 // User email and role mapping table
 // This is a temporay solution. 
 var userRoleMap = {
-  "admin@cloudspokes.com": userRoles.admin,
-  "user@cloudspokes.com": userRoles.user
+  "jdouglas@appirio.com": userRoles.admin
 };
 
 /*
@@ -105,7 +104,8 @@ exports.users = function(api, next){
 
   // returns true if emails ends with "@cloudspokes.com" or "@appirio.com"
   function isValidEmail(email) {
-    return !!email.match(/.+@(cloudspokes|apprio).com$/);
+    //return !!email.match(/.+@(cloudspokes|apprio).com$/);
+    return email.indexOf("@appirio.com") > 0 ? true : false
   }
 
   next();
