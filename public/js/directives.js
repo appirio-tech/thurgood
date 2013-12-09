@@ -26,3 +26,26 @@ thurgood.directive("bootstrapFooter", function() {
     templateUrl: 'views/directives/footer.html'
   };
 });
+
+
+thurgood.directive('accessLevel', ['Auth', function(Auth) {
+  return {
+    restrict: 'A',
+    link: function($scope, element, attrs) {
+      var prevDisp = element.css('display');
+      var access = Auth.accessLevels[attrs.accessLevel];
+
+      $scope.user = Auth.user;
+      $scope.$watch('user', function(user) {
+        updateCSS();
+      }, true);
+
+      function updateCSS() {
+        if(!Auth.isAccessible(access))
+            element.css('display', 'none');
+        else
+            element.css('display', prevDisp);
+      }
+    }
+  };
+}]);

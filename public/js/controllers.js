@@ -6,11 +6,26 @@ var thurgood = angular.module('thurgoodControllers', []);
 /**
  * Controller for the top navigation bar
  */
-thurgood.controller('NavCtrl', ['$scope', '$location', function($scope, $location) {
+thurgood.controller('NavCtrl', ['$scope', '$location', '$http', 'Auth', function($scope, $location, $http, Auth) {
+
   // Check if loc matches the current location
   $scope.isActive = function(loc) {
     return loc == $location.path();
   };
+
+  $scope.loginText = function() {
+    return Auth.isLoggedIn() ? "LOGOUT" : "LOGIN";
+  };
+
+  $scope.loginOrLogout = function() {
+    if(Auth.isLoggedIn()) {
+      Auth.logout();
+    }
+    else {
+      Auth.googleLogin();
+    }
+  }
+
 }]);
 
 /**

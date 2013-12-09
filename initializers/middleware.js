@@ -21,13 +21,29 @@ exports.middleware = function(api, next){
           var apiKey = S(authorization.split("=")[1]).replaceAll('"', '').s;
 
           // does the apiKey exist in the hash of api keys in redis?
-          redis.hexists("api:keys", apiKey, function(error, found){
-            if (found === 0) { 
-              errorResponse(connection);
-              next(connection, false); 
+          redis.hget("api:keys", apiKey, function(error, email) {
+            if(email === null) {
+              // if email is not found, procceed. It is to integrate legacy data.
+              return next(connection, true); 
             }
-            if (found === 1) { next(connection, true); }
-          });      
+
+            api.users.findByEmail(email).then(function(user) {
+              if(api.users.isAccessible(user, actionTemplate)) {
+                connection.currentUser = user;
+                next(connection, true);  
+              }
+              else {
+                errorResponse(connection);
+                connection.response.error_description = "You are not allowed to access this resource";
+                return next(connection, false);            
+              }
+              
+            }, function(error) {
+              errorResponse(connection);
+              return next(connection, false);               
+            });
+
+          });
 
         } catch (err) {
           console.log("Could not parse API Key: " + err.message);

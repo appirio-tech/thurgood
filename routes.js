@@ -9,7 +9,14 @@ exports.routes = {
     { path: "/:apiVersion/jobs/:id/complete", action: "jobsComplete" },
     { path: "/:apiVersion/jobs/:id", action: "jobsFetch" },
     { path: "/:apiVersion/jobs", action: "jobsFetch" },
-    { path: "/:apiVersion/pt/token/:key", action: "ptFetchToken" }
+    { path: "/:apiVersion/pt/token/:key", action: "ptFetchToken" },
+
+    // angular app request.
+    { path: "/auth/google/return", action: "googleAuthReturn" },
+    { path: "/auth/google", action: "googleAuthStart" },
+    { path: "/userinfo", action: "fetchCurrentUser" },
+    { path: "/logout", action: "logout"}
+
   ],
 
   post: [

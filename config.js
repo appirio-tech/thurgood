@@ -153,6 +153,14 @@ configData.rabbitmq = {
   queue: process.env.RABBITMQ_QUEUE
 };
 
+//////////////
+// GOOGLE //
+//////////////
+
+configData.google = {
+  redirectUrl : process.env.GOOGLE_REDIRECT_URL || "http://localhost:5000/api/auth/google/return"
+}
+
 //////////////////////////////////
 
 exports.configData = configData;
