@@ -93,6 +93,8 @@ exports.users = function(api, next){
       return deferred.promise;
     },
 
+    // returns true if a user is accessbile to an action.
+    //         falase otherwise.
     isAccessible: function(user, action) {
       var role = (user && user.role) ? user.role : userRoles.anon;
       var access = action.access || accessLevels.public;

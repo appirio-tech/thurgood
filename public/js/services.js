@@ -70,55 +70,55 @@ thurgood.factory('Pt', ['$resource', function ($resource) {
 
 thurgood.factory('Auth', function($http, $location){
 
-    var accessLevels = routingConfig.accessLevels
-        , userRoles = routingConfig.userRoles
-        , currentUser = { username: '', role: userRoles.anon };
+  var accessLevels = routingConfig.accessLevels
+      , userRoles = routingConfig.userRoles
+      , currentUser = { username: '', role: userRoles.anon };
 
 
-    function changeUser(user) {
-        angular.extend(currentUser, user);
-    };
+  function changeUser(user) {
+      angular.extend(currentUser, user);
+  };
 
-    return {
-      getCurrentUser: function(success, error) {
-        $http.get('/api/userinfo').success(function(res){
-          if(res.data) {
-            changeUser(res.data);
-            console.log("set api key", currentUser.apiKey);
-            $http.defaults.headers.common['Authorization'] = 'Token token=' + currentUser.apiKey;            
-          }
+  return {
+    getCurrentUser: function(success, error) {
+      $http.get('/api/userinfo').success(function(res){
+        if(res.data) {
+          changeUser(res.data);
+          console.log("set api key", currentUser.apiKey);
+          $http.defaults.headers.common['Authorization'] = 'Token token=' + currentUser.apiKey;            
+        }
 
-          success && success(currentUser);
-          
-        }).error(error);
-      },
+        success && success(currentUser);
+        
+      }).error(error);
+    },
 
-      isLoggedIn: function() {
-        var user = currentUser;
-        return user.role.title == userRoles.user.title || user.role.title == userRoles.admin.title;
-      },
+    isLoggedIn: function() {
+      var user = currentUser;
+      return user.role.title == userRoles.user.title || user.role.title == userRoles.admin.title;
+    },
 
-      logout: function() {
-        $http.get("/api/logout").success(function() {
-          changeUser({username: '', role: userRoles.anon});
-          $http.defaults.headers.common['Authorization'] = 'Token token=invalid';
-          $location.path('/');
-        });
-      },
+    logout: function() {
+      $http.get("/api/logout").success(function() {
+        changeUser({username: '', role: userRoles.anon});
+        $http.defaults.headers.common['Authorization'] = 'Token token=invalid';
+        $location.path('/');
+      });
+    },
 
-      googleLogin: function() {
-        window.location.pathname = "/api/auth/google"; 
-      },
+    googleLogin: function() {
+      window.location.pathname = "/api/auth/google"; 
+    },
 
-      isAccessible: function(access) {
-        access = access || accessLevels.public;
-        console.log("debug", access, currentUser.role)
-        return access.bitMask & currentUser.role.bitMask;
-      },
+    isAccessible: function(access) {
+      access = access || accessLevels.public;
+      console.log("debug", access, currentUser.role)
+      return access.bitMask & currentUser.role.bitMask;
+    },
 
-      accessLevels: accessLevels,
-      userRoles: userRoles,
-      user: currentUser
-    };
+    accessLevels: accessLevels,
+    userRoles: userRoles,
+    user: currentUser
+  };
 });
 

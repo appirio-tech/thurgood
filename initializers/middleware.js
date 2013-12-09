@@ -23,12 +23,11 @@ exports.middleware = function(api, next){
           // does the apiKey exist in the hash of api keys in redis?
           redis.hget("api:keys", apiKey, function(error, email) {
             if(email === null) {
-              errorResponse(connection);
-              return next(connection, false); 
+              // if email is not found, procceed. It is to integrate legacy data.
+              return next(connection, true); 
             }
 
             api.users.findByEmail(email).then(function(user) {
-              console.log("debug : user =", user)
               if(api.users.isAccessible(user, actionTemplate)) {
                 connection.currentUser = user;
                 next(connection, true);  

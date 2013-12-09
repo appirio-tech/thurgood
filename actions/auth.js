@@ -23,18 +23,6 @@ exports.action = {
   outputExample: {},
   version: 1.0,
   run: function(api, connection, next) {
-    // remove me : just for test
-    // api.users.delete({email: "abc@cloudspokes.com"}).then(function() {console.log("db success", arguments)});
-    // api.session.getCurrentUser(connection).then(function(user) {
-    //   console.log("session success", user);
-    //   if(user) {
-    //     api.redis.client.hget("api:keys", user.apiKey, function(email) {
-    //       console.log("APIKEY", user.apiKey, "email =", email);
-    //     });
-    //   }
-    // });
-    // api.session.clear(connection);
-
 
     getGoogleAuthUrl()
     .then(redirectTo)
@@ -92,7 +80,6 @@ exports.googleAuthReturn = {
     }
 
     var email = connection.params["openid.ext1.value.email"];
-    email = "abc@cloudspokes.com"; // remove me, for test
     var fullname = connection.params["openid.ext1.value.firstname"] + " " + connection.params["openid.ext1.value.lastname"];
 
     // flows
@@ -163,16 +150,6 @@ exports.fetchCurrentUser = {
   outputExample: {},
   version: 1.0,
   run: function(api, connection, next) {
-
-    // remove me, for test
-    // api.session.getCurrentUser(connection).then(function(user) {
-    //   if(user) {
-    //     console.log("debug", user);
-    //     api.redis.client.hget("api:keys", user.apiKey, function(err, email) {
-    //       console.log("APIKEY", user.apiKey, "email =", email);
-    //     });
-    //   }
-    // });
 
     api.session.getCurrentUser(connection)
     .then(respondOk)
