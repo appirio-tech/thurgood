@@ -120,8 +120,9 @@ exports.googleAuthReturn = {
     }
 
     function handleError(error) {
+      api.session.set(connection, "message", error.message);
       console.log("[Google Auth] Error : ", error)
-      redirectTo("/")
+      redirectTo("/");
     }
 
     function redirectTo(path) {
@@ -152,16 +153,29 @@ exports.fetchCurrentUser = {
   run: function(api, connection, next) {
 
     api.session.getCurrentUser(connection)
-    .then(respondOk)
+    .then(getStatusMessage)
+    .spread(respondOk)
     .fail(respondError)
     .done();
 
-    function respondOk(user) {
-      api.response.success(connection, undefined, user);
+    function getStatusMessage(user) {
+      var deferred = Q.defer();
+      
+      api.session.get(connection, "message").then(function(msg) {
+        api.session.del(connection, "message");
+        deferred.resolve([user, msg]);
+      }, deferred.reject);
+
+      return deferred.promise;
+    }
+
+    function respondOk(user, message) {
+      api.response.success(connection, message, user);
       next(connection, true);
     }
 
     function respondError(err) {
+      console.log("[fetchCurrentUser] Error : ", err)
       api.response.error(connection, err);
       next(connection, true);
     }

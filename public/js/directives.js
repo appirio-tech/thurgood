@@ -41,7 +41,6 @@ thurgood.directive('accessLevel', ['Auth', function(Auth) {
       }, true);
 
       function updateCSS() {
-        console.log("update css")
         if(!Auth.isAccessible(access))
             element.css('display', 'none');
         else

@@ -88,6 +88,11 @@ thurgood.factory('Auth', function($http, $location){
           $http.defaults.headers.common['Authorization'] = 'Token token=' + currentUser.apiKey;            
         }
 
+        if(res.message) {
+          // TODO : display it nice
+          alert(res.message);
+        }
+
         success && success(currentUser);
         
       }).error(error);
@@ -112,7 +117,6 @@ thurgood.factory('Auth', function($http, $location){
 
     isAccessible: function(access) {
       access = access || accessLevels.public;
-      console.log("debug", access, currentUser.role)
       return access.bitMask & currentUser.role.bitMask;
     },
 
