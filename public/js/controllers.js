@@ -120,7 +120,7 @@ thurgood.controller('JobsCtrl', ['$scope', '$filter', '$location', '$modal', 'Jo
   $scope.submitJob = function(_id) {
     var errorHandler = function(err) {
       var error = (err.data && err.data.error) || err.error || err.message || "Error";
-      if (error == 'Could not find any available servers. Try again in a few minutes') {
+      if (error == 'Could not find any available servers. Try again in a few minutes.') {
         error = 'No servers available';
       }
 
