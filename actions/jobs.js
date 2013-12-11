@@ -1,11 +1,10 @@
 var ObjectID = require('mongodb').ObjectID;
 var amqp = require('amqp');
-var syslogProducer = require('glossy').Produce;
-var glossy = new syslogProducer({ type: 'BSD' });
 var request = require('request');
 var loggers = require('./loggers');
 var crypto = require('crypto');
 var accessLevels = require('../public/js/routingConfig').accessLevels;
+var syslog = require('syslog');
 
 /**
  * GET /jobs
@@ -205,14 +204,14 @@ exports.jobsMessage = {
   name: "jobsMessage",
   description: "Sends a message to the job's logger. Method: POST",
   inputs: {
-    required: ['id', 'message'],
-    optional: ['facility', 'severity'],
+    required: ['id', 'message', 'sender'],
+    optional: [],
   },
   authenticated: true,
   outputExample: {},
   version: 1.0,
   run: function(api, connection, next) {
-    var selector;
+    var selector, loggerSelector;
 
     // Validate id and build selector
     try {
@@ -225,19 +224,13 @@ exports.jobsMessage = {
     // Find job's logger
     api.mongo.collections.jobs.findOne(selector, function(err, job) {
       if (!err && job) {
-        api.mongo.collections.loggerSystems.findOne({ _id: job.loggerId }, function(err, logger) {
+        loggerSelector = { _id: new ObjectID(job.loggerId) };
+        api.mongo.collections.loggerSystems.findOne(loggerSelector, function(err, logger) {
           if (!err && logger) {
-            // Send message
-            glossy.produce({
-              facility: connection.params.facility,
-              severity: connection.params.severity || 'info',
-              host: logger.syslogHostname + ":" + logger.syslogPort,
-              date: new Date(),
-              message: connection.params.message
-            }, function(syslogMsg){
-              api.response.success(connection, syslogMsg);
-              next(connection, true);
-            });
+            var logger = syslog.createClient(logger.syslogPort, logger.syslogHostname, {name: connection.params.sender});
+            logger.info(connection.params.message);
+            api.response.success(connection, "Message sent to logger.");
+            next(connection, true);            
           } else if (!logger) {
             api.response.error(connection, "Logger not found");
             next(connection, true);
@@ -323,7 +316,7 @@ exports.jobsSubmit = {
               next(connection, true);
             });
           } else if (!server) {
-            api.response.error(connection, "Could not find any available servers. Try again in a few minutes");
+            api.response.error(connection, "Could not find any available servers. Try again in a few minutes.");
             next(connection, true);
           } else {
             api.response.error(connection, err);
@@ -362,7 +355,7 @@ exports.jobsUpdate = {
 /**
  * POST /jobs/:id/publish
  */
-exports.jobsMessage = {
+exports.jobsPublish = {
   name: "jobsPublish",
   description: "Publishes a message to the queue. Method: POST",
   inputs: {
