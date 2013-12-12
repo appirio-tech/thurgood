@@ -228,8 +228,8 @@ exports.jobsMessage = {
         api.mongo.collections.loggerSystems.findOne(loggerSelector, function(err, logger) {
           if (!err && logger) {
             // set some temp - testing vars
-            //logger.syslogHostname = "logs.papertrailapp.com";
-            //logger.syslogPort = 37402;
+            logger.syslogHostname = "logs.papertrailapp.com";
+            logger.syslogPort = 37402;
 
             var logger = syslog.createClient(logger.syslogPort, logger.syslogHostname, {name: connection.params.message.sender});
             logger.info(connection.params.message.text);
