@@ -204,7 +204,7 @@ exports.jobsMessage = {
   name: "jobsMessage",
   description: "Sends a message to the job's logger. Method: POST",
   inputs: {
-    required: ['id', 'message', 'sender'],
+    required: ['id', 'message'],
     optional: [],
   },
   authenticated: true,
@@ -227,8 +227,12 @@ exports.jobsMessage = {
         loggerSelector = { _id: new ObjectID(job.loggerId) };
         api.mongo.collections.loggerSystems.findOne(loggerSelector, function(err, logger) {
           if (!err && logger) {
-            var logger = syslog.createClient(logger.syslogPort, logger.syslogHostname, {name: connection.params.sender});
-            logger.info(connection.params.message);
+            // set some temp - testing vars
+            //logger.syslogHostname = "logs.papertrailapp.com";
+            //logger.syslogPort = 37402;
+
+            var logger = syslog.createClient(logger.syslogPort, logger.syslogHostname, {name: connection.params.message.sender});
+            logger.info(connection.params.message.text);
             api.response.success(connection, "Message sent to logger.");
             next(connection, true);            
           } else if (!logger) {
