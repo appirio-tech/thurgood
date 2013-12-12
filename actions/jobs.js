@@ -122,7 +122,10 @@ exports.jobsCreate = {
                 connection.params.loggerId = id.toString();
                 api.mongo.create(api, connection, next, api.mongo.collections.jobs, api.mongo.schema.job);
               });
-            // if we didn't find an account, create the account and also the logger  
+            // if we didn't find an account, create the account and also the logger
+            // NEEDED MODIFICATION -- the account may already exist in papertrail but not in mongo. should check first to see if the 
+            // account exists in papertrail, if it does then simply insert the record into the account and create the new logger. if it does
+            // not exist in papertrail tehn continue on below and create both the account and logger.
             } else if (!account) {
               var accountConnection = new api.connection({ type: 'task', remotePort: '0', remoteIP: '0', rawConnection: {req: { headers: {authorization: "Token token=" + process.env.THIS_API_KEY}}}});
               accountConnection.params = { action: "accountsCreate", apiVersion: 1, username: connection.params.userId, email: connection.params.email };
