@@ -86,7 +86,8 @@ exports.loggersCreate = {
 
     // Insert document into the database
     function insertLogger(logger) {
-      console.log("[LoggerCreate]", "Insert Logger to DB : " + logger);
+      console.log("[LoggerCreate]", "Insert Logger to DB : ");
+      console.log("[LoggerCreate]", logger);
       var deferred = Q.defer();
       collection.insert(logger, deferred.makeNodeResolver());
       return deferred.promise;
