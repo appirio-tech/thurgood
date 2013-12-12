@@ -22,9 +22,11 @@ exports.middleware = function(api, next){
 
           // does the apiKey exist in the hash of api keys in redis?
           redis.hget("api:keys", apiKey, function(error, email) {
+            // api key not found. restrict access.
             if(email === null) {
-              // if email is not found, procceed. It is to integrate legacy data.
-              return next(connection, true); 
+                errorResponse(connection);
+                connection.response.error_description = "You are not allowed to access this resource";
+                return next(connection, false);         
             }
 
             api.users.findByEmail(email).then(function(user) {
