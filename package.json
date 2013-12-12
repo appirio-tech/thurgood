@@ -22,7 +22,7 @@
     "request": "~2.27.0",
     "string": "~1.6.0",
     "openid": "*",
-    "syslog": "git+ssh://git@github.com:jeffdonthemic/node-syslog.git#master"
+    "syslog": "git://github.com/jeffdonthemic/node-syslog.git" 
   },
   "devDependencies": {
     "mocha": "~1.13.0",
