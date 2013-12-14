@@ -7,6 +7,7 @@ var accessLevels = require('../public/js/routingConfig').accessLevels;
 var syslog = require('syslog');
 var _ = require('underscore');
 var Q = require("q");
+var papertrail = require("../lib/papertrail");
 
 /**
  * GET /jobs
@@ -147,6 +148,7 @@ exports.jobsCreate = {
     function createLoggerIfNotExist(logger) {
       if(logger) { return logger; }
 
+      console.log("[jobsCreate]", "Create a logger");
       // 1. find a account by name and email
       // 2. if not exist, create an account with the name ane email
       // 3. create a logger from the found/created account
@@ -161,18 +163,36 @@ exports.jobsCreate = {
     function createAccountIfNotExist(account) {
       if(account) { return account; }
 
-      // if we didn't find an account, create the account and also the logger
-      // NEEDED MODIFICATION -- the account may already exist in papertrail but not in mongo. should check first to see if the 
-      // account exists in papertrail, if it does then simply insert the record into the account and create the new logger. if it does
-      // not exist in papertrail tehn continue on below and create both the account and logger.
+      console.log("[jobsCreate]", "Create an account");
 
       var deferred = Q.defer();
 
-      var loggerConnection = buildApiConnection("accountsCreate");
-      loggerConnection.params.username = connection.params.userId;
-      loggerConnection.params.email = connection.params.email;
+      // 1. first check if the account exist in papertrail.
+      papertrail.findAccount(api, connection.params.userId).then(function(account) {
+        if(account) {
+          // 2.1 if exist, just insert an account to the db.
+          console.log("[jobsCreate]", "found an account in papertrail");
 
-      runLocalAction(loggerConnection, deferred.makeNodeResolver());
+          var attrs = {
+            email: connection.params.email,
+            name: account.name,
+            papertrailApiToken: account.api_token,
+            papertrailId: account.id
+          };
+
+          api.loggerAccounts.create(attrs).then(function(account) {
+            deferred.resolve(account);
+          }, deferred.reject);
+        }
+        else {
+          // 2.2 if not exist, create in both papertrail and db using local action process.
+          var localConnection = buildApiConnection("accountsCreate");
+          localConnection.params.username = connection.params.userId;
+          localConnection.params.email = connection.params.email;
+
+          runLocalAction(localConnection, deferred.makeNodeResolver());      
+        }
+      });
 
       return deferred.promise;
     }
@@ -186,14 +206,16 @@ exports.jobsCreate = {
         throw new Exception("Internal Error - Account does not exist");
       }
 
+      console.log("[jobsCreate]", "Create a logger with account", account.name);
+
       var deferred = Q.defer();
 
       var loggerName = connection.params.logger || crypto.randomBytes(16).toString('hex');
-      var loggerConnection = buildApiConnection("loggersCreate");
-      loggerConnection.params.name = loggerName;
-      loggerConnection.params.loggerAccountId = account._id.toString();
+      var localConnection = buildApiConnection("loggersCreate");
+      localConnection.params.name = loggerName;
+      localConnection.params.loggerAccountId = account._id.toString();
 
-      runLocalAction(loggerConnection, deferred.makeNodeResolver());
+      runLocalAction(localConnection, deferred.makeNodeResolver());
 
       return deferred.promise;
     }
@@ -227,12 +249,14 @@ exports.jobsCreate = {
     //  - to create a loggerAccount.
     // callback is like `function (err, createdItem) {}`
     function runLocalAction(actionConnection, callback) {
+      console.log("[jobsCreate]", "run local action :", actionConnection.params.action);
       var actionProcessor = new api.actionProcessor({connection: actionConnection, callback: function(internalConnection, cont) {
         
         var err = internalConnection.error;
         if(err) { return callback(err, null); }
 
         var item = internalConnection.response.data[0];
+        console.log("[jobsCreate]", " => local action result :", item);
         if(callback) { callback(null, item); }
       }});
 
