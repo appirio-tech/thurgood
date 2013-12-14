@@ -6,7 +6,7 @@ var _ = require('underscore');
 */
 exports.loggerAccounts = function(api, next){
 
-  api.loggerAccountsloggerAccounts = {
+  api.loggerAccounts = {
 
     // creates a job, and returns promise.
     findByNameAndEmail: function(name, email) {

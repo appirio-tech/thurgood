@@ -5,6 +5,8 @@ var loggers = require('./loggers');
 var crypto = require('crypto');
 var accessLevels = require('../public/js/routingConfig').accessLevels;
 var syslog = require('syslog');
+var _ = require('underscore');
+var Q = require("q");
 
 /**
  * GET /jobs
@@ -100,102 +102,124 @@ exports.jobsCreate = {
   outputExample: {},
   version: 1.0,
   run: function(api, connection, next) {
+    var promise = null;
+    var attrs = _.pick(connection.params, _.keys(api.mongo.schema.job));
+
     // add the job with the specified loggerId
     if (connection.params.loggerId) {
-      api.mongo.create(api, connection, next, api.mongo.collections.jobs, api.mongo.schema.job);      
+      promise = api.jobs.create(attrs);
+
     // add the job with a loggerId that we lookup by logger name
     } else if (connection.params.logger) {
-      api.mongo.collections.loggerSystems.findOne({ name: connection.params.logger }, { _id:1 }, function(err, logger) {
-        // found a logger's id by logger name
-        if (!err && logger) {
-          connection.params.loggerId = new String(logger._id);
-          api.mongo.create(api, connection, next, api.mongo.collections.jobs, api.mongo.schema.job);
-        // did not find a logger, so create one
-        } else if (!err && !logger) {
-          api.mongo.collections.loggerAccounts.findOne({ name: connection.params.userId, email: connection.params.email }, {}, function(err, account) {
-            // if we found and existing account, just create the logger
-            if(!err && account) {
-              var loggerConnection = new api.connection({ type: 'task', remotePort: '0', remoteIP: '0', rawConnection: {req: { headers: {authorization: "Token token=" + process.env.THIS_API_KEY}}}});
-              loggerConnection.params = { action: "loggersCreate", apiVersion: 1, name: connection.params.logger, loggerAccountId: new String(account._id) };
+      var loggerName = connection.params.logger;
 
-              runLocalAction(api, connection, loggerConnection, next, function(id) {
-                connection.params.loggerId = id.toString();
-                api.mongo.create(api, connection, next, api.mongo.collections.jobs, api.mongo.schema.job);
-              });
-            // if we didn't find an account, create the account and also the logger
-            // NEEDED MODIFICATION -- the account may already exist in papertrail but not in mongo. should check first to see if the 
-            // account exists in papertrail, if it does then simply insert the record into the account and create the new logger. if it does
-            // not exist in papertrail tehn continue on below and create both the account and logger.
-            } else if (!account) {
-              var accountConnection = new api.connection({ type: 'task', remotePort: '0', remoteIP: '0', rawConnection: {req: { headers: {authorization: "Token token=" + process.env.THIS_API_KEY}}}});
-              accountConnection.params = { action: "accountsCreate", apiVersion: 1, username: connection.params.userId, email: connection.params.email };
-
-              runLocalAction(api, connection, accountConnection, next, function(id) {
-                var loggerConnection = new api.connection({ type: 'task', remotePort: '0', remoteIP: '0', rawConnection: {req: { headers: {authorization: "Token token=" + process.env.THIS_API_KEY}}}});
-                loggerConnection.params = { action: "loggersCreate", apiVersion: 1, name: connection.params.logger, loggerAccountId: id };
-
-                runLocalAction(api, connection, loggerConnection, next, function(id) {
-                  connection.params.loggerId = id.toString();
-                  api.mongo.create(api, connection, next, api.mongo.collections.jobs, api.mongo.schema.job);
-                });
-              });
-            // return the error
-            } else {
-              api.response.error(connection, err);
-              next(connection, true);
-            }
-          });
-        // return the error
-        } else {
-          api.response.error(connection, err);
-          next(connection, true);
-        }
-      });
-    // create a logger
-    } else {
-      // TODO -- refactor this code as it's duplicate of above
-      api.mongo.collections.loggerAccounts.findOne({ name: connection.params.userId, email: connection.params.email }, {}, function(err, account) {
-        // if we found and existing account, just create the logger
-        if(!err && account) {
-          var loggerConnection = new api.connection({ type: 'task', remotePort: '0', remoteIP: '0', rawConnection: {req: { headers: {authorization: "Token token=" + process.env.THIS_API_KEY}}}});
-          loggerConnection.params = { action: "loggersCreate", apiVersion: 1, name: crypto.randomBytes(16).toString('hex'), loggerAccountId: new String(account._id) };
-
-          runLocalAction(api, connection, loggerConnection, next, function(id) {
-            connection.params.loggerId = id.toString();
-            api.mongo.create(api, connection, next, api.mongo.collections.jobs, api.mongo.schema.job);
-          });
-        // if we didn't find an account, create the account and also the logger  
-        } else if (!account) {
-          var accountConnection = new api.connection({ type: 'task', remotePort: '0', remoteIP: '0', rawConnection: {req: { headers: {authorization: "Token token=" + process.env.THIS_API_KEY}}}});
-          accountConnection.params = { action: "accountsCreate", apiVersion: 1, username: connection.params.userId, email: connection.params.email };
-
-          runLocalAction(api, connection, accountConnection, next, function(id) {
-            var loggerConnection = new api.connection({ type: 'task', remotePort: '0', remoteIP: '0', rawConnection: {req: { headers: {authorization: "Token token=" + process.env.THIS_API_KEY}}}});
-            loggerConnection.params = { action: "loggersCreate", apiVersion: 1, name: crypto.randomBytes(16).toString('hex'), loggerAccountId: id };
-
-            runLocalAction(api, connection, loggerConnection, next, function(id) {
-              connection.params.loggerId = id.toString();
-              api.mongo.create(api, connection, next, api.mongo.collections.jobs, api.mongo.schema.job);
-            });
-          });
-        // return the error
-        } else {
-          api.response.error(connection, err);
-          next(connection, true);
-        }
-      });
+      promise = api.loggers.findByName(loggerName)
+                  .then(createLoggerIfNotExist)
+                  .then(createJobFromLogger);
+    }
+    else {
+      promise = createLoggerIfNotExist().then(createJobFromLogger);
     }
 
-    function runLocalAction(api, connection, actionConnection, next, cascadeCreate) {
-      var actionProcessor = new api.actionProcessor({connection: actionConnection, callback: function(internalConnection, cont) {
-        if (internalConnection.error) {
-          api.response.error(connection, internalConnection.error);
-          next(connection, true);
-        } else {
-          cascadeCreate(new String(internalConnection.response.data[0]._id));
+    promise.then(respondOk).fail(respondError).done();
+
+
+    function createJobFromLogger(logger) {
+      if(!logger) {
+        // make sure that the logger exist before calling this function.
+        throw new Exception("Logger does not exist");
+      }
+
+      attrs.loggerId = logger._id.toString();
+      return api.jobs.create(attrs);      
+    }
+
+    function createLoggerIfNotExist(logger) {
+      if(logger) { return logger; }
+
+      var name = connection.params.userId;
+      var email = connection.params.email;
+      return api.loggerAccounts.findByNameAndEmail(name, email)
+              .then(createAccountIfNotExist)
+              .then(createLoggerFromAccount);
+    }
+
+    function createAccountIfNotExist(account) {
+      if(account) { return account; }
+
+      // if we didn't find an account, create the account and also the logger
+      // NEEDED MODIFICATION -- the account may already exist in papertrail but not in mongo. should check first to see if the 
+      // account exists in papertrail, if it does then simply insert the record into the account and create the new logger. if it does
+      // not exist in papertrail tehn continue on below and create both the account and logger.
+
+      var deferred = Q.defer();
+
+      var loggerConnection = buildApiConnection("accountsCreate");
+      loggerConnection.params.username = connection.params.userId;
+      loggerConnection.params.email = connection.params.email;
+
+      runLocalAction(loggerConnection, deferred.makeNodeResolver());
+
+      return deferred.promise;
+    }
+
+    function createLoggerFromAccount(account) {
+      var deferred = Q.defer();
+
+      var loggerName = connection.params.logger || crypto.randomBytes(16).toString('hex');
+      var loggerConnection = buildApiConnection("loggersCreate");
+      loggerConnection.params.name = loggerName;
+      loggerConnection.params.loggerAccountId = new String(account._id);
+
+      runLocalAction(loggerConnection, deferred.makeNodeResolver());
+
+      return deferred.promise;
+    }
+
+    function buildApiConnection(action) {
+      var connection = new api.connection({ 
+        type: 'task', 
+        remotePort: '0', 
+        remoteIP: '0', 
+        rawConnection: {
+          req: { 
+            headers: {
+              authorization: "Token token=" + process.env.THIS_API_KEY
+            }
+          }
         }
+      });
+
+      connection.params = {
+        action: action, 
+        apiVersion: 1
+      }
+
+      return connection;
+    }
+
+    function runLocalAction(actionConnection, callback) {
+      var actionProcessor = new api.actionProcessor({connection: actionConnection, callback: function(internalConnection, cont) {
+        
+        var err = internalConnection.error;
+        if(err) { return callback(err, null); }
+
+        var item = internalConnection.response.data[0];
+        if(callback) { callback(null, item); }
       }});
+
       actionProcessor.processAction();
+    }
+
+    function respondOk(job) {
+      api.response.success(connection, null, job);
+      next(connection, true);
+    }
+
+    function respondError(err) {
+      console.log("[jobsCreate] Error : ", err.stack);
+      api.response.error(connection, err);
+      next(connection, true);
     }
   }
 };
