@@ -16,6 +16,22 @@ exports.loggerAccounts = function(api, next){
       collection.findOne({name:name, email: email}, deferred.makeNodeResolver());
 
       return deferred.promise;
+    },
+
+    create: function(attrs) {
+      var deferred = Q.defer();
+      var collection = api.mongo.collections.loggerAccounts;
+      var doc = api.mongo.schema.new(api.mongo.schema.loggerAccount);
+      _.extend(doc, _.pick(attrs, _.keys(doc)));
+
+      console.log("[loggerAccounts]", "create a loggerAccount", doc);
+      collection.insert(doc, {safe: true}, function(err, result) {
+        if(err) { return deferred.reject(err); }
+
+        deferred.resolve(doc);
+      });
+
+      return deferred.promise;      
     }
   }
 
