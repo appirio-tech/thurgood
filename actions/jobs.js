@@ -105,45 +105,59 @@ exports.jobsCreate = {
     var promise = null;
     var attrs = _.pick(connection.params, _.keys(api.mongo.schema.job));
 
-    // add the job with the specified loggerId
     if (connection.params.loggerId) {
+      // create a job with the specified loggerId
       promise = api.jobs.create(attrs);
 
-    // add the job with a loggerId that we lookup by logger name
     } else if (connection.params.logger) {
-      var loggerName = connection.params.logger;
-
+      // 1. find logger from name
+      // 2. if not exist create a logger with the name
+      // 3. create a job from the created/found logger.
+      var loggerName = connection.params.logger;      
       promise = api.loggers.findByName(loggerName)
                   .then(createLoggerIfNotExist)
                   .then(createJobFromLogger);
     }
     else {
+      // 1. create a logger with random generated name
+      // 2. create a job from the created logger
       promise = createLoggerIfNotExist().then(createJobFromLogger);
     }
 
+    // respond error or success.
     promise.then(respondOk).fail(respondError).done();
 
 
+    //
+    // Help functions from here
+    //
+
+    // create a job from a logger
     function createJobFromLogger(logger) {
       if(!logger) {
         // make sure that the logger exist before calling this function.
-        throw new Exception("Logger does not exist");
+        throw new Exception("Internal Error - Logger does not exist");
       }
 
       attrs.loggerId = logger._id.toString();
       return api.jobs.create(attrs);      
     }
 
+    // create a account if not exist
     function createLoggerIfNotExist(logger) {
       if(logger) { return logger; }
 
+      // 1. find a account by name and email
+      // 2. if not exist, create an account with the name ane email
+      // 3. create a logger from the found/created account
       var name = connection.params.userId;
-      var email = connection.params.email;
+      var email = connection.params.email;      
       return api.loggerAccounts.findByNameAndEmail(name, email)
               .then(createAccountIfNotExist)
               .then(createLoggerFromAccount);
     }
 
+    // create a account if not exist
     function createAccountIfNotExist(account) {
       if(account) { return account; }
 
@@ -163,19 +177,29 @@ exports.jobsCreate = {
       return deferred.promise;
     }
 
+    // creates a logger of account.
+    // it uses local action process.
+    // returns promise.
     function createLoggerFromAccount(account) {
+      if(!account) {
+        // make sure that the accout exists before calling this function.
+        throw new Exception("Internal Error - Account does not exist");
+      }
+
       var deferred = Q.defer();
 
       var loggerName = connection.params.logger || crypto.randomBytes(16).toString('hex');
       var loggerConnection = buildApiConnection("loggersCreate");
       loggerConnection.params.name = loggerName;
-      loggerConnection.params.loggerAccountId = new String(account._id);
+      loggerConnection.params.loggerAccountId = account._id.toString();
 
       runLocalAction(loggerConnection, deferred.makeNodeResolver());
 
       return deferred.promise;
     }
 
+    // default api connection.
+    // used when run action process locally(see runLocalAction below)
     function buildApiConnection(action) {
       var connection = new api.connection({ 
         type: 'task', 
@@ -198,6 +222,10 @@ exports.jobsCreate = {
       return connection;
     }
 
+    // run a action process locally
+    //  - to create a logger or
+    //  - to create a loggerAccount.
+    // callback is like `function (err, createdItem) {}`
     function runLocalAction(actionConnection, callback) {
       var actionProcessor = new api.actionProcessor({connection: actionConnection, callback: function(internalConnection, cont) {
         
@@ -211,11 +239,13 @@ exports.jobsCreate = {
       actionProcessor.processAction();
     }
 
+    // respond success with the created job.
     function respondOk(job) {
       api.response.success(connection, null, job);
       next(connection, true);
     }
 
+    // respond error
     function respondError(err) {
       console.log("[jobsCreate] Error : ", err.stack);
       api.response.error(connection, err);
