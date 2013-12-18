@@ -47,8 +47,11 @@ thurgood.controller('JobsCtrl', ['$scope', '$filter', '$location', '$modal', 'Jo
     $modal.open({
       templateUrl: 'jobsCreateModal',
       controller: function($scope, $modalInstance) {
-        $scope.job = {};
+        $scope.job = {email: $scope.user.email};
         $scope.timestamp = new Date().getTime();
+
+        $scope.platforms = ["other","salesforce.com", "heroku"];  
+        $scope.languages = ["apex", "java"];  
 
         // Change server error messages to user friendly strings
         var translateError = function(err) {
@@ -271,6 +274,8 @@ thurgood.controller('JobsDetailCtrl', ['$scope', '$routeParams', '$modal', 'Jobs
         controller: function($scope, $modalInstance) {
           $scope.job = {};
           $scope.job.id = res.data[0]._id;
+          $scope.platforms = ["other","salesforce.com", "heroku"];  
+          $scope.languages = ["apex", "java"];            
 
           // Move updateable values in a new object
           angular.forEach(res.data[0], function(value, key) {
