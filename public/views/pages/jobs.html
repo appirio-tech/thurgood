@@ -51,13 +51,13 @@
           <div class="form-group">
             <span class="col-lg-3 control-label mModal-key">Platform</span>
             <div class="col-lg-9">
-              <input type="text" class="form-control mModal-input" ng-model="job.platform" placeholder="Platform">
+              <select class="form-control mModal-input" ng-model="job.platform" ng-options="p for p in platforms"></select>
             </div>
           </div>
           <div class="form-group">
             <span class="col-lg-3 control-label mModal-key">Language</span>
             <div class="col-lg-9">
-              <input type="text" class="form-control mModal-input" ng-model="job.language" placeholder="Language">
+              <select class="form-control mModal-input" ng-model="job.language" ng-options="lang for lang in languages"></select>
             </div>
           </div>
           <div class="form-group">
@@ -73,23 +73,17 @@
             </div>
           </div>
           <div class="form-group">
-            <span class="col-lg-3 control-label mModal-key">Logger ID</span>
-            <div class="col-lg-9">
-              <input type="text" class="form-control mModal-input" ng-model="job.loggerId" placeholder="Logger ID (optional)">
-            </div>
-          </div>
-          <div class="form-group">
-            <span class="col-lg-3 control-label mModal-key">Options</span>
-            <div class="col-lg-9">
-              <input type="text" class="form-control mModal-input" ng-model="job.options" placeholder="Options (optional)">
-            </div>
-          </div>
-          <div class="form-group">
             <span class="col-lg-3 control-label mModal-key">Project</span>
             <div class="col-lg-9">
               <input type="text" class="form-control mModal-input" ng-model="job.project" placeholder="Project name (optional)">
             </div>
-          </div>          
+          </div>    
+          <div class="form-group">
+            <span class="col-lg-3 control-label mModal-key">Logger ID</span>
+            <div class="col-lg-9">
+              <input type="text" class="form-control mModal-input" ng-model="job.loggerId" placeholder="Logger ID (optional)">
+            </div>
+          </div>      
         </div>
         <div class="alert alert-danger mModal" ng-show="uploadWarning">
           <h4>{{uploadWarning}}</h4>

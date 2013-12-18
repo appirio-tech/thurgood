@@ -28,8 +28,12 @@
         <span class="col-lg-10 detail-value">{{job._id}}</span>
       </div>
       <div class="form-group">
-        <span class="col-lg-2 control-label detail-key">Options</span>
-        <span class="col-lg-10 detail-value">{{job.options}}</span>
+        <span class="col-lg-2 control-label detail-key">Status</span>
+        <span class="col-lg-10 detail-value">{{job.status}}</span>
+      </div>      
+      <div class="form-group">
+        <span class="col-lg-2 control-label detail-key">Code URL</span>
+        <span class="col-lg-10 detail-value"><a href="{{job.codeUrl}}" ng-show="job.codeUrl && job.codeUrl != 'null'" target="_blank">{{job.codeUrl}}</a>{{!(job.codeUrl && job.codeUrl != 'null')?'null':''}}</span>
       </div>      
       <div class="form-group">
         <span class="col-lg-2 control-label detail-key">Platform</span>
@@ -38,14 +42,6 @@
       <div class="form-group">
         <span class="col-lg-2 control-label detail-key">Language</span>
         <span class="col-lg-10 detail-value">{{job.language}}</span>
-      </div>
-      <div class="form-group">
-        <span class="col-lg-2 control-label detail-key">Status</span>
-        <span class="col-lg-10 detail-value">{{job.status}}</span>
-      </div>
-      <div class="form-group">
-        <span class="col-lg-2 control-label detail-key">Code URL</span>
-        <span class="col-lg-10 detail-value"><a href="{{job.codeUrl}}" ng-show="job.codeUrl && job.codeUrl != 'null'" target="_blank">{{job.codeUrl}}</a>{{!(job.codeUrl && job.codeUrl != 'null')?'null':''}}</span>
       </div>
       <div class="form-group">
         <span class="col-lg-2 control-label detail-key">User ID</span>
@@ -57,15 +53,15 @@
       </div>
       <div class="form-group">
         <span class="col-lg-2 control-label detail-key">Project</span>
-        <span class="col-lg-10 detail-value">{{job.project}}</span>
+        <span class="col-lg-10 detail-value">{{!(job.project == 'null') ? job.project:'&nbsp;'}}</span>
       </div>      
       <div class="form-group">
         <span class="col-lg-2 control-label detail-key">Start Time</span>
-        <span class="col-lg-10 detail-value">{{job.startTime}}</span>
+        <span class="col-lg-10 detail-value">{{!(job.startTime == 'null') ? job.startTime:'&nbsp;'}}</span>
       </div>
       <div class="form-group">
         <span class="col-lg-2 control-label detail-key">End Time</span>
-        <span class="col-lg-10 detail-value">{{job.endTime}}</span>
+        <span class="col-lg-10 detail-value">{{!(job.endTime == 'null') ? job.endTime:'&nbsp;'}}</span>
       </div>
       <div class="form-group">
         <span class="col-lg-2 control-label detail-key">Created At</span>
@@ -124,7 +120,7 @@
           <div class="form-group">
             <span class="col-lg-3 control-label mModal-key">Language</span>
             <div class="col-lg-9">
-              <input type="text" class="form-control mModal-input" ng-model="job.language" placeholder="Language">
+              <select class="form-control mModal-input" ng-model="job.language" ng-options="lang for lang in languages"></select>
             </div>
           </div>
           <div class="form-group">
@@ -140,17 +136,6 @@
             </div>
           </div>
           <div class="form-group">
-            <span class="col-lg-3 control-label mModal-key">Logger ID</span>
-            <div class="col-lg-9">
-              <input type="text" class="form-control mModal-input" ng-model="job.loggerId" placeholder="Logger ID (optional)">
-            </div>
-          </div>
-          <div class="form-group">
-            <span class="col-lg-3 control-label mModal-key">Options</span>
-            <div class="col-lg-9">
-              <input type="text" class="form-control mModal-input" ng-model="job.options" placeholder="Options (optional)">
-            </div>
-          </div>
             <span class="col-lg-3 control-label mModal-key">Project</span>
             <div class="col-lg-9">
               <input type="text" class="form-control mModal-input" ng-model="job.project" placeholder="Project name (optional)">
