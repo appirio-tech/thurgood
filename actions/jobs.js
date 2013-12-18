@@ -307,6 +307,7 @@ exports.jobsSubmit = {
 
             var newDoc = {
               status: 'submitted',
+              startTime: new Date().getTime(),
               updatedAt: new Date().getTime()
             };
 
@@ -315,7 +316,7 @@ exports.jobsSubmit = {
               if (!err) {
                 // Publish message
                 api.configData.rabbitmq.connection.publish(api.configData.rabbitmq.queue, message);
-                api.response.success(connection, "Job has been successfully submitted");
+                api.response.success(connection, "Job has been successfully submitted for processing.");
               } else {
                 api.response.error(connection, err);
               }
