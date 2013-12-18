@@ -84,7 +84,6 @@ thurgood.factory('Auth', function($http, $location){
       $http.get('/api/userinfo').success(function(res){
         if(res.data) {
           changeUser(res.data);
-          console.log("set api key", currentUser.apiKey);
           $http.defaults.headers.common['Authorization'] = 'Token token=' + currentUser.apiKey;            
         }
 
