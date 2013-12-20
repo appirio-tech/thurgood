@@ -1,1 +1,1 @@
-web: node --debug ./node_modules/.bin/actionHero start
+web: bin/proximo node ./node_modules/.bin/actionHero start
