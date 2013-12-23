@@ -69,7 +69,7 @@ exports.jobsComplete = {
         };
 
         // Find server and release it
-        api.mongo.collections.servers.findAndModify({ jobId: job._id }, {}, { $set: newDoc }, { new: true, w:1 }, function(err, server) {
+        api.mongo.collections.servers.findAndModify({ jobId: job._id.toString() }, {}, { $set: newDoc }, { new: true, w:1 }, function(err, server) {
           if (!err) {
             api.response.success(connection, "Job updated and server released");
           } else {
