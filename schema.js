@@ -51,7 +51,9 @@ exports.job = {
   updatedAt: null,
   userId: null,
   project: null,
-  status: 'created'
+  status: "created",
+  notification: null,
+  steps: "all"
 };
 
 /**

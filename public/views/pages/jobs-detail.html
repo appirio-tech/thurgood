@@ -34,7 +34,7 @@
       <div class="form-group">
         <span class="col-lg-2 control-label detail-key">Code URL</span>
         <span class="col-lg-10 detail-value"><a href="{{job.codeUrl}}" ng-show="job.codeUrl && job.codeUrl != 'null'" target="_blank">{{job.codeUrl}}</a>{{!(job.codeUrl && job.codeUrl != 'null')?'null':''}}</span>
-      </div>      
+      </div>
       <div class="form-group">
         <span class="col-lg-2 control-label detail-key">Platform</span>
         <span class="col-lg-10 detail-value">{{job.platform}}</span>
@@ -44,6 +44,10 @@
         <span class="col-lg-10 detail-value">{{job.language}}</span>
       </div>
       <div class="form-group">
+        <span class="col-lg-2 control-label detail-key">Steps </span>
+        <span class="col-lg-10 detail-value">{{job.steps}}</span>
+      </div>            
+      <div class="form-group">
         <span class="col-lg-2 control-label detail-key">User ID</span>
         <span class="col-lg-10 detail-value">{{job.userId}}</span>
       </div>
@@ -51,6 +55,10 @@
         <span class="col-lg-2 control-label detail-key">User Email</span>
         <span class="col-lg-10 detail-value">{{job.email}}</span>
       </div>
+      <div class="form-group">
+        <span class="col-lg-2 control-label detail-key">Notification</span>
+        <span class="col-lg-10 detail-value">{{!(job.notification == 'null') ? job.notification:'&nbsp;'}}</span>
+      </div>      
       <div class="form-group">
         <span class="col-lg-2 control-label detail-key">Project</span>
         <span class="col-lg-10 detail-value">{{!(job.project == 'null') ? job.project:'&nbsp;'}}</span>
@@ -110,19 +118,25 @@
                 </div>
               </form>
             </div>
-          </div>
+          </div>  
           <div class="form-group">
             <span class="col-lg-3 control-label mModal-key">Platform</span>
             <div class="col-lg-9">
-              <input type="text" class="form-control mModal-input" ng-model="job.platform" placeholder="Platform">
+              <select class="form-control mModal-input" ng-model="job.platform" ng-options="p for p in platforms"></select>
             </div>
           </div>
           <div class="form-group">
             <span class="col-lg-3 control-label mModal-key">Language</span>
             <div class="col-lg-9">
-              <select class="form-control mModal-input" ng-model="job.language" ng-options="lang for lang in languages"></select>
+              <select class="form-control mModal-input" ng-model="job.language" ng-options="lang.toString() for lang in languages"></select>
             </div>
           </div>
+          <div class="form-group">
+            <span class="col-lg-3 control-label mModal-key">Steps</span>
+            <div class="col-lg-9">
+              <select class="form-control mModal-input" ng-model="job.steps" ng-options="s for s in steps"></select>
+            </div>
+          </div>                  
           <div class="form-group">
             <span class="col-lg-3 control-label mModal-key">User ID</span>
             <div class="col-lg-9">
@@ -135,6 +149,12 @@
               <input type="text" class="form-control mModal-input" ng-model="job.email" placeholder="User Email">
             </div>
           </div>
+          <div class="form-group">
+            <span class="col-lg-3 control-label mModal-key">Notification</span>
+            <div class="col-lg-9">
+              <select class="form-control mModal-input" ng-model="job.notification" ng-options="n for n in notifications"></select>
+            </div>
+          </div>    
           <div class="form-group">
             <span class="col-lg-3 control-label mModal-key">Project</span>
             <div class="col-lg-9">

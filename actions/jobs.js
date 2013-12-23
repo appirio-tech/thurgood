@@ -97,7 +97,7 @@ exports.jobsCreate = {
   description: "Creates a new job. Method: POST",
   inputs: {
     required: ['email', 'platform', 'language', 'userId', 'codeUrl'],
-    optional: ['loggerId', 'logger', 'options', 'project'],
+    optional: ['loggerId', 'logger', 'options', 'project', 'notification', 'steps'],
   },
   authenticated: true,
   outputExample: {},
@@ -428,7 +428,7 @@ exports.jobsUpdate = {
   description: "Updates a job. Method: PUT",
   inputs: {
     required: ['id'],
-    optional: ['status', 'email', 'platform', 'language', 'papertrailSystem', 'userId', 'codeUrl', 'options', 'startTime', 'endTime'],
+    optional: ['status', 'email', 'platform', 'language', 'papertrailSystem', 'userId', 'codeUrl', 'options', 'steps', 'notification', 'startTime', 'endTime'],
   },
   authenticated: true,
   outputExample: {},

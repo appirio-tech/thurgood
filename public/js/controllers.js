@@ -47,11 +47,13 @@ thurgood.controller('JobsCtrl', ['$scope', '$filter', '$location', '$modal', 'Jo
     $modal.open({
       templateUrl: 'jobsCreateModal',
       controller: function($scope, $modalInstance) {
-        $scope.job = {email: $scope.user.email};
+        $scope.job = {email: $scope.user.email, steps: 'all'};
         $scope.timestamp = new Date().getTime();
 
         $scope.platforms = ["other","salesforce.com", "heroku"];  
-        $scope.languages = ["apex", "java"];  
+        $scope.languages = ["apex", "java"];
+        $scope.steps = ["all", "scan"];  
+        $scope.notifications = ["email"];
 
         // Change server error messages to user friendly strings
         var translateError = function(err) {
@@ -275,11 +277,13 @@ thurgood.controller('JobsDetailCtrl', ['$scope', '$routeParams', '$modal', 'Jobs
           $scope.job = {};
           $scope.job.id = res.data[0]._id;
           $scope.platforms = ["other","salesforce.com", "heroku"];  
-          $scope.languages = ["apex", "java"];            
+          $scope.languages = ["apex", "java"];  
+          $scope.steps = ["all", "scan"];  
+          $scope.notifications = ["email"];         
 
           // Move updateable values in a new object
           angular.forEach(res.data[0], function(value, key) {
-            if (value && ['email', 'platform', 'language', 'userId', 'codeUrl', 'loggerId', 'options'].indexOf(key) > -1) {
+            if (value && ['email', 'platform', 'language', 'userId', 'codeUrl', 'loggerId', 'options', 'steps', 'notification'].indexOf(key) > -1) {
               this[key] = value;
             }
           }, $scope.job);
@@ -291,6 +295,8 @@ thurgood.controller('JobsDetailCtrl', ['$scope', '$routeParams', '$modal', 'Jobs
             if (err == 'Error: language is a required parameter for this action') return 'Language is required';
             if (err == 'Error: userId is a required parameter for this action')   return 'User ID is required';
             if (err == 'Error: codeUrl is a required parameter for this action')  return 'Code URL is required';
+            if (err == 'Error: steps is a required parameter for this action')  return 'Steps is required';
+            if (err == 'Error: notification is a required parameter for this action')  return 'Email Notify is required';
             if (err == 'Parameter loggerId is not a valid ObjectID')              return 'Invalid logger ID';
             if (err == 'Parameter options is not a valid JSON object')            return 'Invalid options: must be a valid JSON object';
             return err;
