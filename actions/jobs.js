@@ -8,6 +8,7 @@ var syslog = require('syslog');
 var _ = require('underscore');
 var Q = require("q");
 var papertrail = require("../lib/papertrail");
+var mailer = require("../lib/mandrill");
 
 /**
  * GET /jobs
@@ -67,6 +68,11 @@ exports.jobsComplete = {
           status: 'available',
           updatedAt: new Date().getTime()
         };
+
+        // send the job complete notifications email if requested
+        if (job.notification === "email") {
+          mailer.sendMail(api, job);
+        }
 
         // Find server and release it
         api.mongo.collections.servers.findAndModify({ jobId: job._id.toString() }, {}, { $set: newDoc }, { new: true, w:1 }, function(err, server) {

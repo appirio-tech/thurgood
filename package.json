@@ -22,7 +22,8 @@
     "request": "~2.27.0",
     "string": "~1.6.0",
     "openid": "*",
-    "syslog": "git://github.com/jeffdonthemic/node-syslog.git" 
+    "syslog": "git://github.com/jeffdonthemic/node-syslog.git",
+    "mandrill-api": "~1.0.37"
   },
   "devDependencies": {
     "mocha": "~1.13.0",
