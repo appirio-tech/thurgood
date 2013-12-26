@@ -370,8 +370,8 @@ exports.jobsSubmit = {
       if (!err && doc) {
         // can submit a job no matter the current status
         var serverSelector = {
-          languages: doc.language,
-          platform: doc.platform,
+          languages: doc.language.toLowerCase(),
+          platform: doc.platform.toLowerCase(),
           status: 'available'
         };
 
