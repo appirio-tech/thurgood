@@ -121,35 +121,6 @@ thurgood.controller('JobsCtrl', ['$scope', '$filter', '$location', '$modal', 'Jo
     });
   };
 
-  // Submit job
-  $scope.submitJob = function(_id) {
-    var errorHandler = function(err) {
-      var error = (err.data && err.data.error) || err.error || err.message || "Error";
-      if (error == 'Could not find any available servers. Try again in a few minutes.') {
-        error = 'No servers available';
-      }
-
-      $scope.submitStatus[_id] = error;
-      
-      setTimeout(function() {
-        if ($scope.submitStatus[_id] == 'Error') {
-          $scope.submitStatus[_id] = undefined;
-        }
-      }, 2000);
-    };
-
-    $scope.submitStatus[_id] = 'Submitting...';
-    
-    new Jobs({id: _id}).$submit(function(res) {
-      if (res.success != true) {
-        errorHandler(res);
-        return;
-      }
-
-      $scope.submitStatus[_id] = 'Submitted';
-    }, errorHandler);
-  }
-
   // API request successful
   promise.then(function(res) {
     if (res.success != true) {
@@ -245,6 +216,27 @@ thurgood.controller('JobsDetailCtrl', ['$scope', '$routeParams', '$modal', 'Jobs
   var job = {};
   $scope.jobId = jobId;
   $scope.loading = true;  
+
+ // Submit job
+  $scope.submitJob = function() {
+    new Jobs({id: jobId}).$submit(function(res) {
+      if (res.success != true) {
+        submitErrorHandler(res);
+        return;
+      } else {
+          // show the new status before the page refresh
+          job.status = 'submitted';
+          job.endTime = null;        
+          alert('Your job has been submitted for processing. See the Event Viewer for progress. ');
+      }
+    }, submitErrorHandler);
+  }  
+
+  var submitErrorHandler = function(err) {
+    console.log(err);
+    var error = (err.data && err.data.error) || err.error || err.message || "Error";
+    alert(error);
+  };  
 
   // Change server error messages to user friendly strings
   var translateError = function(err) {

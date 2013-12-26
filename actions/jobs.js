@@ -392,6 +392,7 @@ exports.jobsSubmit = {
             var newDoc = {
               status: 'submitted',
               startTime: new Date().getTime(),
+              endTime: null,
               updatedAt: new Date().getTime()
             };
 

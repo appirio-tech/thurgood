@@ -1,5 +1,5 @@
 <div class="page-header">
-  <button type="button" class="btn btn-primary pull-right" ng-click="createModal()">Create</button>
+  <button type="button" class="btn btn-primary pull-right" ng-click="createModal()">New Job</button>
   <input type="text" class="form-control pull-right search" ng-model="searchText" placeholder="Search">
   <h1>Jobs{{totalItems >= 0 ? ' (' + totalItems + ')' : ''}}</h1>
 </div>
@@ -12,7 +12,6 @@
     <td data-title="'Project'" sortable="project">{{row.project}}</td>
     <td data-title="'User'" sortable="userId">{{row.userId}}</td>
     <td data-title="'Status'" sortable="status">{{row.status}}</td>
-    <td data-title="'Action'"><button type="button" class="btn btn-info btn-xs" ng-click="submitJob(row._id)">{{submitStatus[row._id] || 'Submit'}}</button></td>
   </tr>
 </table>
 
