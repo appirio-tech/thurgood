@@ -98,9 +98,10 @@ thurgood.controller('JobsCtrl', ['$scope', '$filter', '$location', '$modal', 'Jo
               errorHandler(res);
               return;
             }
-
-            $scope.jobId = res.data[0]._id;
+            $scope.jobId = res.data._id;
             $scope.status = 'SUCCESS';
+            $modalInstance.dismiss();
+            $location.path('/jobs/' + res.data._id);
           }, errorHandler);
         };
         
