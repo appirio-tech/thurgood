@@ -24,8 +24,8 @@ exports.serversCreate = {
   name: "serversCreate",
   description: "Creates a new server. Method: POST",
   inputs: {
-    required: [],
-    optional: ['name', 'status', 'instanceUrl', 'operatingSystem', 'installedServices', 'languages', 'platform', 'repoName', 'username', 'password', 'jobId'],
+    required: ['name', 'status', 'instanceUrl', 'repoName', 'platform', 'languages'],
+    optional: ['operatingSystem', 'installedServices', 'username', 'password', 'jobId', 'project'],
   },
   authenticated: true,
   outputExample: {},
@@ -42,8 +42,8 @@ exports.serversUpdate = {
   name: "serversUpdate",
   description: "Updates a server. Method: PUT",
   inputs: {
-    required: ['id'],
-    optional: ['name', 'status', 'instanceUrl', 'operatingSystem', 'installedServices', 'languages', 'platform', 'repoName', 'username', 'password', 'jobId'],
+    required: ['id', 'name', 'status', 'instanceUrl', 'repoName', 'platform', 'languages'],
+    optional: ['operatingSystem', 'installedServices', 'username', 'password', 'jobId', 'project'],
   },
   authenticated: true,
   outputExample: {},
