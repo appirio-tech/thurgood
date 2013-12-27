@@ -236,7 +236,7 @@ exports.jobsCreate = {
         rawConnection: {
           req: { 
             headers: {
-              authorization: "Token token=" + process.env.THIS_API_KEY
+              authorization: "Token token=" + api.configData.general.apiKey
             }
           }
         }

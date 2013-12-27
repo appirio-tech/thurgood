@@ -13,7 +13,7 @@ exports.task = {
     // Find old loggers and delete them from database and Papertrail
     api.mongo.collections.loggerSystems.find({ updatedAt: { $lt: (now - period) } }).toArray(function(err, docs) {
       if (!err) {
-        var loggerConnection = new api.connection({ type: 'task', remotePort: '0', remoteIP: '0', rawConnection: {req: { headers: {authorization: "Token token=" + process.env.THIS_API_KEY}}}});
+        var loggerConnection = new api.connection({ type: 'task', remotePort: '0', remoteIP: '0', rawConnection: {req: { headers: {authorization: "Token token=" + api.configData.general.apiKey}}}});
         _.each(docs, function(doc) { 
           var loggerId = doc._id.toString();
           loggerConnection.params = { action: "loggersDelete", apiVersion: 1, id: loggerId };

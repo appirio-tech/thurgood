@@ -21,7 +21,7 @@ You should now be able to go to [http://localhost:5000](http://localhost:5000) a
 The Angular frontend should be available from [http://localhost:5000](http://localhost:5000).
 
 ## API Keys
-An API key is required for each call to the API. See the [API Keys page](https://github.com/cloudspokes/thurgood/wiki/API-Keys) for more info.
+An API key is required for each call to the API. See the [API Keys page](https://github.com/cloudspokes/thurgood/wiki/Security-&-API-Keys) for more info.
 
 **Please see the [wiki](https://github.com/cloudspokes/thurgood/wiki) for complete documentation.** The documentation provides sample cURL statements for API calls with a Token that is passed in the header. At this time, the token is not being used so it can be safely be submitted.
 
