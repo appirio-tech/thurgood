@@ -27,8 +27,6 @@ exports.jobs = function(api, next){
     },
 
     findById: function(id) {
-      console.log("======== running findby id")
-      console.log(id);
       var selector;
       var deferred = Q.defer();
 
