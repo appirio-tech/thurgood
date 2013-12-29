@@ -342,7 +342,7 @@ exports.jobsMessage = {
 };
 
 /**
- * POST /jobs/:id/submit
+ * PUT /jobs/:id/submit
  */
 exports.jobsSubmit = {
   name: "jobsSubmit",
@@ -355,75 +355,106 @@ exports.jobsSubmit = {
   outputExample: {},
   version: 1.0,
   run: function(api, connection, next) {
-    var selector;
 
-    // Validate id and build selector
-    try {
-      selector = { _id: new ObjectID(connection.params.id) };
-    } catch(err) {
-      api.response.badRequest(connection, "Id is not a valid ObjectID");
-      return next(connection, true);
+    findJob(connection.params.id)
+      .then(reserveServer)
+      .then(updateJobAndPublish)
+      .then(respondOk)
+      .fail(respondError);
+
+    function findJob(id) {
+      var selector;
+      var deferred = Q.defer();
+
+      // Validate id and build selector
+      try {
+        selector = { _id: new ObjectID(id) };
+      } catch(err) {
+        deferred.reject(new Error("Id is not a valid ObjectID"));
+      }      
+
+      api.mongo.collections.jobs.findOne(selector, function(err, job) {
+        if (job) {
+          deferred.resolve(job);
+        } else {
+          deferred.reject(new Error("Job not found."));
+        }
+      });
+      return deferred.promise;
+    } 
+
+    function reserveServer(job) {
+      var deferred = Q.defer();
+      var selector = {
+        languages: job.language.toLowerCase(),
+        platform: job.platform.toLowerCase(),
+        status: 'available'
+      }; 
+      // change the status to reserved
+      var newDoc = {
+        jobId: job._id.toString(),
+        status: 'reserved',
+        updatedAt: new Date().getTime()
+      };            
+
+      // if this job is not for a project but is scan only then find available "checkmarx-scan-only" server
+      if (job.steps === "scan" && !job.project) {
+        selector.name = api.configData.general.scanOnlyProjectName;
+        delete selector.languages;
+        delete selector.platform;
+      }      
+
+      // Find server and reserve it
+      api.mongo.collections.servers.findAndModify(selector, {}, { $set: newDoc }, { new: true, w:1 }, function(err, server) {
+        if (!err && server) {
+          deferred.resolve(job);
+        } else {
+          deferred.reject(new Error("Could not find any available servers. Try again in a few minutes."));
+        }
+      });
+      return deferred.promise;
+    }     
+
+    function updateJobAndPublish(job) {
+      var deferred = Q.defer();
+      var message = {
+        job_id: job._id,
+        type: job.language
+      };  
+      var newDoc = {
+        status: 'submitted',
+        startTime: new Date().getTime(),
+        endTime: null,
+        updatedAt: new Date().getTime()
+      };
+
+      // Set job status to submitted
+      api.mongo.collections.jobs.update({ _id: job._id }, { $set: newDoc }, { w:1 }, function(err, result) {
+        console.log(result);
+        if (!err && result == 1) {
+          // Publish message
+          //api.configData.rabbitmq.connection.publish(api.configData.rabbitmq.queue, message);
+          deferred.resolve("Job has been successfully submitted for processing. See the job's Event Viewer for details.");
+        } else {
+          // TODO -- need to release the server!
+          deferred.reject(new Error("Could not update job and publish message for processing. Contact support."));
+        }
+      });      
+      return deferred.promise;
+    }    
+
+    // respond success with the results message
+    function respondOk(result) {
+      api.response.success(connection, null, result);
+      next(connection, true);
     }
 
-    // Find document
-    api.mongo.collections.jobs.findOne(selector, function(err, doc) {
-      if (!err && doc) {
-        // can submit a job no matter the current status
-        var serverSelector = {
-          languages: doc.language.toLowerCase(),
-          platform: doc.platform.toLowerCase(),
-          status: 'available'
-        };
+    // respond error
+    function respondError(err) {
+      api.response.error(connection, err.message);
+      next(connection, true);
+    }     
 
-        var newDoc = {
-          jobId: doc._id.toString(),
-          status: 'reserved',
-          updatedAt: new Date().getTime()
-        };
-
-        // Find server and reserve it
-        api.mongo.collections.servers.findAndModify(serverSelector, {}, { $set: newDoc }, { new: true, w:1 }, function(err, server) {
-          if (!err && server) {
-            var message = {
-              job_id: server.jobId,
-              type: doc.language
-            };
-
-            var newDoc = {
-              status: 'submitted',
-              startTime: new Date().getTime(),
-              endTime: null,
-              updatedAt: new Date().getTime()
-            };
-
-            // Set job status to submitted
-            api.mongo.collections.jobs.update({ _id: doc._id }, { $set: newDoc }, { w:1 }, function(err, result) {
-              if (!err) {
-                // Publish message
-                api.configData.rabbitmq.connection.publish(api.configData.rabbitmq.queue, message);
-                api.response.success(connection, "Job has been successfully submitted for processing.");
-              } else {
-                api.response.error(connection, err);
-              }
-
-              next(connection, true);
-            });
-          } else if (!server) {
-            api.response.error(connection, "Could not find any available servers. Try again in a few minutes.");
-            next(connection, true);
-          } else {
-            api.response.error(connection, err);
-            next(connection, true);
-          }
-        });
-      } else if (!doc) {
-        api.response.error(connection, "Job not found");
-        next(connection, true);
-      } else {
-        api.response.error(connection, err);
-        next(connection, true);
-      }
-    });
   }
 };
 
@@ -435,12 +466,16 @@ exports.jobsUpdate = {
   description: "Updates a job. Method: PUT",
   inputs: {
     required: ['id'],
-    optional: ['status', 'email', 'platform', 'language', 'papertrailSystem', 'userId', 'codeUrl', 'options', 'steps', 'notification', 'startTime', 'endTime'],
+    optional: ['status', 'email', 'platform', 'language', 'papertrailSystem', 'userId', 'codeUrl', 'options', 'steps', 'notification', 'startTime', 'endTime', 'project'],
   },
   authenticated: true,
   outputExample: {},
   version: 1.0,
   run: function(api, connection, next) {
+    // set the project for the job to null if 'null'
+    if (connection.params.project === "null") {
+      connection.params.project = null;
+    }
     api.mongo.update(api, connection, next, api.mongo.collections.jobs, api.mongo.schema.job);
   }
 };
