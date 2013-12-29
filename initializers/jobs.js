@@ -1,5 +1,6 @@
 var Q = require("q");
 var _ = require('underscore');
+var ObjectID = require('mongodb').ObjectID;
 
 /*
   user model, it uses promise.
@@ -23,7 +24,32 @@ exports.jobs = function(api, next){
       });
 
       return deferred.promise;
+    },
+
+    findById: function(id) {
+      console.log("======== running findby id")
+      console.log(id);
+      var selector;
+      var deferred = Q.defer();
+
+      // Validate id and build selector
+      try {
+        selector = { _id: new ObjectID(id) };
+      } catch(err) {
+        deferred.reject(new Error("Id is not a valid ObjectID"));
+      }      
+
+      api.mongo.collections.jobs.findOne(selector, function(err, job) {
+        if (job) {
+          deferred.resolve(job);
+        } else {
+          deferred.reject(new Error("Job not found."));
+        }
+      });
+
+      return deferred.promise;    
     }
+
   }
 
   next();

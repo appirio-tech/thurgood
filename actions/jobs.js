@@ -356,32 +356,11 @@ exports.jobsSubmit = {
   version: 1.0,
   run: function(api, connection, next) {
 
-    findJob(connection.params.id)
+    api.jobs.findById(connection.params.id)
       .then(reserveServer)
       .then(updateJobAndPublish)
       .then(respondOk)
       .fail(respondError);
-
-    function findJob(id) {
-      var selector;
-      var deferred = Q.defer();
-
-      // Validate id and build selector
-      try {
-        selector = { _id: new ObjectID(id) };
-      } catch(err) {
-        deferred.reject(new Error("Id is not a valid ObjectID"));
-      }      
-
-      api.mongo.collections.jobs.findOne(selector, function(err, job) {
-        if (job) {
-          deferred.resolve(job);
-        } else {
-          deferred.reject(new Error("Job not found."));
-        }
-      });
-      return deferred.promise;
-    } 
 
     function reserveServer(job) {
       var deferred = Q.defer();
