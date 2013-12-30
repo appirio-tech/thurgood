@@ -30,6 +30,12 @@ exports.middleware = function(api, next){
             }
 
             api.users.findByEmail(email).then(function(user) {
+
+              // if the anonymous user is requesting a specific job (most likely to view the event viewer), make them an admin
+              if (user.apiKey === "anonymous" && connection.params.action === "jobsFetch" && connection.params.id) {
+                user.role.bitMask = 4;
+              }
+              
               if(api.users.isAccessible(user, actionTemplate)) {
                 connection.currentUser = user;
                 next(connection, true);  
