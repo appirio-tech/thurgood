@@ -30,7 +30,8 @@ exports.server = {
   repoName: null,
   status: null,
   updatedAt: null,
-  username: null
+  username: null,
+  project: null
 };
 
 /**

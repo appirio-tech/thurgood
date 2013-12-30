@@ -27,7 +27,8 @@ configData.general = {
   pidFileDirectory: process.cwd() + "/pids/",                     // the location of the directory to keep pidfiles
   simultaneousActions: 50,                                          // how many pending actions can a single connection be working on 
   apiKey: null,                                                          // set by startup middleware and used by internal calls to create jobs
-  skipAuthorization: process.env.SKIP_AUTH || false // determined if the middleware check for an API Key should be skipped
+  skipAuthorization: process.env.SKIP_AUTH || false, // determined if the middleware check for an API Key should be skipped
+  scanOnlyProjectName: "Checkmarx Scan Only"
 };
 
 /////////////

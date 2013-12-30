@@ -16,7 +16,7 @@
         <div class="col-lg-4">
             <input type="text" class="form-control" id="name" placeholder="Server display name" ng-model="newServerData.name" required>
         </div>
-    </div>
+    </div>  
 
     <div class="form-group">
         <label for="instanceUrl" class="col-lg-2 control-label detail-key">
@@ -77,6 +77,16 @@
             <input type="text" class="form-control" id="operatingSystem" placeholder="Enter the operating system" ng-model="newServerData.operatingSystem">
         </div>
     </div>
+
+    <div class="form-group">
+        <label for="project" class="col-lg-2 control-label detail-key">
+            Project
+        </label>
+
+        <div class="col-lg-6">
+            <input type="text" class="form-control" id="project" placeholder="Enter a project name to restrict this server to that project only" ng-model="newServerData.project">
+        </div>
+    </div>      
 
     <div class="form-group">
         <label for="username" class="col-lg-2 control-label detail-key">

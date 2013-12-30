@@ -359,6 +359,7 @@ exports.jobsSubmit = {
 
     function reserveServer(job) {
       var deferred = Q.defer();
+      var  serverNotFoudMsg = "Could not find any available servers. Try again in a few minutes.";
       var selector = {
         languages: job.language.toLowerCase(),
         platform: job.platform.toLowerCase(),
@@ -368,7 +369,8 @@ exports.jobsSubmit = {
       var newDoc = {
         jobId: job._id.toString(),
         status: 'reserved',
-        updatedAt: new Date().getTime()
+        updatedAt: new Date().getTime(),
+        project: null
       };            
 
       // if this job is not for a project but is scan only then find available "checkmarx-scan-only" server
@@ -378,12 +380,37 @@ exports.jobsSubmit = {
         delete selector.platform;
       }      
 
+      // if we are building for a specific project look for a matching server by project name
+      if (job.project) {
+        selector.project = job.project;
+      }
+
       // Find server and reserve it
       api.mongo.collections.servers.findAndModify(selector, {}, { $set: newDoc }, { new: true, w:1 }, function(err, server) {
-        if (!err && server) {
-          deferred.resolve(job);
+        if (!err) {
+          // if we found a matching server return it
+          if (server) {
+            deferred.resolve(job);
+
+          // if no server found but looking for a matching project,
+          // then remove the project attribute and just look for a matching language/platform
+          } else if (!server && job.project) {
+            // remove the project selector attribute
+            selector.project = null;
+            api.mongo.collections.servers.findAndModify(selector, {}, { $set: newDoc }, { new: true, w:1 }, function(err, server) {
+              if (!err && server) {
+                deferred.resolve(job);
+              } else {
+                deferred.reject(new Error(serverNotFoudMsg));
+              }
+            });
+          // no server found and not for a specific project
+          } else {
+            deferred.reject(new Error(serverNotFoudMsg));
+          }
+        // error occurred
         } else {
-          deferred.reject(new Error("Could not find any available servers. Try again in a few minutes."));
+          deferred.reject(new Error(serverNotFoudMsg));
         }
       });
       return deferred.promise;
@@ -424,6 +451,7 @@ exports.jobsSubmit = {
 
     // respond error
     function respondError(err) {
+      console.log("[FATAL] " + err.message + " Job: " + connection.params.id);
       api.response.error(connection, err.message);
       next(connection, true);
     }     

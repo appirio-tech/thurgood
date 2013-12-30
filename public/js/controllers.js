@@ -272,11 +272,11 @@ thurgood.controller('JobsDetailCtrl', ['$scope', '$routeParams', '$modal', 'Jobs
           $scope.platforms = ["other","salesforce.com", "heroku"];  
           $scope.languages = ["apex", "java"];  
           $scope.steps = ["all", "scan"];  
-          $scope.notifications = ["email"];         
+          $scope.notifications = ["email"];
 
           // Move updateable values in a new object
           angular.forEach(res.data[0], function(value, key) {
-            if (value && ['email', 'platform', 'language', 'userId', 'codeUrl', 'loggerId', 'options', 'steps', 'notification'].indexOf(key) > -1) {
+            if (value && value != 'null' && ['email', 'platform', 'language', 'userId', 'codeUrl', 'loggerId', 'options', 'steps', 'notification', 'project'].indexOf(key) > -1) {
               this[key] = value;
             }
           }, $scope.job);
@@ -319,7 +319,12 @@ thurgood.controller('JobsDetailCtrl', ['$scope', '$routeParams', '$modal', 'Jobs
               }
             });
 
-            // Create resource and POST it
+            // if they are erasing the project name then pass "null" so the controller will null it
+            if (detailScope.job.project != undefined && $scope.job.project === undefined) {
+              $scope.job.project = "null";
+            }
+
+            // Create resource and PUT it
             var jobRes = new Jobs($scope.job);
             jobRes.$update(function(res) {
               if (res.success != true) {
@@ -342,6 +347,7 @@ thurgood.controller('JobsDetailCtrl', ['$scope', '$routeParams', '$modal', 'Jobs
               
               detailScope.job = job;
               $scope.status = 'SUCCESS';
+              $modalInstance.dismiss();
             }, errorHandler);
           };
           
