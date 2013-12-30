@@ -312,10 +312,6 @@ exports.jobsMessage = {
         loggerSelector = { _id: new ObjectID(job.loggerId) };
         api.mongo.collections.loggerSystems.findOne(loggerSelector, function(err, logger) {
           if (!err && logger) {
-            // set some temp - testing vars
-            logger.syslogHostname = "logs.papertrailapp.com";
-            logger.syslogPort = 37402;
-
             var logger = syslog.createClient(logger.syslogPort, logger.syslogHostname, {name: connection.params.message.sender});
             logger.info(connection.params.message.text);
             api.response.success(connection, "Message sent to logger.");
@@ -437,7 +433,7 @@ exports.jobsSubmit = {
       api.mongo.collections.jobs.update({ _id: job._id }, { $set: newDoc }, { w:1 }, function(err, result) {
         if (!err && result == 1) {
           // Publish message
-          //api.configData.rabbitmq.connection.publish(api.configData.rabbitmq.queue, message);
+          api.configData.rabbitmq.connection.publish(api.configData.rabbitmq.queue, message);
           deferred.resolve("Job has been successfully submitted for processing. See the job's Event Viewer for details.");
         } else {
           api.jobs.releaseServer(job);
