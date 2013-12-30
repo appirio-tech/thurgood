@@ -44,55 +44,50 @@ exports.jobsComplete = {
   outputExample: {},
   version: 1.0,
   run: function(api, connection, next) {
-    var selector;
 
-    // Validate id and build selector
-    try {
-      selector = { _id: new ObjectID(connection.params.id) };
-    } catch(err) {
-      api.response.badRequest(connection, "Id is not a valid ObjectID");
-      return next(connection, true);
+    api.jobs.findById(connection.params.id)
+      .then(api.jobs.releaseServer) 
+      .then(markJobComplete)
+      .then(respondOk)
+      .fail(respondError);  
+
+    // respond success with the results message
+    function markJobComplete(job) {
+      var deferred = Q.defer();
+      var selector = { _id: new ObjectID(connection.params.id) };
+      var newDoc = {
+        status: 'complete',
+        endTime: new Date().getTime(),
+        updatedAt: new Date().getTime()
+      };
+
+      api.mongo.collections.jobs.findAndModify(selector, {}, { $set: newDoc }, { new: true, w:1 }, function(err, job) {
+        if (!err && job) {
+          // send the job complete notifications email if requested
+          if (job.notification === "email") {
+            mailer.sendMail(api, job);
+          }      
+          deferred.resolve(job);
+        } else {
+          deferred.reject(err);
+        }
+      });        
+
+      return deferred.promise;
+    }           
+
+    // respond success with the results message
+    function respondOk(result) {
+      api.response.success(connection, null, "Job updated and server released");
+      next(connection, true);
     }
 
-    var newDoc = {
-      status: 'complete',
-      endTime: new Date().getTime(),
-      updatedAt: new Date().getTime()
-    };
-
-    // Modify document
-    api.mongo.collections.jobs.findAndModify(selector, {}, { $set: newDoc }, { new: true, w:1 }, function(err, job) {
-      if (!err && job) {
-        var newDoc = {
-          jobId: null,
-          status: 'available',
-          updatedAt: new Date().getTime()
-        };
-
-        // send the job complete notifications email if requested
-        if (job.notification === "email") {
-          mailer.sendMail(api, job);
-        }
-
-        // Find server and release it
-        api.mongo.collections.servers.findAndModify({ jobId: job._id.toString() }, {}, { $set: newDoc }, { new: true, w:1 }, function(err, server) {
-          if (!err) {
-            api.response.success(connection, "Job updated and server released");
-          } else {
-            api.response.error(connection, err);
-          }
-
-          next(connection, true);
-        });
-      } else if (!job) {
-        api.response.error(connection, "Job not found");
-        next(connection, true);
-      } else {
-        api.response.error(connection, err);
-        next(connection, true);
-      }
-    });
-  }
+    // respond error
+    function respondError(err) {
+      api.response.error(connection, err.message);
+      next(connection, true);
+    }       
+  }    
 };
 
 /**
@@ -409,7 +404,6 @@ exports.jobsSubmit = {
 
       // Set job status to submitted
       api.mongo.collections.jobs.update({ _id: job._id }, { $set: newDoc }, { w:1 }, function(err, result) {
-        console.log(result);
         if (!err && result == 1) {
           // Publish message
           //api.configData.rabbitmq.connection.publish(api.configData.rabbitmq.queue, message);
