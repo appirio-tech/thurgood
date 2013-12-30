@@ -46,7 +46,27 @@ exports.jobs = function(api, next){
       });
 
       return deferred.promise;    
-    }
+    },
+
+    // releases a server and makes it available
+    releaseServer: function(job) {
+      var deferred = Q.defer();
+      var newDoc = {
+        jobId: null,
+        status: 'available',
+        updatedAt: new Date().getTime()
+      };      
+
+      api.mongo.collections.servers.findAndModify({ jobId: job._id.toString() }, {}, { $set: newDoc }, { new: true, w:1 }, function(err, server) {
+        if (!err && server) {
+          deferred.resolve(job);
+        } else {
+          deferred.reject(err);
+        }
+
+        return deferred.promise;
+      });
+    }    
 
   }
 
