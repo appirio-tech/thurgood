@@ -163,6 +163,8 @@ configData.google = {
   redirectUrl : process.env.GOOGLE_REDIRECT_URL || "http://localhost:5000/api/auth/google/return"
 }
 
+// set the app's main url from the google redirect url
+configData.general.appUrl =  configData.google.redirectUrl.substr(0,configData.google.redirectUrl.indexOf("/api"));
 //////////////////////////////////
 
 exports.configData = configData;
