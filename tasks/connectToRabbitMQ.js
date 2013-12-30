@@ -21,7 +21,7 @@ exports.task = {
     });    
 
     conn.on('error', function(err){
-      console.log("[ERROR] RabbitMQ error: " + err);
+      console.log("[FATAL] RabbitMQ error: " + err);
     });        
 
   }
