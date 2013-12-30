@@ -409,7 +409,7 @@ exports.jobsSubmit = {
           //api.configData.rabbitmq.connection.publish(api.configData.rabbitmq.queue, message);
           deferred.resolve("Job has been successfully submitted for processing. See the job's Event Viewer for details.");
         } else {
-          // TODO -- need to release the server!
+          api.jobs.releaseServer(job);
           deferred.reject(new Error("Could not update job and publish message for processing. Contact support."));
         }
       });      
