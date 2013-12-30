@@ -43,6 +43,7 @@ exports.jobsComplete = {
   authenticated: true,
   outputExample: {},
   version: 1.0,
+  access: accessLevels.admin,  
   run: function(api, connection, next) {
 
     api.jobs.findById(connection.params.id)
@@ -103,6 +104,7 @@ exports.jobsCreate = {
   authenticated: true,
   outputExample: {},
   version: 1.0,
+  access: accessLevels.user,  
   run: function(api, connection, next) {
     var promise = null;
     var attrs = _.pick(connection.params, _.keys(api.mongo.schema.job));
@@ -292,6 +294,7 @@ exports.jobsMessage = {
   authenticated: true,
   outputExample: {},
   version: 1.0,
+  access: accessLevels.user,  
   run: function(api, connection, next) {
     var selector, loggerSelector;
 
@@ -349,6 +352,7 @@ exports.jobsSubmit = {
   authenticated: true,
   outputExample: {},
   version: 1.0,
+  access: accessLevels.user,  
   run: function(api, connection, next) {
 
     api.jobs.findById(connection.params.id)
@@ -472,6 +476,7 @@ exports.jobsUpdate = {
   authenticated: true,
   outputExample: {},
   version: 1.0,
+  access: accessLevels.user,  
   run: function(api, connection, next) {
     // set the project for the job to null if 'null'
     if (connection.params.project === "null") {
@@ -494,6 +499,7 @@ exports.jobsPublish = {
   authenticated: true,
   outputExample: {},
   version: 1.0,
+  access: accessLevels.user,  
   run: function(api, connection, next) {
     api.configData.rabbitmq.connection.publish(api.configData.rabbitmq.queue, connection.params.message);  
     api.response.success(connection, "Message successfully published.");

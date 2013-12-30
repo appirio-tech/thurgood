@@ -1,3 +1,5 @@
+var accessLevels = require('../public/js/routingConfig').accessLevels;
+
 /**
  * GET /servers
  * GET /servers/:id
@@ -12,6 +14,7 @@ exports.action = {
   authenticated: true,
   outputExample: {},
   version: 1.0,
+  access: accessLevels.admin,
   run: function(api, connection, next) {
     api.mongo.get(api, connection, next, api.mongo.collections.servers);
   }
@@ -30,6 +33,7 @@ exports.serversCreate = {
   authenticated: true,
   outputExample: {},
   version: 1.0,
+  access: accessLevels.admin,
   run: function(api, connection, next) {
     api.mongo.create(api, connection, next, api.mongo.collections.servers, api.mongo.schema.server);
   }
@@ -48,6 +52,7 @@ exports.serversUpdate = {
   authenticated: true,
   outputExample: {},
   version: 1.0,
+  access: accessLevels.admin,  
   run: function(api, connection, next) {
     api.mongo.update(api, connection, next, api.mongo.collections.servers, api.mongo.schema.server);
   }
