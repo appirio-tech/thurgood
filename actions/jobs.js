@@ -4,7 +4,6 @@ var request = require('request');
 var loggers = require('./loggers');
 var crypto = require('crypto');
 var accessLevels = require('../public/js/routingConfig').accessLevels;
-var syslog = require('syslog');
 var _ = require('underscore');
 var Q = require("q");
 var papertrail = require("../lib/papertrail");
