@@ -34,7 +34,7 @@ exports.middleware = function(api, next){
               // they passed a valid api key in redis but no matching user record
               if (!user) {
                 errorResponse(connection);
-                connection.response.error_description = "User not found for registered API key.";
+                connection.response.error_description = "User not found for registered API key: " + apiKey;
                 return next(connection, false);     
               }
 
