@@ -1,6 +1,7 @@
 var Q = require("q");
 var _ = require('underscore');
 var ObjectID = require('mongodb').ObjectID;
+var syslog = require('syslog');
 
 /*
   user model, it uses promise.
@@ -27,23 +28,23 @@ exports.jobs = function(api, next){
     },
 
     findById: function(id) {
-      var selector;
       var deferred = Q.defer();
 
-      // Validate id and build selector
-      try {
-        selector = { _id: new ObjectID(id) };
-      } catch(err) {
-        deferred.reject(new Error("Id is not a valid ObjectID"));
-      }      
+      api.mongo.utils.validateObjectId(id)
+        .then(function() {
+          
+          api.mongo.collections.jobs.findOne({ _id: new ObjectID(id) }, function(err, job) {
+            if (job) {
+              deferred.resolve(job);
+            } else {
+              deferred.reject(new Error("Job not found."));
+            }
+          });          
 
-      api.mongo.collections.jobs.findOne(selector, function(err, job) {
-        if (job) {
-          deferred.resolve(job);
-        } else {
-          deferred.reject(new Error("Job not found."));
-        }
-      });
+        })
+        .fail(function(err) {
+          deferred.reject(err);
+        });
 
       return deferred.promise;    
     },
@@ -66,7 +67,49 @@ exports.jobs = function(api, next){
 
         return deferred.promise;
       });
-    }    
+    } ,   
+
+    // logs some text to papertrail
+    log: function(id, sender, text) {
+      var deferred = Q.defer();
+
+      api.mongo.utils.validateObjectId(id)
+        .then(function() {
+
+          var selector = { _id: new ObjectID(id) };
+          // Find job's logger
+          api.mongo.collections.jobs.findOne(selector, function(err, job) {
+            if (!err && job) {
+              loggerSelector = { _id: new ObjectID(job.loggerId) };
+              api.mongo.collections.loggerSystems.findOne(loggerSelector, function(err, logger) {
+                if (!err && logger) {
+
+                  // TODO - Debugging remove
+                  logger.syslogHostname = "logs.papertrailapp.com";
+                  logger.syslogPort = 37402;
+
+                  var logger = syslog.createClient(logger.syslogPort, logger.syslogHostname, {name: sender});
+                  logger.info(text);
+                  deferred.resolve("Message sent to logger."); 
+                } else if (!logger) {
+                  deferred.reject(new Error("Logger not found"));
+                } else {
+                  deferred.reject(err);
+                }
+              });
+            } else if (!job) {
+              deferred.reject(new Error("Job not found"));
+            } else {
+              deferred.reject(err);
+            }
+          });
+
+        })
+        .fail(function(err) {
+          deferred.reject(err);
+        });
+      return deferred.promise;
+    }        
 
   }
 
