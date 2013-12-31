@@ -2,11 +2,25 @@ var MongoClient = require('mongodb').MongoClient;
 var ObjectID = require('mongodb').ObjectID;
 var Schema = require('../schema.js');
 var _ = require('underscore');
+var Q = require("q");
 
 exports.mongodb = function (api, next) {
   api.mongo = {};
   api.mongo.collections = {};
   api.mongo.schema = {};
+
+  api.mongo.utils = {
+    validateObjectId: function(id) {
+      var obj, deferred = Q.defer();
+      try {
+        obj = { _id: new ObjectID(id) };
+        deferred.resolve(id);
+      } catch(err) {
+        deferred.reject(new Error("Id is not a valid ObjectID."));
+      }      
+      return deferred.promise;
+    }
+  },
 
   // Connect to the database
   MongoClient.connect(api.configData.mongo.serverUri, { server: { auto_reconnect: true } }, function(err, db) {
