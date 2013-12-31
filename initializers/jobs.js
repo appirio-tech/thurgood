@@ -1,7 +1,8 @@
 var Q = require("q");
 var _ = require('underscore');
 var ObjectID = require('mongodb').ObjectID;
-var syslog = require('syslog');
+var winston = require('winston')
+var Papertrail = require('winston-papertrail').Papertrail;
 
 /*
   user model, it uses promise.
@@ -32,7 +33,7 @@ exports.jobs = function(api, next){
 
       api.mongo.utils.validateObjectId(id)
         .then(function() {
-          
+
           api.mongo.collections.jobs.findOne({ _id: new ObjectID(id) }, function(err, job) {
             if (job) {
               deferred.resolve(job);
@@ -84,11 +85,22 @@ exports.jobs = function(api, next){
               api.mongo.collections.loggerSystems.findOne(loggerSelector, function(err, logger) {
                 if (!err && logger) {
 
-                  // TODO - Debugging remove
-                  logger.syslogHostname = "logs.papertrailapp.com";
-                  logger.syslogPort = 37402;
+                  var logger = new winston.Logger({
+                      transports: [
+                          new Papertrail({
+                              host: 'logs.papertrailapp.com',
+                              port: logger.syslogPort,
+                              hostname: logger.papertrailId,
+                              program: sender,
+                              colorize: true,
+                              logFormat: function(level, message) {
+                                  return message;
+                              }
+                          })
+                      ]
+                  });                      
 
-                  var logger = syslog.createClient(logger.syslogPort, logger.syslogHostname, {name: sender});
+                  // send the message to pt
                   logger.info(text);
                   deferred.resolve("Message sent to logger."); 
                 } else if (!logger) {
