@@ -1,11 +1,15 @@
 <div class="jumbotron hero-spacer">
   <h1>A Warm Welcome!</h1>
   <p><i>Thurgood Manager</i> is the best way to manage the Thurgood API. Built from fluffy bits of 0's and 1's, with support from AngularJS and Bootstrap, it just screams slickness and performance. Because an awesome API deserves an awesome app!</p>
-  <h3>Why it rocks</h3>
+  <h3>Instructions</h3>
   <ul>
-    <li>Table can be sorted, includes search, pagination and choice of displayed items</li>
-    <li>Job's detail page included; when you press back the previous table state is restored</li>
-    <li>Module-based structured app, endpoint is encapsulated as a factory resource (in services.js)</li>
-    <li>Loading and errors both handled within an alert</li>
+    <li>Login with your Appirio credentials.</li>
+    <li>Create a new job or search for an existing job by keyword from the "Jobs" menu.</li>
+    <li>Once you create your job and ensure that it looks correct, submit the job for processing.</li>
+    <li>While the job is processing, click the "Event Viewer" button to open the log viewer to see the process of the job.</li>
+    <li>When creating a job, if you select "email" as the notification method, you will receive an email once the job has completed.</li>
+    <li>When creating a job you can specify the "steps" to perform. Supported steps are "all" and "scan". The "scan" step will just peform a Checkmarx scan while "all" will perform a Checkmarx scan plus build, test and deploy. Default is "all".</li>
+    <li>You can also specify a project for your job and tie the build process to a specific server (e.g., salesforce org). Contact jeff@appirio.com to set this up.</li>
   </ul>
+  <p>Take a look at the <a href="https://github.com/cloudspokes/thurgood" target="_blank">source code</a> or the <a href="https://github.com/cloudspokes/thurgood/wiki/_pages" target="_blank">API documentation</a> if you need more info.</p>
 </div>
