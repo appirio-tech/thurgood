@@ -68,6 +68,8 @@ exports.jobsComplete = {
           if (job.notification === "email") {
             mailer.sendMail(api, job);
           }      
+          // write message to pt that job is compete
+          api.jobs.log(connection.params.id, "thurgood", "Job complete. Thank you and have a super-awesome day.");
           deferred.resolve(job);
         } else {
           deferred.reject(err);
