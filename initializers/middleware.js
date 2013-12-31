@@ -31,6 +31,13 @@ exports.middleware = function(api, next){
 
             api.users.findByEmail(email).then(function(user) {
 
+              // they passed a valid api key in redis but no matching user record
+              if (!user) {
+                errorResponse(connection);
+                connection.response.error_description = "User not found for registered API key.";
+                return next(connection, false);     
+              }
+
               // if the anonymous user is requesting a specific job (most likely to view the event viewer), make them an admin
               if (user.apiKey === "anonymous" && connection.params.action === "jobsFetch" && connection.params.id) {
                 user.role.bitMask = 4;
