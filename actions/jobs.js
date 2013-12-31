@@ -60,6 +60,7 @@ exports.jobsComplete = {
         endTime: new Date().getTime(),
         updatedAt: new Date().getTime()
       };
+      var messages = ['have a super-awesome day.','remember to eat your vegetables.', 'do not play the lottery. It is a waste of time. You will not win.','do a kind deed for someone today.', 'remember to spend time with the people you love.', 'get some sleep. You look tired.'];
 
       api.mongo.collections.jobs.findAndModify(selector, {}, { $set: newDoc }, { new: true, w:1 }, function(err, job) {
         if (!err && job) {
@@ -68,7 +69,7 @@ exports.jobsComplete = {
             mailer.sendMail(api, job);
           }      
           // write message to pt that job is compete
-          api.jobs.log(connection.params.id, "thurgood", "Job complete. Thank you and have a super-awesome day.");
+          api.jobs.log(connection.params.id, "thurgood", "Job complete. Thank you and " + messages[Math.floor((Math.random()*5))]);
           deferred.resolve(job);
         } else {
           deferred.reject(err);
