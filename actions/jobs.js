@@ -296,42 +296,16 @@ exports.jobsMessage = {
   version: 1.0,
   access: accessLevels.user,  
   run: function(api, connection, next) {
-    var selector, loggerSelector;
-
-    // Validate id and build selector
-    try {
-      selector = { _id: new ObjectID(connection.params.id) };
-    } catch(err) {
-      api.response.badRequest(connection, "Id is not a valid ObjectID");
-      return next(connection, true);
-    }
-
-    // Find job's logger
-    api.mongo.collections.jobs.findOne(selector, function(err, job) {
-      if (!err && job) {
-        loggerSelector = { _id: new ObjectID(job.loggerId) };
-        api.mongo.collections.loggerSystems.findOne(loggerSelector, function(err, logger) {
-          if (!err && logger) {
-            var logger = syslog.createClient(logger.syslogPort, logger.syslogHostname, {name: connection.params.message.sender});
-            logger.info(connection.params.message.text);
-            api.response.success(connection, "Message sent to logger.");
-            next(connection, true);            
-          } else if (!logger) {
-            api.response.error(connection, "Logger not found");
-            next(connection, true);
-          } else {
-            api.response.error(connection, err);
-            next(connection, true);
-          }
-        });
-      } else if (!job) {
-        api.response.error(connection, "Job not found");
+    api.jobs.log(connection.params.id, connection.params.message.sender, connection.params.message.text)
+      .then(function(results) {    
+        api.response.success(connection, null, results);
+        next(connection, true);        
+      })
+      .fail(function(err) {
+        console.log("[FATAL] Could not send message to logger for job " + connection.params.id); 
+        api.response.error(connection, err.message);
         next(connection, true);
-      } else {
-        api.response.error(connection, err);
-        next(connection, true);
-      }
-    });
+      });
   }
 };
 
