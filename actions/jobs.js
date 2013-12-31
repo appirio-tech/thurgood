@@ -419,6 +419,7 @@ exports.jobsSubmit = {
 
     // respond success with the results message
     function respondOk(result) {
+      api.jobs.log(connection.params.id, "thurgood", "Job submitted for processing.");
       api.response.success(connection, null, result);
       next(connection, true);
     }
@@ -426,6 +427,7 @@ exports.jobsSubmit = {
     // respond error
     function respondError(err) {
       console.log("[FATAL] " + err.message + " Job: " + connection.params.id);
+      api.jobs.log(connection.params.id, "thurgood", "Error submitting your job for processing: " + err.message);
       api.response.error(connection, err.message);
       next(connection, true);
     }     
