@@ -339,14 +339,14 @@ exports.jobsSubmit = {
       var selector = {
         languages: job.language.toLowerCase(),
         platform: job.platform.toLowerCase(),
+        project: null,
         status: 'available'
       }; 
       // change the status to reserved
       var newDoc = {
         jobId: job._id.toString(),
         status: 'reserved',
-        updatedAt: new Date().getTime(),
-        project: null
+        updatedAt: new Date().getTime()
       };            
 
       // if this job is not for a project but is scan only then find available "checkmarx-scan-only" server
