@@ -354,6 +354,7 @@ exports.jobsSubmit = {
         selector.name = api.configData.general.scanOnlyProjectName;
         delete selector.languages;
         delete selector.platform;
+        delete selector.project;
       }      
 
       // if we are building for a specific project look for a matching server by project name
