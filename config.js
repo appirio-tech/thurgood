@@ -156,6 +156,14 @@ configData.rabbitmq = {
 };
 
 //////////////
+// AWS //
+//////////////
+
+configData.aws = {
+  secret_key: process.env.AWS_SECRET_KEY
+};
+
+//////////////
 // GOOGLE //
 //////////////
 
