@@ -31,7 +31,7 @@ thurgood.controller('NavCtrl', ['$scope', '$location', '$http', 'Auth', function
 /**
  * Controller for the Jobs page
  */
-thurgood.controller('JobsCtrl', ['$scope', '$http', '$filter', '$location', '$modal', 'Jobs', 'ngTableParams', function($scope, $http, $filter, $location, $modal, Jobs, ngTableParams) {
+thurgood.controller('JobsCtrl', ['$scope', '$http', '$filter', '$location', '$modal', 'Jobs', 'ngTableParams', 'AwsS3', function($scope, $http, $filter, $location, $modal, Jobs, ngTableParams, AwsS3) {
   var promise = Jobs.query().$promise;
   $scope.loading = true;
   $scope.submitStatus = {};
@@ -112,22 +112,21 @@ thurgood.controller('JobsCtrl', ['$scope', '$http', '$filter', '$location', '$mo
 
         // Upload file
         $scope.fileNameChanged = function(file) {
-          $http.post('/api/1/awssignature', {redirect_url: $location.absUrl()}).success(function(res){
+          var awsPromise = AwsS3.signature({redirect_url: $location.absUrl(), file_name: file.name});
+          awsPromise.success(function(res){
+            var data = res.data;
 
-            if (res.success != true) {
-              errorHandler(res);
-              return;
-            }
-
-            $scope.policy = res.aws.policy;
-            $scope.signature = res.aws.signature;
-            $scope.$apply();
-
-            document.getElementById("s3UploadForm").submit();
-            var url = 'https://cs-test-jeff.s3.amazonaws.com/thurgood/' + $scope.timestamp + '-' + file.name;
-            $scope.job.codeUrl = url;
+            $scope.policy = data.policy;
+            $scope.signature = data.signature;
+            $scope.file_name = data.file_name;
+            $scope.job.codeUrl = data.codeUrl;
             $scope.uploadWarning = 'Note: please make sure the file has finished uploading before pressing Create!';
-            $scope.$apply();
+
+            AwsS3.upload($('#s3UploadForm'), file, data, function(){
+              $scope.status = 'Upload Complete.';
+              $scope.uploadWarning = undefined;
+              $scope.$digest($scope);
+            });
           });
         };
       }
@@ -224,7 +223,7 @@ thurgood.controller('JobsCtrl', ['$scope', '$http', '$filter', '$location', '$mo
 /**
  * Controller for a job's detail page
  */
-thurgood.controller('JobsDetailCtrl', ['$scope', '$http', '$location', '$routeParams', '$modal', 'Jobs', 'Pt', function($scope, $http, $location, $routeParams, $modal, Jobs, Pt) {
+thurgood.controller('JobsDetailCtrl', ['$scope', '$http', '$location', '$routeParams', '$modal', 'Jobs', 'Pt', 'AwsS3', function($scope, $http, $location, $routeParams, $modal, Jobs, Pt, AwsS3) {
   var jobId = $routeParams.id;
   var job = {};
   $scope.jobId = jobId;
@@ -370,25 +369,22 @@ thurgood.controller('JobsDetailCtrl', ['$scope', '$http', '$location', '$routePa
 
           // Upload file
           $scope.fileNameChanged = function(file) {
-            $http.post('/api/1/awssignature', {redirect_url: $location.absUrl()}).success(function(res){
+            var awsPromise = AwsS3.signature({redirect_url: $location.absUrl(), file_name: file.name});
+            awsPromise.success(function(res){
+              var data = res.data;
 
-              if (res.success != true) {
-                errorHandler(res);
-                return;
-              }
-
-              $scope.policy = res.data.policy;
-              $scope.signature = res.data.signature;
-              $scope.$apply();
-
-              console.log($scope.policy);
-              console.log($scope.signature);
-
-              document.getElementById("s3UploadForm").submit();
-              var url = 'https://cs-test-jeff.s3.amazonaws.com/thurgood/' + $scope.job.id + '-' + file.name;
-              $scope.job.codeUrl = detailScope.job.codeUrl = url;
+              $scope.policy = data.policy;
+              $scope.signature = data.signature;
+              //$scope.redirect_url = 'https://thurgood.s3.amazonaws.com/thurgood/' + file_name;
+              $scope.file_name = data.file_name;
+              $scope.job.codeUrl = data.codeUrl;
               $scope.uploadWarning = 'Note: please make sure the file has finished uploading before pressing Create!';
-              $scope.$apply();
+
+              AwsS3.upload($('#s3UploadForm'), file, data, function(){
+                $scope.status = 'Upload Complete.';
+                $scope.uploadWarning = undefined;
+                $scope.$digest($scope);
+              });
             });
           };
         }

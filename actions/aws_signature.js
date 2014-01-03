@@ -10,23 +10,29 @@ exports.action = {
   name: "awsSignature",
   description: "Generate s3 signature to upload doc. Method: POST",
   inputs: {
-    required: ['redirect_url'],
+    required: ['redirect_url', 'file_name'],
     optional: []
   },
   authenticated: true,
   outputExample: {},
   version: 1.0,
   run: function(api, connection, next) {
-    console.log("running get s")
+    var acl = 'public-read';
+    var file_name = (new Date()).getTime() + '-' + connection.params.file_name;
     var signature = aws.s3Signature(api.configData.aws.secret_key, 
                       [
-                        ["starts-with", "$key", "thurgood/"],
-                        {"acl": "public-read"},
-                        {"success_action_redirect": connection.params.redirect_url},
-                        ["starts-with", "$Content-Type", ""],
-                        ["content-length-range", 0, 104857600]
+                        ["eq", "$bucket", api.configData.aws.bucket],
+                        ["starts-with", "$key", file_name],
+                        {"acl": acl},
+                        ["starts-with", "$Content-Type", ""]
                       ], 
                     1); 
+
+    signature.aws_access_key = api.configData.aws.access_key;
+    signature.file_name = file_name;
+    signature.acl = acl;
+    signature.codeUrl = 'https://'+ api.configData.aws.bucket + '.s3.amazonaws.com/' + file_name; 
+
     api.response.success(connection, null, signature);
     next(connection, true);
   }

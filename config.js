@@ -160,7 +160,9 @@ configData.rabbitmq = {
 //////////////
 
 configData.aws = {
-  secret_key: process.env.AWS_SECRET_KEY
+  secret_key: process.env.AWS_SECRET_KEY,
+  access_key: process.env.AWS_ACCESS_KEY,
+  bucket: 'thurgood'
 };
 
 //////////////
