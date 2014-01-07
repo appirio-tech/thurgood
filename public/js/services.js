@@ -61,6 +61,14 @@ thurgood.factory('Servers', ['$resource', function ($resource) {
     });
 }]);
 
+/**
+ * Resource for the /servers endpoint
+ * @return {$resource} Resource object
+ */
+thurgood.factory('LoggerSystem', ['$resource', function ($resource) {
+    return $resource('/api/1/loggers/:id', {id: '@id'});
+}]);
+
 thurgood.factory('Pt', ['$resource', function ($resource) {
     return $resource('/api/1/pt/token/:key', {key:'@key'}, {
         query: { method: 'GET' }
