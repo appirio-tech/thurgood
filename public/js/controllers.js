@@ -702,53 +702,63 @@ thurgood.controller('ServerMaintainCtrl', ['$scope', '$routeParams', '$timeout',
 /**
  * Controller for a job's events page
  */
-thurgood.controller('JobsEventsCtrl', ['$scope', '$routeParams', 'Jobs', 'Pt', function($scope, $routeParams, Jobs, Pt) {
+thurgood.controller('JobsEventsCtrl', ['$scope', '$routeParams', 'Jobs', 'Pt', 'LoggerSystem', '$q', function($scope, $routeParams, Jobs, Pt, LoggerSystem, $q) {
   var jobId = $routeParams.id;
   var job = {};
   $scope.jobId = jobId;
   $scope.loading = true;
 
-  //  fetch the job
-  var jobPromise = Jobs.get({id: jobId}).$promise;
-  // chain the token as a promise
-  var tokenPromise = jobPromise.then(function(res) {
-    if (res.success === false) {
-      errorHandler(res);
-      return;
-    }
+  getJob()
+    .then(getToken)
+    .then(getLogger)
+    .then(function() {
+      $scope.timestamp = parseInt(new Date().getTime() / 1000);    
+      $scope.distributor = "CloudSpokes";
+      $scope.loading = false;
+    })
+    .catch(function(err) {
+      $scope.loading = false;
+      $scope.error = err;
+    });  
 
-    // Save original document
-    $scope.jobRaw = res.data[0];
+  function getJob() {
+    var deferred = $q.defer();
+    Jobs.get({id: jobId}, function(res) {
+      if (res.success === true) {
+        job = res.data[0];
+        $scope.job = job;
+        deferred.resolve(true);
+      } else {
+        deferred.reject("Could not find Job by Id.");
+      }
+    })
+    return deferred.promise;
+  }
 
-    angular.forEach(res.data[0], function(value, key) {
-      this[key] = value ? value : 'null';
-    }, job);
+  function getLogger(msg) {
+    var deferred = $q.defer();
+    LoggerSystem.get({id: job.loggerId}, function(res) {
+      if (res.success === true) {
+        $scope.system = res.data[0].papertrailId;
+        deferred.resolve(true);
+      } else {
+        deferred.reject("Could not find Papertrail Logger by Id.");
+      }
+    })
+    return deferred.promise;
+  }
 
-    // return the token promise
-    return Pt.get({key: res.data[0].userId}).$promise;
-  });
+  function getToken(msg)  {
+    var deferred = $q.defer();
+    Pt.get({key: job.userId}, function(res) {
+      if (res.success === true) {
+        $scope.token = res.message;
+        deferred.resolve(true);
+      } else {
+        deferred.reject("Could not find user token.")
+      }      
+    })
+    return deferred.promise;
+  }
 
-  tokenPromise.then(function(res) {
-    if (res.success === false) {
-      errorHandler(res);
-      return;
-    }
-
-    $scope.error = undefined;
-    $scope.loading = false;
-    $scope.job = job;
-    $scope.timestamp = parseInt(new Date().getTime() / 1000);    
-    $scope.token = res.message;
-    $scope.distributor = "CloudSpokes";
-  });
-
-  // Handle errors
-  var errorHandler = function(err) {
-    $scope.loading = false;
-    $scope.error = err.data.error || err.error || err.message || "Unknown error. Please contact support.";
-  };
-
-  // // API request error
-  jobPromise.catch(errorHandler);
-  tokenPromise.catch(errorHandler);
 }]);
