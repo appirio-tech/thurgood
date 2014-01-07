@@ -212,11 +212,75 @@ thurgood.controller('JobsCtrl', ['$scope', '$filter', '$location', '$modal', 'Jo
 /**
  * Controller for a job's detail page
  */
-thurgood.controller('JobsDetailCtrl', ['$scope', '$routeParams', '$modal', 'Jobs', 'Pt', function($scope, $routeParams, $modal, Jobs, Pt) {
+thurgood.controller('JobsDetailCtrl', ['$scope', '$routeParams', '$modal', 'Jobs', 'Pt', 'LoggerSystem', '$q', function($scope, $routeParams, $modal, Jobs, Pt, LoggerSystem, $q) {
   var jobId = $routeParams.id;
   var job = {};
   $scope.jobId = jobId;
   $scope.loading = true;  
+
+  getJob()
+    .then(getToken)
+    .then(getLogger)
+    .then(function() {
+      $scope.timestamp = parseInt(new Date().getTime() / 1000);    
+      $scope.distributor = "CloudSpokes";
+      $scope.loading = false;
+    })
+    .catch(function(err) {
+      $scope.loading = false;
+      $scope.error = err;
+    });  
+
+  function getJob() {
+    var deferred = $q.defer();
+    Jobs.get({id: jobId}, function(res) {
+      if (res.success === true) {
+        // Format fields
+        job = res.data[0];
+        job.createdAt = job.createdAt ? new Date(job.createdAt).toISOString() : 'null';
+        job.updatedAt = job.updatedAt ? new Date(job.updatedAt).toISOString() : 'null';
+        job.startTime = job.startTime ? new Date(job.startTime).toISOString() : 'null';
+        job.endTime = job.endTime ? new Date(job.endTime).toISOString() : 'null';
+        job.options = job.options ? JSON.stringify(job.options) : 'null';
+
+        // Replace empty fields with null
+        angular.forEach(job, function(value, key) {
+          job[key] = value ? value : 'null';
+        });
+        $scope.job = job;
+        deferred.resolve(true);
+      } else {
+        deferred.reject("Could not find Job by Id.");
+      }
+    })
+    return deferred.promise;
+  }
+
+  function getLogger(msg) {
+    var deferred = $q.defer();
+    LoggerSystem.get({id: job.loggerId}, function(res) {
+      if (res.success === true) {
+        $scope.system = res.data[0].papertrailId;
+        deferred.resolve(true);
+      } else {
+        deferred.reject("Could not find Papertrail Logger by Id.");
+      }
+    })
+    return deferred.promise;
+  }
+
+  function getToken(msg)  {
+    var deferred = $q.defer();
+    Pt.get({key: job.userId}, function(res) {
+      if (res.success === true) {
+        $scope.token = res.message;
+        deferred.resolve(true);
+      } else {
+        deferred.reject("Could not find user token.")
+      }      
+    })
+    return deferred.promise;
+  }  
 
  // Submit job
   $scope.submitJob = function() {
@@ -252,155 +316,113 @@ thurgood.controller('JobsDetailCtrl', ['$scope', '$routeParams', '$modal', 'Jobs
     $scope.error = translateError(error);
   };
 
-  //  fetch the job promise
-  var jobPromise = Jobs.get({id: jobId}).$promise;
-    // chain the token as a promise
-  var tokenPromise = jobPromise.then(function(res) {
-    if (res.success === false) {
-      errorHandler(res);
-      return;
-    }
+  // Show job edit modal
+  var detailScope = $scope;
+  $scope.editModal = function () {
+    $modal.open({
+      templateUrl: 'jobsEditModal',
+      controller: function($scope, $modalInstance) {
+        $scope.job = {};
+        $scope.job.id = job._id;
+        $scope.platforms = ["other","salesforce.com", "heroku"];  
+        $scope.languages = ["apex", "java"];  
+        $scope.steps = ["all", "scan"];  
+        $scope.notifications = ["email"];
 
-    // Show job edit modal
-    var detailScope = $scope;
-    $scope.editModal = function () {
-      $modal.open({
-        templateUrl: 'jobsEditModal',
-        controller: function($scope, $modalInstance) {
-          $scope.job = {};
-          $scope.job.id = res.data[0]._id;
-          $scope.platforms = ["other","salesforce.com", "heroku"];  
-          $scope.languages = ["apex", "java"];  
-          $scope.steps = ["all", "scan"];  
-          $scope.notifications = ["email"];
+        // Move updateable values in a new object
+        angular.forEach(job, function(value, key) {
+          if (value && value != 'null' && ['email', 'platform', 'language', 'userId', 'codeUrl', 'loggerId', 'options', 'steps', 'notification', 'project'].indexOf(key) > -1) {
+            this[key] = value;
+          }
+        }, $scope.job);
 
-          // Move updateable values in a new object
-          angular.forEach(res.data[0], function(value, key) {
-            if (value && value != 'null' && ['email', 'platform', 'language', 'userId', 'codeUrl', 'loggerId', 'options', 'steps', 'notification', 'project'].indexOf(key) > -1) {
-              this[key] = value;
+        // Change server error messages to user friendly strings
+        var translateError = function(err) {
+          if (err == 'Error: email is a required parameter for this action')    return 'User Email is required';
+          if (err == 'Error: platform is a required parameter for this action') return 'Platform is required';
+          if (err == 'Error: language is a required parameter for this action') return 'Language is required';
+          if (err == 'Error: userId is a required parameter for this action')   return 'User ID is required';
+          if (err == 'Error: codeUrl is a required parameter for this action')  return 'Code URL is required';
+          if (err == 'Error: steps is a required parameter for this action')  return 'Steps is required';
+          if (err == 'Error: notification is a required parameter for this action')  return 'Email Notify is required';
+          if (err == 'Parameter loggerId is not a valid ObjectID')              return 'Invalid logger ID';
+          if (err == 'Parameter options is not a valid JSON object')            return 'Invalid options: must be a valid JSON object';
+          return err;
+        };
+
+        // Handle api errors
+        var errorHandler = function(err) {
+          var error = (err.data && err.data.error) || err.error || err.message || "Unknown error. Please contact support.";
+          $scope.status = translateError(error);
+        };
+
+        // Update job
+        $scope.update = function () {
+          // Ignore click if request is already pending
+          if ($scope.status == 'Updating job...') {
+            return;
+          }
+
+          // Display current status
+          $scope.status = 'Updating job...';
+          $scope.uploadWarning = undefined;
+
+          // Clean empty fields so that they aren't sent resulting in invalid parameter errors
+          angular.forEach(Object.keys($scope.job), function(key) {
+            if (!$scope.job[key]) {
+              delete $scope.job[key];
             }
-          }, $scope.job);
+          });
 
-          // Change server error messages to user friendly strings
-          var translateError = function(err) {
-            if (err == 'Error: email is a required parameter for this action')    return 'User Email is required';
-            if (err == 'Error: platform is a required parameter for this action') return 'Platform is required';
-            if (err == 'Error: language is a required parameter for this action') return 'Language is required';
-            if (err == 'Error: userId is a required parameter for this action')   return 'User ID is required';
-            if (err == 'Error: codeUrl is a required parameter for this action')  return 'Code URL is required';
-            if (err == 'Error: steps is a required parameter for this action')  return 'Steps is required';
-            if (err == 'Error: notification is a required parameter for this action')  return 'Email Notify is required';
-            if (err == 'Parameter loggerId is not a valid ObjectID')              return 'Invalid logger ID';
-            if (err == 'Parameter options is not a valid JSON object')            return 'Invalid options: must be a valid JSON object';
-            return err;
-          };
+          // if they are erasing the project name then pass "null" so the controller will null it
+          if (detailScope.job.project != undefined && $scope.job.project === undefined) {
+            $scope.job.project = "null";
+          }
 
-          // Handle api errors
-          var errorHandler = function(err) {
-            var error = (err.data && err.data.error) || err.error || err.message || "Unknown error. Please contact support.";
-            $scope.status = translateError(error);
-          };
-
-          // Update job
-          $scope.update = function () {
-            // Ignore click if request is already pending
-            if ($scope.status == 'Updating job...') {
+          // Create resource and PUT it
+          var jobRes = new Jobs($scope.job);
+          jobRes.$update(function(res) {
+            if (res.success != true) {
+              errorHandler(res);
               return;
             }
 
-            // Display current status
-            $scope.status = 'Updating job...';
-            $scope.uploadWarning = undefined;
+            // Format fields
+            var job = res.data;
+            job.createdAt = job.createdAt ? new Date(job.createdAt).toISOString() : 'null';
+            job.updatedAt = job.updatedAt ? new Date(job.updatedAt).toISOString() : 'null';
+            job.startTime = job.startTime ? new Date(job.startTime).toISOString() : 'null';
+            job.endTime = job.endTime ? new Date(job.endTime).toISOString() : 'null';
+            job.options = job.options ? JSON.stringify(job.options) : 'null';
 
-            // Clean empty fields so that they aren't sent resulting in invalid parameter errors
-            angular.forEach(Object.keys($scope.job), function(key) {
-              if (!$scope.job[key]) {
-                delete $scope.job[key];
-              }
+            // Replace empty fields with null
+            angular.forEach(job, function(value, key) {
+              job[key] = value ? value : 'null';
             });
-
-            // if they are erasing the project name then pass "null" so the controller will null it
-            if (detailScope.job.project != undefined && $scope.job.project === undefined) {
-              $scope.job.project = "null";
-            }
-
-            // Create resource and PUT it
-            var jobRes = new Jobs($scope.job);
-            jobRes.$update(function(res) {
-              if (res.success != true) {
-                errorHandler(res);
-                return;
-              }
-
-              // Format fields
-              var job = res.data;
-              job.createdAt = job.createdAt ? new Date(job.createdAt).toISOString() : 'null';
-              job.updatedAt = job.updatedAt ? new Date(job.updatedAt).toISOString() : 'null';
-              job.startTime = job.startTime ? new Date(job.startTime).toISOString() : 'null';
-              job.endTime = job.endTime ? new Date(job.endTime).toISOString() : 'null';
-              job.options = job.options ? JSON.stringify(job.options) : 'null';
-
-              // Replace empty fields with null
-              angular.forEach(job, function(value, key) {
-                job[key] = value ? value : 'null';
-              });
-              
-              detailScope.job = job;
-              $scope.status = 'SUCCESS';
-              $modalInstance.dismiss();
-            }, errorHandler);
-          };
-          
-          // Dismiss modal
-          $scope.cancel = function () {
+            
+            detailScope.job = job;
+            $scope.status = 'SUCCESS';
             $modalInstance.dismiss();
-          };
+          }, errorHandler);
+        };
+        
+        // Dismiss modal
+        $scope.cancel = function () {
+          $modalInstance.dismiss();
+        };
 
-          // Upload file
-          $scope.fileNameChanged = function(file) {
-            document.getElementById("s3UploadForm").submit();
-            var url = 'https://s3-us-west-2.amazonaws.com/cs-thurgood-jobsupload/thurgood/' + $scope.job.id + '-' + file.name;
-            $scope.job.codeUrl = detailScope.job.codeUrl = url;
-            $scope.uploadWarning = 'Note: please make sure the file has finished uploading before pressing Upload!';
-            $scope.$apply();
-          };
-        }
-      });
-    };
-
-    // Format fields
-    job = res.data[0];
-    job.createdAt = job.createdAt ? new Date(job.createdAt).toISOString() : 'null';
-    job.updatedAt = job.updatedAt ? new Date(job.updatedAt).toISOString() : 'null';
-    job.startTime = job.startTime ? new Date(job.startTime).toISOString() : 'null';
-    job.endTime = job.endTime ? new Date(job.endTime).toISOString() : 'null';
-    job.options = job.options ? JSON.stringify(job.options) : 'null';
-
-    // Replace empty fields with null
-    angular.forEach(job, function(value, key) {
-      job[key] = value ? value : 'null';
+        // Upload file
+        $scope.fileNameChanged = function(file) {
+          document.getElementById("s3UploadForm").submit();
+          var url = 'https://s3-us-west-2.amazonaws.com/cs-thurgood-jobsupload/thurgood/' + $scope.job.id + '-' + file.name;
+          $scope.job.codeUrl = detailScope.job.codeUrl = url;
+          $scope.uploadWarning = 'Note: please make sure the file has finished uploading before pressing Upload!';
+          $scope.$apply();
+        };
+      }
     });
-    $scope.job = job;
+  };
 
-    // return the token promise
-    return Pt.get({key: res.data[0].userId}).$promise;
-  });    
-
-  tokenPromise.then(function(res) {
-    if (res.success === false) {
-      errorHandler(res);
-      return;
-    }
-    $scope.error = undefined;
-    $scope.loading = false;
-    $scope.timestamp = parseInt(new Date().getTime() / 1000);    
-    $scope.token = res.message;
-    $scope.distributor = "CloudSpokes";
-  });
-
-  // // API request error
-  jobPromise.catch(errorHandler);
-  tokenPromise.catch(errorHandler);
 }]);
 
 /**
