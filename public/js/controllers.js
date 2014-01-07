@@ -222,7 +222,6 @@ thurgood.controller('JobsDetailCtrl', ['$scope', '$routeParams', '$modal', 'Jobs
     .then(getToken)
     .then(getLogger)
     .then(function() {
-      $scope.timestamp = parseInt(new Date().getTime() / 1000);    
       $scope.distributor = "CloudSpokes";
       $scope.loading = false;
     })
@@ -273,7 +272,8 @@ thurgood.controller('JobsDetailCtrl', ['$scope', '$routeParams', '$modal', 'Jobs
     var deferred = $q.defer();
     Pt.get({key: job.userId}, function(res) {
       if (res.success === true) {
-        $scope.token = res.message;
+        $scope.token = res.message.token;
+        $scope.timestamp = res.message.timestamp;
         deferred.resolve(true);
       } else {
         deferred.reject("Could not find user token.")
@@ -734,7 +734,6 @@ thurgood.controller('JobsEventsCtrl', ['$scope', '$routeParams', 'Jobs', 'Pt', '
     .then(getToken)
     .then(getLogger)
     .then(function() {
-      $scope.timestamp = parseInt(new Date().getTime() / 1000);    
       $scope.distributor = "CloudSpokes";
       $scope.loading = false;
     })
@@ -774,7 +773,8 @@ thurgood.controller('JobsEventsCtrl', ['$scope', '$routeParams', 'Jobs', 'Pt', '
     var deferred = $q.defer();
     Pt.get({key: job.userId}, function(res) {
       if (res.success === true) {
-        $scope.token = res.message;
+        $scope.token = res.message.token;
+        $scope.timestamp = res.message.timestamp;
         deferred.resolve(true);
       } else {
         deferred.reject("Could not find user token.")
