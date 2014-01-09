@@ -223,7 +223,7 @@ thurgood.controller('JobsCtrl', ['$scope', '$http', '$filter', '$location', '$mo
 /**
  * Controller for a job's detail page
  */
-thurgood.controller('JobsDetailCtrl', ['$scope', '$routeParams', '$modal', 'Jobs', 'Pt', 'LoggerSystem', '$q', 'AwsS3', function($scope, $routeParams, $modal, Jobs, Pt, LoggerSystem, $q, AwsS3) {
+thurgood.controller('JobsDetailCtrl', ['$scope', '$routeParams', '$modal', 'Jobs', 'Pt', 'LoggerSystem', '$q', 'AwsS3', '$location', function($scope, $routeParams, $modal, Jobs, Pt, LoggerSystem, $q, AwsS3, $location) {
   var jobId = $routeParams.id;
   var job = {};
   $scope.jobId = jobId;
