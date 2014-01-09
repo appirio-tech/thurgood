@@ -129,7 +129,38 @@ thurgood.factory('Auth', function($http, $location){
 
     accessLevels: accessLevels,
     userRoles: userRoles,
-    user: currentUser
+    user: currentUser,
+
   };
 });
+
+thurgood.factory('AwsS3', ['$http', function ($http) {
+  return {
+    signature: function(data){
+      return $http.post('/api/1/awssignature', data);
+    },
+
+    upload: function(form, file, data, success){
+      var fd = new FormData();
+
+      fd.append('key', data.file_name);
+      fd.append('acl', data.acl); 
+      fd.append('Content-Type', '');      
+      fd.append('AWSAccessKeyId', data.aws_access_key);
+      fd.append('policy', data.policy)
+      fd.append('signature', data.signature);
+      fd.append("file", file);
+
+      return $.ajax({
+        url: form.attr('action'),
+        data: fd,
+        processData: false,
+        contentType: false,
+        type: 'POST',
+        success: success,
+        async: true
+      });
+    }
+  }
+}]);
 

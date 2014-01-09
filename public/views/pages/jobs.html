@@ -23,7 +23,7 @@
         <h3>Create job</h3>
       </div>
       <div class="modal-body mModal">
-        <div class="alert alert-{{status == 'Creating job...' || status == 'SUCCESS' ? 'success' : 'danger'}} mModal" ng-show="status">
+        <div class="alert alert-{{status == 'Creating job...' || status == 'SUCCESS' || status == 'Upload Complete.' ? 'success' : 'danger'}} mModal" ng-show="status">
           <h4><span ng-show="status == 'SUCCESS'">Job <a href="#/jobs/{{jobId}}" ng-click="cancel()">{{jobId}}</a> created successfully!</span>{{status == 'SUCCESS' ? '' : status}}</h4>
         </div>
         <div class="form-horizontal">
@@ -33,12 +33,13 @@
               <div>
                 <input type="text" class="form-control mModal-input" ng-model="job.codeUrl" placeholder="Code URL">
               </div>
-              <form id="s3UploadForm" action="//cs-thurgood-jobsupload.s3.amazonaws.com/" method="post" enctype="multipart/form-data">
-                <input type="hidden" name="key" value="thurgood/{{timestamp}}-${filename}">
+              <form id="s3UploadForm" action="https://cs-thurgood.s3.amazonaws.com/" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="key" value="{{file_name}}">
                 <input type="hidden" name="acl" value="public-read">
-                <input type="hidden" name="AWSAccessKeyId" value="AKIAIPSE5AIYKGE6T7WA"> 
-                <input type="hidden" name="policy" value="ewogICJleHBpcmF0aW9uIjogIjIwMTUtMDEtMDFUMTI6MDA6MDAuMDAwWiIsCiAgImNvbmRpdGlvbnMiOiBbCiAgICB7ImJ1Y2tldCI6ICJjcy10aHVyZ29vZC1qb2JzdXBsb2FkIiB9LAogICAgeyJhY2wiOiAicHVibGljLXJlYWQiIH0sCiAgICBbInN0YXJ0cy13aXRoIiwgIiRrZXkiLCAidGh1cmdvb2QvIl0sCiAgXQp9">
-                <input type="hidden" name="signature" value="+ZtmNFaLTSs0I8JkbpVBS4NpXiY=">
+                <input type="hidden" name="Content-Type" value='' />
+                 <input type="hidden" name="AWSAccessKeyId" value="">  
+                <input type="hidden" name="policy" value="{{policy}}">
+                <input type="hidden" name="signature" value="{{signature}}">
                 <input type="submit">
                 <div class="clickArea">
                   <input type="file" name="file" onchange="angular.element(this).scope().fileNameChanged(this.files[0])">
