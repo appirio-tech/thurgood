@@ -18,7 +18,7 @@ exports.action = {
   version: 1.0,
   run: function(api, connection, next) {
     var acl = 'public-read';
-    var file_name = (new Date()).getTime() + '-' + connection.params.file_name;
+    var file_name = "upload/" + (new Date()).getTime() + '-' + connection.params.file_name;
     var signature = aws.s3Signature(api.configData.aws.secret_key, 
                       [
                         ["eq", "$bucket", api.configData.aws.bucket],
