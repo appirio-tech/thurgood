@@ -31,7 +31,7 @@
             <span class="col-lg-3 control-label mModal-key">Code URL</span>
             <div class="col-lg-9 s3Upload">
               <div>
-                <input type="text" class="form-control mModal-input" ng-model="job.codeUrl" placeholder="Code URL">
+                <input type="text" class="form-control mModal-input" ng-model="job.codeUrl" placeholder="Code URL. Must be .ZIP extension.">
               </div>
               <form id="s3UploadForm" action="https://cs-thurgood.s3.amazonaws.com/" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="key" value="{{file_name}}">
@@ -93,7 +93,7 @@
           <div class="form-group">
             <span class="col-lg-3 control-label mModal-key">Logger ID</span>
             <div class="col-lg-9">
-              <input type="text" class="form-control mModal-input" ng-model="job.loggerId" placeholder="Logger ID (optional)">
+              <input type="text" class="form-control mModal-input" ng-model="job.loggerId" placeholder="Logger ID (only enter if one assigned by support)">
             </div>
           </div>      
         </div>
