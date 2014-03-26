@@ -12,5 +12,11 @@
     <li>When creating a job you can specify the "steps" to perform. Supported steps are "all" and "scan". The "scan" step will just peform a Checkmarx scan while "all" will perform a Checkmarx scan plus build, test and deploy. Default is "all".</li>
     <li>You can also specify a project for your job and tie the build process to a specific server (e.g., salesforce org). Contact jeff@appirio.com to set this up.</li>
   </ul>
+
+  <h3>Force.com Projects</h3>
+  <p>If you are creating a job for Force.com code, it is easiest to create it from your Eclipse project with the <a href="http://www.salesforce.com/us/developer/docs/api_meta/Content/manifest_samples.htm" target="_blank">manifest structure</a>. Just right click on the 'src' directory from Eclipse and zip up everything you want submitted. Your zip file should unzip in the following structure:  
+
+  <p style="padding-left:25px;padding-bottom:15px"><img src="/img/submission-structure.png"></p>
+
   <p>Take a look at the <a href="https://github.com/cloudspokes/thurgood" target="_blank">source code</a> or the <a href="https://github.com/cloudspokes/thurgood/wiki/_pages" target="_blank">API documentation</a> if you need more info.</p>
 </div>
