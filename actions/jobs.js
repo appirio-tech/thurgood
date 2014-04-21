@@ -1,11 +1,12 @@
 var ObjectID = require('mongodb').ObjectID;
-var amqp = require('amqp');
+var amqp = require('amqplib');
 var request = require('request');
 var loggers = require('./loggers');
 var crypto = require('crypto');
 var accessLevels = require('../public/js/routingConfig').accessLevels;
 var _ = require('underscore');
 var Q = require("q");
+var when = require('when');
 var papertrail = require("../lib/papertrail");
 var mailer = require("../lib/mandrill");
 
@@ -410,8 +411,26 @@ exports.jobsSubmit = {
       api.mongo.collections.jobs.update({ _id: job._id }, { $set: newDoc }, { w:1 }, function(err, result) {
         if (!err && result == 1) {
           // Publish message
-          api.configData.rabbitmq.connection.publish(api.configData.rabbitmq.queue, message);
-          deferred.resolve("Job has been successfully submitted for processing. See the job's Event Viewer for details.");
+          amqp.connect(api.configData.rabbitmq.url ).then(function(conn) {
+            return when(conn.createChannel().then(function(ch) {
+
+              var implOpts = {
+                reconnect: true,
+                reconnectBackoffStrategy: 'linear',
+                reconnectBackoffTime: 500, // ms
+                durable: false
+              };
+
+              var ok = ch.assertQueue(api.configData.rabbitmq.queue, implOpts);
+              return ok.then(function(_qok) {
+                ch.sendToQueue(api.configData.rabbitmq.queue, new Buffer(message));
+                console.log(" [x] Sent '%s'", message);
+                deferred.resolve("Job has been successfully submitted for processing. See the job's Event Viewer for details.");
+                return ch.close();
+              });
+            })).ensure(function() { conn.close(); });;
+          }).then(null, console.warn);
+
         } else {
           api.jobs.releaseServer(job);
           deferred.reject(new Error("Could not update job and publish message for processing. Contact support."));
