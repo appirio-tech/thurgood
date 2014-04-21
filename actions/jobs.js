@@ -413,18 +413,10 @@ exports.jobsSubmit = {
           // Publish message
           amqp.connect(api.configData.rabbitmq.url ).then(function(conn) {
             return when(conn.createChannel().then(function(ch) {
-
-              var implOpts = {
-                reconnect: true,
-                reconnectBackoffStrategy: 'linear',
-                reconnectBackoffTime: 500, // ms
-                durable: false
-              };
-
-              var ok = ch.assertQueue(api.configData.rabbitmq.queue, implOpts);
+              var ok = ch.assertQueue(api.configData.rabbitmq.queue, {durable: false});
               return ok.then(function(_qok) {
-                ch.sendToQueue(api.configData.rabbitmq.queue, new Buffer(message));
-                console.log(" [x] Sent '%s'", message);
+                ch.sendToQueue(api.configData.rabbitmq.queue, new Buffer(JSON.stringify(message)));
+                console.log(" [x] Sent '%s'", JSON.stringify(message));
                 deferred.resolve("Job has been successfully submitted for processing. See the job's Event Viewer for details.");
                 return ch.close();
               });
