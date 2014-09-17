@@ -1,7 +1,7 @@
 var Q = require("q");
 var _ = require('underscore');
 var ObjectID = require('mongodb').ObjectID;
-var winston = require('winston')
+var winston = require('winston');
 var Papertrail = require('winston-papertrail').Papertrail;
 
 /*
@@ -40,14 +40,14 @@ exports.jobs = function(api, next){
             } else {
               deferred.reject(new Error("Job not found."));
             }
-          });          
+          });
 
         })
         .fail(function(err) {
           deferred.reject(err);
         });
 
-      return deferred.promise;    
+      return deferred.promise;
     },
 
     // releases a server and makes it available
@@ -57,7 +57,7 @@ exports.jobs = function(api, next){
         jobId: null,
         status: 'available',
         updatedAt: new Date().getTime()
-      };      
+      };
 
       api.mongo.collections.servers.findAndModify({ jobId: job._id.toString() }, {}, { $set: newDoc }, { new: true, w:1 }, function(err, server) {
         if (!err && server) {
@@ -68,7 +68,7 @@ exports.jobs = function(api, next){
 
         return deferred.promise;
       });
-    } ,   
+    } ,
 
     // logs some text to papertrail
     log: function(id, sender, text) {
@@ -82,10 +82,10 @@ exports.jobs = function(api, next){
           api.mongo.collections.jobs.findOne(selector, function(err, job) {
             if (!err && job) {
               loggerSelector = { _id: new ObjectID(job.loggerId) };
-              api.mongo.collections.loggerSystems.findOne(loggerSelector, function(err, logger) {
+              api.mongo.collections.loggerSystems.findOne(loggerSelector, function(err, loggerSyste) {
                 if (!err && logger) {
 
-                  var logger = new winston.Logger({
+                  var winstonLogger = new winston.Logger({
                       transports: [
                           new Papertrail({
                               host: 'logs.papertrailapp.com',
@@ -98,11 +98,11 @@ exports.jobs = function(api, next){
                               }
                           })
                       ]
-                  });                      
+                  });
 
                   // send the message to pt
-                  logger.info(text);
-                  deferred.resolve("Message sent to logger."); 
+                  winstonLogger.info(text);
+                  deferred.resolve("Message sent to logger.");
                 } else if (!logger) {
                   deferred.reject(new Error("Logger not found"));
                 } else {
@@ -121,9 +121,9 @@ exports.jobs = function(api, next){
           deferred.reject(err);
         });
       return deferred.promise;
-    }        
+    }
 
-  }
+  };
 
   next();
-}
+};

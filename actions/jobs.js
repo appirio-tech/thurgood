@@ -43,14 +43,14 @@ exports.jobsComplete = {
   authenticated: true,
   outputExample: {},
   version: 1.0,
-  access: accessLevels.admin,  
+  access: accessLevels.admin,
   run: function(api, connection, next) {
 
     api.jobs.findById(connection.params.id)
-      .then(api.jobs.releaseServer) 
+      .then(api.jobs.releaseServer)
       .then(markJobComplete)
       .then(respondOk)
-      .fail(respondError);  
+      .fail(respondError);
 
     // respond success with the results message
     function markJobComplete(job) {
@@ -68,17 +68,17 @@ exports.jobsComplete = {
           // send the job complete notifications email if requested
           if (job.notification === "email") {
             mailer.sendMail(api, job);
-          }      
+          }
           // write message to pt that job is compete
           api.jobs.log(connection.params.id, "thurgood", "Job complete. Thank you and " + messages[Math.floor((Math.random()*5))]);
           deferred.resolve(job);
         } else {
           deferred.reject(err);
         }
-      });        
+      });
 
       return deferred.promise;
-    }           
+    }
 
     // respond success with the results message
     function respondOk(result) {
@@ -90,8 +90,8 @@ exports.jobsComplete = {
     function respondError(err) {
       api.response.error(connection, err.message);
       next(connection, true);
-    }       
-  }    
+    }
+  }
 };
 
 /**
@@ -107,7 +107,7 @@ exports.jobsCreate = {
   authenticated: true,
   outputExample: {},
   version: 1.0,
-  access: accessLevels.user,  
+  access: accessLevels.user,
   run: function(api, connection, next) {
     var promise = null;
     var attrs = _.pick(connection.params, _.keys(api.mongo.schema.job));
@@ -120,7 +120,7 @@ exports.jobsCreate = {
       // 1. find logger from name
       // 2. if not exist create a logger with the name
       // 3. create a job from the created/found logger.
-      var loggerName = connection.params.logger;      
+      var loggerName = connection.params.logger;
       promise = api.loggers.findByName(loggerName)
                   .then(createLoggerIfNotExist)
                   .then(createJobFromLogger);
@@ -147,7 +147,7 @@ exports.jobsCreate = {
       }
 
       attrs.loggerId = logger._id.toString();
-      return api.jobs.create(attrs);      
+      return api.jobs.create(attrs);
     }
 
     // create a account if not exist
@@ -159,7 +159,7 @@ exports.jobsCreate = {
       // 2. if not exist, create an account with the name ane email
       // 3. create a logger from the found/created account
       var name = connection.params.userId;
-      var email = connection.params.email;      
+      var email = connection.params.email;
       return api.loggerAccounts.findByNameAndEmail(name, email)
               .then(createAccountIfNotExist)
               .then(createLoggerFromAccount);
@@ -196,7 +196,7 @@ exports.jobsCreate = {
           localConnection.params.username = connection.params.userId;
           localConnection.params.email = connection.params.email;
 
-          runLocalAction(localConnection, deferred.makeNodeResolver());      
+          runLocalAction(localConnection, deferred.makeNodeResolver());
         }
       });
 
@@ -229,12 +229,12 @@ exports.jobsCreate = {
     // default api connection.
     // used when run action process locally(see runLocalAction below)
     function buildApiConnection(action) {
-      var connection = new api.connection({ 
-        type: 'task', 
-        remotePort: '0', 
-        remoteIP: '0', 
+      var connection = new api.connection({
+        type: 'task',
+        remotePort: '0',
+        remoteIP: '0',
         rawConnection: {
-          req: { 
+          req: {
             headers: {
               authorization: "Token token=" + api.configData.general.apiKey
             }
@@ -243,7 +243,7 @@ exports.jobsCreate = {
       });
 
       connection.params = {
-        action: action, 
+        action: action,
         apiVersion: 1
       }
 
@@ -257,7 +257,7 @@ exports.jobsCreate = {
     function runLocalAction(actionConnection, callback) {
       console.log("[jobsCreate]", "run local action :", actionConnection.params.action);
       var actionProcessor = new api.actionProcessor({connection: actionConnection, callback: function(internalConnection, cont) {
-        
+
         var err = internalConnection.error;
         if(err) { return callback(err, null); }
 
@@ -297,15 +297,15 @@ exports.jobsMessage = {
   authenticated: true,
   outputExample: {},
   version: 1.0,
-  access: accessLevels.user,  
+  access: accessLevels.user,
   run: function(api, connection, next) {
     api.jobs.log(connection.params.id, connection.params.message.sender, connection.params.message.text)
-      .then(function(results) {    
+      .then(function(results) {
         api.response.success(connection, null, results);
-        next(connection, true);        
+        next(connection, true);
       })
       .fail(function(err) {
-        console.log("[FATAL] Could not send message to logger for job " + connection.params.id); 
+        console.log("[FATAL] Could not send message to logger for job " + connection.params.id);
         api.response.error(connection, err.message);
         next(connection, true);
       });
@@ -325,7 +325,7 @@ exports.jobsSubmit = {
   authenticated: true,
   outputExample: {},
   version: 1.0,
-  access: accessLevels.user,  
+  access: accessLevels.user,
   run: function(api, connection, next) {
 
     api.jobs.findById(connection.params.id)
@@ -342,13 +342,13 @@ exports.jobsSubmit = {
         platform: job.platform.toLowerCase(),
         project: null,
         status: 'available'
-      }; 
+      };
       // change the status to reserved
       var newDoc = {
         jobId: job._id.toString(),
         status: 'reserved',
         updatedAt: new Date().getTime()
-      };            
+      };
 
       // if this job is not for a project but is scan only then find available "checkmarx-scan-only" server
       if (job.steps === "scan" && !job.project) {
@@ -356,7 +356,7 @@ exports.jobsSubmit = {
         delete selector.languages;
         delete selector.platform;
         delete selector.project;
-      }      
+      }
 
       // if we are building for a specific project look for a matching server by project name
       if (job.project) {
@@ -392,14 +392,14 @@ exports.jobsSubmit = {
         }
       });
       return deferred.promise;
-    }     
+    }
 
     function updateJobAndPublish(job) {
       var deferred = Q.defer();
       var message = {
         job_id: job._id,
         type: job.language
-      };  
+      };
       var newDoc = {
         status: 'submitted',
         startTime: new Date().getTime(),
@@ -427,9 +427,9 @@ exports.jobsSubmit = {
           api.jobs.releaseServer(job);
           deferred.reject(new Error("Could not update job and publish message for processing. Contact support."));
         }
-      });      
+      });
       return deferred.promise;
-    }    
+    }
 
     // respond success with the results message
     function respondOk(result) {
@@ -444,7 +444,7 @@ exports.jobsSubmit = {
       api.jobs.log(connection.params.id, "thurgood", "Error submitting your job for processing: " + err.message);
       api.response.error(connection, err.message);
       next(connection, true);
-    }     
+    }
 
   }
 };
@@ -462,7 +462,7 @@ exports.jobsUpdate = {
   authenticated: true,
   outputExample: {},
   version: 1.0,
-  access: accessLevels.user,  
+  access: accessLevels.user,
   run: function(api, connection, next) {
     // set the project for the job to null if 'null'
     if (connection.params.project === "null") {
@@ -485,9 +485,9 @@ exports.jobsPublish = {
   authenticated: true,
   outputExample: {},
   version: 1.0,
-  access: accessLevels.user,  
+  access: accessLevels.user,
   run: function(api, connection, next) {
-    api.configData.rabbitmq.connection.publish(api.configData.rabbitmq.queue, connection.params.message);  
+    api.configData.rabbitmq.connection.publish(api.configData.rabbitmq.queue, connection.params.message);
     api.response.success(connection, "Message successfully published.");
     next(connection, true);
   }

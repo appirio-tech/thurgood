@@ -5,4 +5,4 @@ node_modules
 .env
 .notes
 dump.rdb
-test.js
+npm-debug.log
