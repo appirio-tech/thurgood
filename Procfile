@@ -1,1 +1,1 @@
-web: node --debug ./node_modules/.bin/actionHero start
+web: ./node_modules/.bin/actionHero --debug start

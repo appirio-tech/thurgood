@@ -82,7 +82,7 @@ exports.middleware = function(api, next){
     connection.rawConnection.responseHttpCode = 401;     
   };    
 
-  api.actions.preProcessors.push(authorization);
+  api.actions.addPreProcessor(authorization);
 
   next();
 }
