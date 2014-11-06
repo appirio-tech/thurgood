@@ -1,5 +1,5 @@
 // actionHero Config File
-// I will be loded into api.configData
+// I will be loaded into api.configData
 
 var fs = require('fs');
 var cluster = require('cluster');
@@ -16,7 +16,7 @@ configData.general = {
   // id: "myActionHeroServer",                                    // id can be set here, or generated dynamically.  be sure that every server you run as a unique ID (which will happen when genrated dynamically)
   serverToken: process.env.SERVER_TOKEN,                                       // A unique token to your application which servers will use to authenticate to eachother
   welcomeMessage : "Hello! Welcome to the Thurgood!",        // The welcome message seen by TCP and webSocket clients upon connection
-  flatFileDirectory: __dirname + "/public/",                      // The directory which will be the root for the /public route
+  flatFileDirectory: __dirname + "/../public/",                      // The directory which will be the root for the /public route
   flatFileNotFoundMessage: "Sorry, that file is not found :(",    // The body message to acompany 404 (file not found) errors regading flat files
   serverErrorMessage: "The server experienced an internal error", // The message to acompany 500 errors (internal server errors)
   defaultChatRoom: "defaultRoom",                                 // the chatRoom that TCP and webSocket clients are joined to when the connect
@@ -74,7 +74,7 @@ configData.redis = {
   port: process.env.REDIS_PORT || 6379,
   password: process.env.REDIS_PASSWORD || null,
   options: null,
-  DB: 0,
+  DB: 0
 };
 
 //////////
@@ -114,7 +114,7 @@ configData.servers = {
       maxFieldsSize: 1024 * 1024 * 100
     },
     returnErrorCodes: false              // when enabled, returnErrorCodes will modify the response header for http(s) clients if connection.error is not null.  You can also set connection.responseHttpCode to specify a code per request.
-  },
+  }
   // "socket" : {
   //   secure: false,                        // TCP or TLS?
   //   serverOptions: {},                    // passed to tls.createServer if secure=ture. Should contain SSL certificates
@@ -171,10 +171,17 @@ configData.aws = {
 
 configData.google = {
   redirectUrl : process.env.GOOGLE_REDIRECT_URL || "http://localhost:5000/api/auth/google/return"
-}
+};
 
 // set the app's main url from the google redirect url
 configData.general.appUrl =  configData.google.redirectUrl.substr(0,configData.google.redirectUrl.indexOf("/api"));
 //////////////////////////////////
 
-exports.configData = configData;
+
+exports.default = {
+    configData: function (api) {
+        api.configData = configData;
+    }
+};
+
+exports.development = exports.default;
