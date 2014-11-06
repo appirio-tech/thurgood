@@ -11,7 +11,7 @@
   "main": "app.js",
   "keywords": "",
   "engines": {
-    "node": ">=0.8.0"
+    "node": "0.10.x"
   },
   "dependencies": {
     "actionhero": "9.3.2",
