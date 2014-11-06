@@ -14,7 +14,7 @@
     "node": "0.10.33"
   },
   "dependencies": {
-    "actionhero": "6.3.4",
+    "actionhero": "9.3.2",
     "mongodb": "~1.3.19",
     "q": "~0.9.7",
     "underscore": "~1.5.2",
