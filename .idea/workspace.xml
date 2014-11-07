@@ -133,6 +133,7 @@
         <option value="$PROJECT_DIR$/config/api.js" />
         <option value="$PROJECT_DIR$/config/servers/web.js" />
         <option value="$PROJECT_DIR$/initializers/mongodb.js" />
+		<option value="$PROJECT_DIR$/config/routes.js" />
       </list>
     </option>
   </component>
