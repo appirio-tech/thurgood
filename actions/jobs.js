@@ -256,10 +256,10 @@ exports.jobsCreate = {
     // callback is like `function (err, createdItem) {}`
     function runLocalAction(actionConnection, callback) {
       console.log("[jobsCreate]", "run local action :", actionConnection.params.action);
-	  console.log(JSON.stringify(connection));
-	  console.log(JSON.stringify(actionConnection));
+	  console.log(connection);
+	  console.log(actionConnection);
       var actionProcessor = new api.actionProcessor({connection: actionConnection, callback: function(internalConnection, cont) {
-console.log(JSON.stringify(internalConnection));
+console.log(internalConnection);
         var err = internalConnection.error;
         if(err) { return callback(err, null); }
 		console.log('******');		
