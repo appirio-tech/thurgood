@@ -257,7 +257,9 @@ exports.jobsCreate = {
     function runLocalAction(actionConnection, callback) {
       console.log("[jobsCreate]", "run local action :", actionConnection.params.action);
 	  console.log(connection);
+	  console.log('@@@@@@');
 	  console.log(actionConnection);
+	  console.log('@@@@@@#####');
       var actionProcessor = new api.actionProcessor({connection: actionConnection, callback: function(internalConnection, cont) {
 console.log(internalConnection);
         var err = internalConnection.error;
