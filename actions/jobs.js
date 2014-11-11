@@ -261,10 +261,10 @@ exports.jobsCreate = {
 	  console.log("Connection ofbjext",connection);
 	   console.log('Connection ofbjextssssssss',actionConnection);
 	  console.log('@@@@@@');
-	  console.log('ActionConnection',actionConnection);
+	  console.log(actionConnection);
 	  console.log('@@@@@@#####');
       var actionProcessor = new api.actionProcessor({connection: actionConnection, callback: function(internalConnection, cont) {
-console.log('InternalConnection',internalConnection);
+console.log(internalConnection);
         var err = internalConnection.error;
         if(err) { return callback(err, null); }
 		console.log('******');		
