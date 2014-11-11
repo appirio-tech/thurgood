@@ -13,10 +13,21 @@ exports.session = function(api, next){
 
   api.session = {
 
+    // returns connectionKey based on fingerprint for web clients
+    // As of actionhero v8.0.8, connection.id is no-longer static for all web requests, in favor of connection.rawConnection.fingerprint
+    // or based on id for any other clients
+    connectionKey: function(connection){
+      if(connection.fingerprint != null){
+        return connection.fingerprint;
+      }else{
+        return conneciton.id;
+      }
+    },
+
     // sets a name, value to the session.
     set: function(connection, name, value) {
       var deferred = Q.defer();
-      var key = prefix + connection.id;
+      var key = prefix + api.session.connectionKey(connection);
 
       api.redis.client.hset(key, name, value, deferred.makeNodeResolver());
 
@@ -26,7 +37,7 @@ exports.session = function(api, next){
     // load all values from the session.
     load: function(connection) {
       var deferred = Q.defer();
-      var key = prefix + connection.id;
+      var key = prefix + api.session.connectionKey(connection);
 
       api.redis.client.hgetall(key, deferred.makeNodeResolver());
 
@@ -36,7 +47,7 @@ exports.session = function(api, next){
     // gets the value of name
     get: function(connection, name) {
       var deferred = Q.defer();
-      var key = prefix + connection.id;
+      var key = prefix + api.session.connectionKey(connection);
 
       api.redis.client.hget(key, name, deferred.makeNodeResolver());      
 
@@ -46,7 +57,7 @@ exports.session = function(api, next){
     // deletes a value of name
     del: function(connection, name) {
       var deferred = Q.defer();
-      var key = prefix + connection.id;
+      var key = prefix + api.session.connectionKey(connection);
 
       api.redis.client.hdel(key, name, deferred.makeNodeResolver());      
 
@@ -56,7 +67,7 @@ exports.session = function(api, next){
     // deletes all the values
     clear: function(connection) {
       var deferred = Q.defer();
-      var key = prefix + connection.id;
+      var key = prefix + api.session.connectionKey(connection);
 
       api.redis.client.del(key, deferred.makeNodeResolver());      
 
