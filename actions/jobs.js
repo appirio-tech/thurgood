@@ -191,8 +191,10 @@ exports.jobsCreate = {
           }, deferred.reject);
         }
         else {
+		console.log("[jobsCreate]", "Nothing found");
           // 2.2 if not exist, create in both papertrail and db using local action process.
           var localConnection = buildApiConnection("accountsCreate");
+		  console.log("[jobsCreate] Local connection", localConnection);
           localConnection.params.username = connection.params.userId;
           localConnection.params.email = connection.params.email;
 
@@ -257,6 +259,7 @@ exports.jobsCreate = {
     function runLocalAction(actionConnection, callback) {
       console.log("[jobsCreate]", "run local action :", actionConnection.params.action);
 	  console.log("Connection ofbjext",connection);
+	   console.log("Connection ofbjextssssssss',actionConnection);
 	  console.log('@@@@@@');
 	  console.log(actionConnection);
 	  console.log('@@@@@@#####');
