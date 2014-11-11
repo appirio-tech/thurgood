@@ -260,7 +260,9 @@ exports.jobsCreate = {
 
         var err = internalConnection.error;
         if(err) { return callback(err, null); }
-
+		console.log('******');
+		console.log(internalConnection.response);
+		console.log('####');
         var item = internalConnection.response.data[0];
         console.log("[jobsCreate]", " => local action result :", item);
         if(callback) { callback(null, item); }
