@@ -198,6 +198,9 @@ exports.jobsCreate = {
 
           runLocalAction(localConnection, deferred.makeNodeResolver());
         }
+      }).fail(function(err) {
+        console.log("[jobsCreate]", "Error connecting to Papertrail. Check that PAPERTRAIL_DIST_USERNAME and PAPERTRAIL_DIST_PASSWORD are correct");
+        deferred.reject(new Error("Could not create job for processing. Please contact support"));
       });
 
       return deferred.promise;
@@ -256,17 +259,10 @@ exports.jobsCreate = {
     // callback is like `function (err, createdItem) {}`
     function runLocalAction(actionConnection, callback) {
       console.log("[jobsCreate]", "run local action :", actionConnection.params.action);
-	  console.log("Connection ofbjext",connection);
-	  console.log('@@@@@@');
-	  console.log(actionConnection);
-	  console.log('@@@@@@#####');
       var actionProcessor = new api.actionProcessor({connection: actionConnection, callback: function(internalConnection, cont) {
-console.log(internalConnection);
+
         var err = internalConnection.error;
         if(err) { return callback(err, null); }
-		console.log('******');		
-		console.log(internalConnection.response);
-		console.log('####');
         var item = internalConnection.response.data[0];
         console.log("[jobsCreate]", " => local action result :", item);
         if(callback) { callback(null, item); }

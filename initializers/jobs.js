@@ -82,13 +82,13 @@ exports.jobs = function(api, next){
           api.mongo.collections.jobs.findOne(selector, function(err, job) {
             if (!err && job) {
               loggerSelector = { _id: new ObjectID(job.loggerId) };
-              api.mongo.collections.loggerSystems.findOne(loggerSelector, function(err, loggerSyste) {
+              api.mongo.collections.loggerSystems.findOne(loggerSelector, function(err, logger) {
                 if (!err && logger) {
 
                   var winstonLogger = new winston.Logger({
                       transports: [
                           new Papertrail({
-                              host: 'logs.papertrailapp.com',
+                              host: logger.syslogHostname,
                               port: logger.syslogPort,
                               hostname: logger.papertrailId,
                               program: sender,
