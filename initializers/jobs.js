@@ -88,7 +88,7 @@ exports.jobs = function(api, next){
                   var winstonLogger = new winston.Logger({
                       transports: [
                           new Papertrail({
-                              host: logger.syslogHostname,
+                              host: logs2.papertrailapp.com,
                               port: logger.syslogPort,
                               hostname: logger.papertrailId,
                               program: sender,
