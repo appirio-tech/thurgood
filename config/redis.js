@@ -11,14 +11,14 @@ exports.default = {
       // How long to wait for an RPC call before considering it a failure 
       rpcTimeout: 5000, 
 
-      package: 'fakeredis',
+        package: 'redis',
 
       // package: 'redis',
-      // host: '127.0.0.1',
-      // port: 6379,
-      // password: null,
-      // options: null,
-      // database: 0
+      host: '127.0.0.1',
+      port: 6379,
+      password: null,
+      options: null,
+      database: 0
 
       // package: 'redis-sentinel-client',
       // port: 26379,
