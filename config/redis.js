@@ -14,9 +14,9 @@ exports.default = {
       //package: 'fakeredis',
 
       package: 'redis',
-      // host: '127.0.0.1',
-      // port: 6379,
-      // password: null,
+      host: 'greeneye.redistogo.com',
+      port: 9315,
+      password: '612d12724cba33a65bef809c9fb0800d',
       // options: null,
       // database: 0
 
