@@ -18,7 +18,7 @@ exports.default = {
       port: 9315,
       password: '612d12724cba33a65bef809c9fb0800d',
       // options: null,
-      database: 0
+      // database: 0
 
       // package: 'redis-sentinel-client',
       // port: 26379,
