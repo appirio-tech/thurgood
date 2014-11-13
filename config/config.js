@@ -69,10 +69,10 @@ configData.logger.transports.push(function(api, winston){
 ///////////
 
 configData.redis = {
-  fake: process.env.USE_FAKE_REDIS || false,
-  host: process.env.REDIS_HOST || "greeneye.redistogo.com",
-  port: process.env.REDIS_PORT || 9315,
-  password: process.env.REDIS_PASSWORD || "612d12724cba33a65bef809c9fb0800d",
+  fake: process.env.USE_FAKE_REDIS || true,
+  host: process.env.REDIS_HOST || "127.0.0.1",
+  port: process.env.REDIS_PORT || 6379,
+  password: process.env.REDIS_PASSWORD || null,
   options: null,
   DB: 0
 };
