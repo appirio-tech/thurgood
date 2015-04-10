@@ -2,6 +2,13 @@ var Q = require("q");
 var _ = require('underscore');
 var openid = require('openid');
 var GOOGLE_ENDPOINT = 'https://www.google.com/accounts/o8/id';
+var request = require('request');
+var open = require('open');
+var url = require('url');
+var querystring = require('querystring');
+var jwt = require('jsonwebtoken');
+var google = require('googleapis');
+var http =  require('http');
 var extensions = [new openid.AttributeExchange(
                   {
                     "http://axschema.org/contact/email": "required",
@@ -31,16 +38,7 @@ exports.action = {
 
     function getGoogleAuthUrl() {
       var deferred = Q.defer();
-
-      var relyingParty = new openid.RelyingParty(
-        api.configData.google.redirectUrl, // callback url
-        null, // realm (optional)
-        false, // stateless
-        false, // strict mode
-        extensions); // List of extensions to enable and include
-      
-      relyingParty.authenticate(GOOGLE_ENDPOINT, false, deferred.makeNodeResolver());
-
+      redirectTo('https://accounts.google.com//o/oauth2/auth?response_type=code&client_id=129549620262-5boveov8v4quodro74fve6gtht49puvu.apps.googleusercontent.com&redirect_uri='+api.configData.google.redirectUrl+'&scope=openid%20email%20profile');
       return deferred.promise;
     }
 
@@ -68,20 +66,51 @@ exports.googleAuthReturn = {
   description: "Return path for Google OAuth",
   inputs: {
     required: [],
-    optional: ["openid.mode", "openid.ext1.value.email", "openid.ext1.value.firstname", "openid.ext1.value.lastname"],
+    optional: [],
   },
   authenticated: false,
   outputExample: {},
   version: 1.0,
-  run: function(api, connection, next) {
-
-    if(connection.params["openid.mode"] !== "id_res") {
+    run: function(api, connection, next) {       
+          var url_parts = url.parse(connection.rawConnection.req.url, true);
+     console.log('URL Parts', url_parts);
+  var query = url_parts.query;
+  console.log('query', query);
+      var isAuthenticated = false;
+      var decoded = null;
+      var fullname = null;
+      var email = null;
+      
+      request.post({url:'https://www.googleapis.com/oauth2/v3/token', form: {code: query.code , client_id:'129549620262-5boveov8v4quodro74fve6gtht49puvu.apps.googleusercontent.com', client_secret:'PFMCq-bj0fJFFV6YcN1rW4po', redirect_uri:api.configData.google.redirectUrl, grant_type:'authorization_code'}}, 
+      function(err,httpResponse,body){ 
+                    var bodyParsed = JSON.parse(body);
+      console.log('body Parsed', bodyParsed);
+      console.log('decoded', jwt.decode(bodyParsed.id_token));
+               decoded = jwt.decode(bodyParsed.id_token);                      
+               isAuthenticated = decoded.email_verified;
+               email = decoded.email;          
+               var plus = google.plus('v1');
+               var OAuth2 = google.auth.OAuth2;
+               var CLIENT_ID = '129549620262-5boveov8v4quodro74fve6gtht49puvu.apps.googleusercontent.com';
+               var CLIENT_SECRET = 'PFMCq-bj0fJFFV6YcN1rW4po';
+               var REDIRECT_URL = 'http://thurgood-production.herokuapp.com/api/auth/google/return';
+               var oauth2Client = new OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URL);
+               oauth2Client.setCredentials({
+                       access_token : bodyParsed.access_token                  
+               });     
+               plus.people.get({ userId: decoded.sub, auth: oauth2Client }, function(err, response) {
+                               // handle err and response
+                               if (err) {
+                                       console.log('An error occured', err);
+                                       return;
+                               }
+                               //var profile = JSON.parse(response.name);                      
+                               fullname = response.displayName; 
+    if(isAuthenticated != true) {
       return handleError(new Error("Authentication Failed"));
     }
 
-    var email = connection.params["openid.ext1.value.email"];
-    var fullname = connection.params["openid.ext1.value.firstname"] + " " + connection.params["openid.ext1.value.lastname"];
-
+    
     // flows
     // 1. find a user by email
     // 2. creates a user if not exist
@@ -94,6 +123,12 @@ exports.googleAuthReturn = {
     .then(handleSuccess)
     .fail(handleError)
     .done();
+				
+		});		
+	});
+	    //var fullname = connection.params["openid.ext1.value.firstname"] + " " + connection.params["openid.ext1.value.lastname"];
+	 
+   
 
     function createUserIfNotExist(user) {
       return user || api.users.create({email: email, name: fullname});
