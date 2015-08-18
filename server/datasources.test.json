@@ -1,0 +1,8 @@
+{
+  "thurgood": {
+    "host": "localhost",
+    "database": "thurgood-test",
+    "name": "thurgood-test",
+    "connector": "mongodb"
+  }
+}

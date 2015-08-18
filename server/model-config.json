@@ -1,0 +1,47 @@
+{
+  "_meta": {
+    "sources": [
+      "loopback/common/models",
+      "loopback/server/models",
+      "../common/models",
+      "./models"
+    ],
+    "mixins": [
+      "loopback/common/mixins",
+      "loopback/server/mixins",
+      "../common/mixins",
+      "./mixins"
+    ]
+  },
+  "User": {
+    "dataSource": "thurgood"
+  },
+  "AccessToken": {
+    "dataSource": "thurgood",
+    "public": false
+  },
+  "ACL": {
+    "dataSource": "thurgood",
+    "public": false
+  },
+  "RoleMapping": {
+    "dataSource": "thurgood",
+    "public": false
+  },
+  "Role": {
+    "dataSource": "thurgood",
+    "public": false
+  },
+  "Server": {
+    "dataSource": "thurgood",
+    "public": true
+  },
+  "Job": {
+    "dataSource": "thurgood",
+    "public": true
+  },
+  "Project": {
+    "dataSource": "thurgood",
+    "public": true
+  }
+}
