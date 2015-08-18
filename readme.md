@@ -4,7 +4,7 @@ Thurgood is the codename for our proprietary toolset that provides automated bui
 
 ## Local Development
 
-Please contact support@cloudspokes.com with the subject "Thurgood v2 Connection Parameters" to receive connection parameters to Mongodb, etc.
+Please contact support@cloudspokes.com with the subject "Thurgood v2 Connection Parameters" to receive connection parameters to MongoDB, etc.
 
 ```
 # clone this repo locally
@@ -24,4 +24,3 @@ The Angular frontend should be available from [http://localhost:5000](http://loc
 An API key is required for each call to the API. See the [API Keys page](https://github.com/cloudspokes/thurgood/wiki/Security-&-API-Keys) for more info.
 
 **Please see the [wiki](https://github.com/cloudspokes/thurgood/wiki) for complete documentation.** The documentation provides sample cURL statements for API calls with a Token that is passed in the header. At this time, the token is not being used so it can be safely be submitted.
-
