@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="run" basedir=".">
+
+    <property name="checkstyle.home.dir" location="${basedir}/checkstyle" />
+    <property name="findbugs.home.dir" value="${basedir}/findbugs" />
+    <property name="cobertura.home.dir" value="${basedir}/cobertura" />
+    <property name="lib.dir" location="${basedir}/lib" />
+    <property name="src.dir" location="${basedir}/src" />
+    <property name="bin.dir" location="${basedir}/bin" />
+    <property name="instrumented.dir" location="${basedir}/instrumented" />
+    <property name="report.dir" location="${basedir}/reports" />    
+    <property name="report.temp.dir" location="${report.dir}/temp" />
+    <property name="cobertura.ser.file" location="${report.temp.dir}/cobertura.ser" />    
+    <property name="report.checkstyle.dir" location="${report.dir}/checkstyle" />
+    <property name="report.findbugs.dir" location="${report.dir}/findbugs" />
+    <property name="report.cobertura.dir" location="${report.dir}/cobertura" />
+
+    <path id="run.classpath">
+        <pathelement path="${bin.dir}" />
+        <pathelement path="${lib.dir}/junit-4.8.2.jar" />
+        <pathelement path="${lib.dir}/hamcrest-core-1.1.jar" />
+    </path>
+
+    <path id="cobertura.classpath">
+        <path refid="run.classpath" />
+        <fileset dir="${cobertura.home.dir}">
+            <include name="cobertura.jar" />
+            <include name="lib/**/*.jar" />
+        </fileset>
+    </path>
+    <taskdef classpathref="cobertura.classpath" resource="tasks.properties" />    
+
+    <target name="clean" description="Delete all result to start with a clean build.">
+        <delete dir="${checkstyles.dir}" />
+        <delete dir="${report.findbugs.dir}" />
+        <delete dir="${report.cobertura.dir}" />
+        <delete dir="${report.temp.dir}" />
+        <delete dir="${bin.dir}" />
+    </target>    
+
+    <target name="compile" description="Compile the entire project.">
+        <mkdir dir="${bin.dir}" />
+        <javac debug="true"
+               debuglevel="source"
+               srcdir="${src.dir}"
+               destdir="${bin.dir}"
+               classpathref="run.classpath"
+               includeantruntime="false"
+        />
+    </target>
+
+    <target name="cobertura.instrument"
+            depends="clean, compile"
+            description="Instrument the project for code coverage."
+    >
+        <mkdir dir="${report.temp.dir}" />
+        <cobertura-instrument todir="${instrumented.dir}" datafile="${cobertura.ser.file}">
+            <ignore regex="org.apache.log4j.*" />
+            <fileset dir="${bin.dir}">
+                <include name="**/*.class" />
+                <exclude name="**/*Test.class" />
+            </fileset>
+        </cobertura-instrument>
+    </target>    
+
+    <target name="runjunit" depends="compile, cobertura.instrument" description="Runs all jUnit tests.">
+
+        <mkdir dir="${report.cobertura.dir}" />
+        <mkdir dir="${report.temp.dir}" />
+
+        <junit printsummary="yes" haltonfailure="no" fork="yes">
+
+            <!-- Specify the name of the coverage data file to use.
+                 The value specified below is the default.    -->
+            <sysproperty key="net.sourceforge.cobertura.datafile" 
+                file="${cobertura.ser.file}" />
+
+            <!-- Note the classpath order: instrumented classes are before 
+                 the original (uninstrumented) classes.  This is important. -->
+            <classpath location="${instrumented.dir}" />
+            <classpath location="${bin.dir}" />
+            <classpath location="${lib.dir}/junit-4.8.2.jar" />
+            <classpath location="${lib.dir}/hamcrest-core-1.1.jar" />            
+
+            <!-- The instrumented classes reference classes used by the
+                 Cobertura runtime, so Cobertura and its dependencies
+                 must be on your classpath. -->
+            <classpath refid="cobertura.classpath" />
+
+            <formatter type="plain" />
+            <formatter type="xml" />            
+
+            <batchtest todir="${report.temp.dir}">
+                <fileset dir="${src.dir}">
+                    <include name="**/*Test.java" />
+                </fileset>
+            </batchtest>
+
+        </junit>
+    </target>
+
+    <!-- -->
+    <target name="findbugs"
+            depends="compile"
+            description="Run code analysis over code to check for problems."
+    >
+        <!-- Fail this target if FindBugs is not installed. -->
+        <available file="${findbugs.home.dir}/lib/findbugs.jar" property="findbugs.available" />
+        <fail unless="findbugs.available"
+              message="Error: FINDBUGS_HOME not set or findbugs.jar not found."
+        />
+        <taskdef name="findbugs"
+                 classname="edu.umd.cs.findbugs.anttask.FindBugsTask"
+                 classpath="${findbugs.home.dir}/lib/findbugs-ant.jar"
+        />
+
+        <!-- Run FindBugs. -->
+        <mkdir dir="${report.findbugs.dir}" />
+        <findbugs home="${findbugs.home.dir}"
+                  workHard="true"
+                  output="xml:withMessages"
+                  outputFile="${report.findbugs.dir}/findbugs.xml"
+        >
+            <class location="${bin.dir}" />
+            <class location="${findbugs.home.dir}/lib/bcel.jar" />
+            <auxClasspath>          
+                <fileset file="${lib.dir}/junit-4.8.2.jar" />
+                <fileset file="${lib.dir}/hamcrest-core-1.1.jar" />
+            </auxClasspath>
+        </findbugs>
+    </target>
+
+    <target name="prepare.report.dir" description="Prepares the reports folder">
+        <copy todir="${report.dir}">
+            <fileset dir="${htm.dir}">
+                <include name="*.htm" />
+            </fileset>
+        </copy>
+    </target>    
+
+    <target name="report.findbugs" description="Generate a report on error analysis.">
+        <xslt in="${report.findbugs.dir}/findbugs.xml"
+              style="${findbugs.home.dir}/src/xsl/fancy.xsl"
+              out="${report.findbugs.dir}/findbugs-default.html"
+        />
+    </target>    
+
+    <target name="report.checkstyle" description="Generate a report of code convention violations.">
+
+        <taskdef resource="checkstyletask.properties"
+                 classpath="${checkstyle.home.dir}/checkstyle-5.6-all.jar"
+        />
+
+        <!-- run verification of installation-->
+        <available file="${checkstyle.home.dir}/checkstyle-5.6-all.jar"
+                   property="checkstyle.available"
+        />
+
+        <fail unless="checkstyle.available"
+              message="Error: CHECKSTYLE_HOME not set or checkstyle-5.6-all.jar not found."
+        />
+
+        <mkdir dir="${report.checkstyle.dir}" />
+
+        <!-- run analysis-->
+        <checkstyle config="${checkstyle.home.dir}/sun_checks.xml"
+                    failureProperty="checkstyle.failure"
+                    failOnViolation="false"
+        >
+            <formatter type="xml" tofile="${report.checkstyle.dir}/checkstyle_report.xml" />
+            <fileset dir="${src.dir}" includes="**/*.java" />
+        </checkstyle>
+
+        <xslt in="${report.checkstyle.dir}/checkstyle_report.xml"
+               out="${report.checkstyle.dir}/checkstyle_report.html"
+               style="${checkstyle.home.dir}/contrib/checkstyle-noframes.xsl"
+        />
+    </target> 
+
+    <target name="report.cobertura"
+            depends="runjunit"
+            description="Generate an HTML report on Cobertura."
+    >
+        <cobertura-report format="html"
+                          datafile="${cobertura.ser.file}"
+                          destdir="${report.cobertura.dir}"
+        >
+            <fileset dir="${src.dir}">
+                <include name="**/*.java" />
+            </fileset>
+        </cobertura-report>
+    </target>   
+
+    <target name="cleanup" description="Delete all temporary files and folders.">
+        <delete dir="${instrumented.dir}" />
+        <delete dir="${report.temp.dir}" />
+    </target>      
+
+    <target name="run" depends="clean, 
+        report.checkstyle, 
+        compile, 
+        runjunit, 
+        report.cobertura,
+        cleanup">
+    </target>
+</project>

@@ -8,6 +8,11 @@ Thurgood is a multi-part application. Here is a high level overview of the appli
 * Thurgood downloads the job's zip file, uppacks it, adds in any necessary build or authentication files and pushes it to a github repo.
 * Github post-commit webhook notifies Jenkins of new code.
 * Jenkins pulls code, run Checkmarx scan and deploys to Salesforce if necessary. 
+* During the Jenkins process, it send status updates back to the API and writes to the job's log file.
+
+## Jenkins & Checkmark
+
+You can log into the Jenkins server at: [http://ec2-54-158-149-254.compute-1.amazonaws.com/jenkins/login](http://ec2-54-158-149-254.compute-1.amazonaws.com/jenkins/login). The Checkmarx server is located at: 
 
 ## Job
 

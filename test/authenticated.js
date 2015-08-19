@@ -5,12 +5,62 @@ var supertest = require('supertest');
 var api = supertest('http://localhost:3000/api');
 
 var User = app.models.User;
+var Server = app.models.Server;
+
+var accessToken;
+var username = 'test-user1';
+var password = 'password'
+
+/*
+  This suite is needed to that before the test runs, it can ensure that
+  there are 0 available server for Salesforce jobs and can return the
+  proper error
+*/
+describe('Authenticated User - No Available Servers', function() {
+
+  before(function(done){
+    // populate the test db with data
+    require('./setup');
+    // log the user in
+    User.login({username: username, password: password}, function(err, results) {
+      if (err) { console.log(err); }
+      accessToken = results.id;
+      // find the existing salesforce server and make it complete
+      Server.findOne({ where: {and: [{platform: 'Salesforce'}, {status: 'available'}]}}, function(err, server){
+        if (server) {
+          server.updateAttributes({jobId: server.jobId, status: 'reserved'})
+          done();
+        }
+      })
+    });
+  });
+
+  it('handles no servers available for processing for Saleforce job', function(done) {
+
+    api.put('/jobs/no-servers-job/submit?access_token='+accessToken)
+    .expect(200)
+    .expect(function (res) {
+      assert.equal(res.body.id, 'no-servers-job');
+      assert.equal(res.body.success, false);
+      assert.equal(res.body.message, 'No Salesforce servers available for processing at this time. Please submit your job later.');
+    })
+    .end(done);
+
+  });
+
+  after(function(done){
+    // find the existing salesforce server and make it complete
+    Server.findOne({ where: {and: [{platform: 'Salesforce'}, {status: 'reserved'}]}}, function(err, server){
+      if (server) {
+        server.updateAttributes({jobId: server.jobId, status: 'available'})
+        done();
+      }
+    })
+  });
+
+})
 
 describe('Authenticated User', function() {
-
-  var accessToken;
-  var username = 'test-user1';
-  var password = 'password'
 
   before(function(done){
     // populate the test db with data
@@ -38,8 +88,8 @@ describe('Authenticated User', function() {
     .expect(200, done);
   });
 
-  it.only('posts a new message for a job', function(done) {
-    api.post('/jobs/test-job1/message?access_token='+accessToken)
+  it('posts a new message for a job', function(done) {
+    api.post('/jobs/message-job/message?access_token='+accessToken)
     .send({
       "message": "Ran successfully",
       "sender": "jenkins"
@@ -51,7 +101,7 @@ describe('Authenticated User', function() {
   });
 
   it('marks a job as complete', function(done) {
-    api.get('/jobs/test-job1/complete?access_token='+accessToken)
+    api.get('/jobs/complete-job/complete?access_token='+accessToken)
     .expect(200)
     .expect(function (res) {
       assert.equal(res.body.status, 'complete');
@@ -61,29 +111,23 @@ describe('Authenticated User', function() {
 
   it('submits a job for processing', function(done) {
     this.timeout(10000);
-    api.put('/jobs/test-job1/submit?access_token='+accessToken)
+    api.put('/jobs/success-submit-job/submit?access_token='+accessToken)
     .expect(200)
     .expect(function (res) {
-      assert.equal(res.body.status, 'in progress');
+      assert.equal(res.body.success, true);
+      assert.equal(res.body.id, 'success-submit-job');
+      assert.equal(res.body.message, 'Job in progress');
+      assert.equal(res.body.job.status, 'in progress');
     })
     .end(done);
   });
 
   it('handles BAD ZIP job submission error', function(done) {
-    api.put('/jobs/test-job2/submit?access_token='+accessToken)
+    this.timeout(2000);
+    api.put('/jobs/bad-zip-job/submit?access_token='+accessToken)
     .expect(500)
     .expect(function (res) {
       assert.equal(res.body.error.message, 'Invalid or unsupported zip format. No END header found');
-    })
-    .end(done);
-  });
-
-  it('handles no servers available for processing for Saleforce job', function(done) {
-    api.put('/jobs/test-job3/submit?access_token='+accessToken)
-    .expect(200)
-    .expect(function (res) {
-      assert.equal(res.body.success, false);
-      assert.equal(res.body.message, 'No Salesforce servers available for processing at this time. Please submit your job later.');
     })
     .end(done);
   });

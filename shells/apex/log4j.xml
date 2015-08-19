@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+  <appender name="console" class="org.apache.log4j.ConsoleAppender"> 
+    <param name="Target" value="System.out"/> 
+    <layout class="org.apache.log4j.PatternLayout"> 
+      <param name="ConversionPattern" value="%5r %-5p %-21d{yyyy-MM-dd HH:mm:ss,SSS} %m %n"/>
+    </layout> 
+  </appender> 
+
+  <appender name="syslog" class="org.apache.log4j.net.SyslogAppender"> 
+    <param name="Facility" value="LOCAL7"/>
+    <param name="SyslogHost" value="cloudspokes1.papertrailapp.com:14136"/>
+    <layout class="cl.huerta.log4j.StackTracePatternLayout">
+      <param name="ConversionPattern" value="%d{MMM dd HH:mm:ss} 52c5cc904da95c0200f6973e jenkins: %c{2} %x %m %n"/>
+    </layout> 
+  </appender>
+
+  <root> 
+    <priority value="info"/> 
+    <appender-ref ref="console"/> 
+    <appender-ref ref="syslog"/> 
+  </root>
+</log4j:configuration>

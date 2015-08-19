@@ -26,8 +26,7 @@
       "type": "string"
     },
     "startTime": {
-      "type": "date",
-      "required": true
+      "type": "date"
     },
     "updatedAt": {
       "type": "date",

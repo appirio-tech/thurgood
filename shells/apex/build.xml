@@ -1,0 +1,22 @@
+<project name="salesforce" default="test" basedir="." xmlns:sf="antlib:com.salesforce">
+
+    <property file="build.properties"/>
+    <property environment="env"/>
+
+    <target name="deployRunAllTests">
+      <sf:deploy username="${sf.username}" 
+        password="${sf.password}" 
+        serverurl="${sf.serverurl}" 
+        runAllTests="true"
+        logType="Detail"
+        deployRoot="src"/>
+    </target>
+
+    <target name="undeployCode">
+      <sf:deploy username="${sf.username}" 
+        password="${sf.password}" 
+        serverurl="${sf.serverurl}" 
+        deployRoot="undeploy"/>
+    </target>    
+
+</project>

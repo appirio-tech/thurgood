@@ -6,8 +6,11 @@ var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.S
 var request = require('request');
 var AdmZip = require('adm-zip');
 var path = require("path");
+var properties = require ("properties");
 var fse = Promise.promisifyAll(require('fs-extra'));
 var github = require('../../server/libs/github');
+var repo = require('../../server/libs/repo');
+var ThurgoodException = require('../../server/libs/exception');
 
 module.exports = function(Job) {
 
@@ -21,8 +24,12 @@ module.exports = function(Job) {
   var findJobById = function(id) {
     return new Promise(function(resolve, reject) {
       Job.findById(id, function(err, job){
-        if (err) reject(err);
-        if (!err) resolve(job);
+        if (!err && job) {
+          resolve(job);
+        } else {
+          if (err) reject(err);
+          if (!err) reject('job not found with Id: ' + id);
+        }
       });
     });
   };
@@ -37,8 +44,12 @@ module.exports = function(Job) {
     return new Promise(function(resolve, reject) {
       var Server = Job.app.models.Server;
       Server.findOne({ where: {jobId: job.id}}, function(err, server){
-        if (err) reject(err);
-        if (!err) resolve(server);
+        if (!err && server) {
+          resolve(server);
+        } else {
+          if (err) reject(server);
+          if (!err) reject('server not found for job with Id: ' + job.id);
+        }
       });
     });
   };
@@ -79,7 +90,7 @@ module.exports = function(Job) {
               if (!err) resolve(job);
             });
           }
-          if (!server) reject('no server available');
+          if (!server) reject(new ThurgoodException('NO_SERVER_AVAILABLE'));
         });
       } else {
         resolve(job);
@@ -135,7 +146,7 @@ module.exports = function(Job) {
   var downloadZip = function(job) {
     return new Promise(function(resolve, reject) {
       // create the job directory
-      var dir = path.resolve(__dirname, '../../tmp/' + job.id);
+      var dir = path.resolve(__dirname, '../../tmp/' + job.id.toString());
       fse.ensureDirAsync(path.resolve(__dirname, dir));
 
       // download and upzip all contents
@@ -156,6 +167,34 @@ module.exports = function(Job) {
       })
     });
   }
+
+  /**
+   * Returns the job by id from MongoDB.
+   * Loopback doesn't support promises at this time :(
+   *
+   * @param <String> id
+   * @return <Job> job
+   */
+  var rollback = function(id) {
+    return new Promise(function(resolve, reject) {
+      findJobById(id)
+        .then(function(job){
+          updateJob(job, {status: 'created', startTime: null, endTime: null, updatedAt: new Date()})
+            .then(findServerByJob)
+            .then(releaseServer)
+            .catch(function(err){
+              // most likely there is not a server for this job but no big deal
+              logger.info('[job-'+id+'] ' + err);
+            })
+            .finally(function(){
+              resolve();
+            });
+        })
+        .catch(function(err){
+          reject(err);
+        });
+    });
+  };
 
   // Register a 'message' remote method: /jobs/some-id/message
   Job.remoteMethod(
@@ -201,38 +240,67 @@ module.exports = function(Job) {
   //the actual function called by the route to do the work
   Job.submit = function(id, cb) {
     findJobById(id)
-       .then(reserveServer)
-       .then(downloadZip)
-       .then(github.push)
-       .then(function(job) {
-         updateJob(job, {status: 'in progress', startTime: new Date(), endTime: null, updatedAt: new Date()})
-           .then(function(job) {
-             cb(null, job);
-           })
-       }).catch(function(err) {
-         if (err === 'no server available') {
-           logger.warn('[job-'+id+'] ' + err);
+     .then(function(job){
+       if (job.status === 'in progress') throw new ThurgoodException('IN_PROGRESS');
+       return job;
+     })
+     .then(reserveServer)
+     .then(downloadZip)
+     .then(repo.addJobProperties)
+     .then(repo.addBuildProperties)
+     .then(repo.addShellAssets)
+     .then(github.push)
+     .then(function(job) {
+       updateJob(job, {status: 'in progress', startTime: new Date(), endTime: null, updatedAt: new Date()})
+         .then(function(job) {
            var msg = {
-             id: id,
-             success: false,
-             message: 'No Salesforce servers available for processing at this time. Please submit your job later.'
+             id: job.id,
+             success: true,
+             message: 'Job in progress',
+             job: job
            }
+           logger.info('[job-'+id+'] job successfully submitted');
            cb(null, msg);
-         } else {
-           logger.error('[job-'+id+'] ' + err);
-           cb(err)
+         })
+     }).catch(function(err) {
+       // catch some custom exceptions and handle accordingly
+       if (err.name === 'ThurgoodException') {
+         var msg = {
+           id: id,
+           success: false
          }
-       }).finally(function(){
-         // clean up after ourselves by deleting downloading directories
-         var repoDir = path.resolve(__dirname, '../../tmp/' + id);
-         var keysDir = path.resolve(__dirname, '../../tmp/keys/' + id);
-         fse.delete(repoDir, function (err) {
-           if (err) logger.fatal('[job-'+job.id+'] error deleting repo directory:' + err);
-         });
-         fse.delete(keysDir, function (err) {
-           if (err) logger.fatal('[job-'+job.id+'] error deleting key directory:' + err);
-         });
+         if (err.message === 'NO_SERVER_AVAILABLE') {
+           msg['message'] = 'No Salesforce servers available for processing at this time. Please submit your job later.';
+          logger.warn('[job-'+id+'] no servers available');
+         } else if (err.message === 'IN_PROGRESS') {
+           msg['message'] = 'Job already in progress. Please wait patiently.';
+         }
+         cb(null, msg);
+       } else {
+         logger.error('[job-'+id+'] ' + err);
+         // rollback the job and server to previous state
+         rollback(id)
+          .then(function(){
+            logger.info('[job-'+id+'] server & job rolled back due to error');
+          })
+          .catch(function(err){
+            logger.error('[job-'+id+'] error rolling back job and releasing server: ' + err);
+          })
+          .finally(function(){
+            cb(err)
+          })
+       }
+     }).finally(function(){
+       // clean up after ourselves by deleting downloading directories
+       var repoDir = path.resolve(__dirname, '../../tmp/' + id.toString());
+       var keysDir = path.resolve(__dirname, '../../tmp/keys/' + id.toString());
+       fse.delete(repoDir, function (err) {
+         if (err) logger.fatal('[job-'+job.id+'] error deleting repo directory:' + err);
        });
+       fse.delete(keysDir, function (err) {
+         if (err) logger.fatal('[job-'+job.id+'] error deleting key directory:' + err);
+       });
+     });
   };
 
   // Register a 'complete' remote method: /jobs/some-id/complete

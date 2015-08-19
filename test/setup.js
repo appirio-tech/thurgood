@@ -30,8 +30,47 @@ var createUsers = function() {
 var createServers = function(users) {
   return new Promise(function(resolve, reject) {
     Server.create([
+      // {
+      //   id: "test-server1",
+      //   installedServices: [
+      //     "ANT", "Jetty"
+      //   ],
+      //   instanceUrl: "http://www.myjavaserver.com",
+      //   languages: [
+      //     "java"
+      //   ],
+      //   name: "Java Server 1",
+      //   operatingSystem: "Linux",
+      //   password: "234567",
+      //   platform: "java",
+      //   repoName: "http://www.github.com/java1",
+      //   status: "available",
+      //   updatedAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
+      //   username: "jeff",
+      //   jobId: 'test-job1'
+      // },
       {
-        id: "test-server1",
+        id: "bad-zip-server",
+        installedServices: [
+          "Force.com", "MongoDB"
+        ],
+        instanceUrl: "http://www.force.com",
+        languages: [
+          "Apex", "Visualforce"
+        ],
+        name: "DE Org 1",
+        operatingSystem: "Linux",
+        password: "111111",
+        platform: "Java",
+        repoName: "http://www.github.com/force1",
+        status: "reserved", // setup so test suceeds for 'no servers'
+        updatedAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
+        username: "steve",
+        project: "ACME",
+        jobId: 'bad-zip-job'
+      },
+      {
+        id: "complete-server",
         installedServices: [
           "ANT", "Jetty"
         ],
@@ -44,30 +83,30 @@ var createServers = function(users) {
         password: "234567",
         platform: "java",
         repoName: "http://www.github.com/java1",
+        status: "reserved",
+        updatedAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
+        username: "jeff",
+        jobId: "complete-job"
+      },
+      {
+        id: "success-submit-server",
+        installedServices: [
+          "ANT", "Jetty"
+        ],
+        instanceUrl: "http://www.myjavaserver.com",
+        languages: [
+          "java"
+        ],
+        name: "Java Server 1",
+        operatingSystem: "Linux",
+        password: "234567",
+        platform: "Salesforce",
+        repoName: "http://www.github.com/java1",
         status: "available",
         updatedAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
         username: "jeff",
-        jobId: 'test-job1'
+        jobId: 'success-submit-job'
       },
-      {
-        id: "test-server2",
-        installedServices: [
-          "Force.com", "MongoDB"
-        ],
-        instanceUrl: "http://www.force.com",
-        languages: [
-          "Apex", "Visualforce"
-        ],
-        name: "DE Org 1",
-        operatingSystem: "Linux",
-        password: "111111",
-        platform: "Salesforce",
-        repoName: "http://www.github.com/force1",
-        status: "reserved", // setup so test suceeds for 'no servers'
-        updatedAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
-        username: "steve",
-        project: "ACME"
-      }
     ], function(err, records) {
       if (err) reject(err);
       if (!err) resolve(users);
@@ -79,7 +118,21 @@ var createJobs = function() {
   return new Promise(function(resolve, reject) {
     Job.create([
       {
-        id: "test-job1",
+        id: "bad-zip-job",
+        createdAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        codeUrl: "http://cs-production.s3.amazonaws.com/bad-zip.zip",
+        endTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        language: "Apex",
+        platform: "Java",
+        startTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        updatedAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        status: "created",
+        notification: "email",
+        steps: "all",
+        userId: 1
+      },
+      {
+        id: "message-job",
         createdAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
         codeUrl: "http://cs-thurgood.s3.amazonaws.com/sfdc-test-thurgood-src.zip",
         endTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
@@ -94,21 +147,22 @@ var createJobs = function() {
         userId: 1
       },
       {
-        id: "test-job2",
+        id: "complete-job",
         createdAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
-        codeUrl: "http://cs-production.s3.amazonaws.com/somecode.zip",
+        codeUrl: "http://cs-thurgood.s3.amazonaws.com/sfdc-test-thurgood-src.zip",
         endTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
         language: "Apex",
-        platform: "Java",
+        platform: "Heroku",
         startTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
         updatedAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        project: "ACME",
         status: "in progress",
         notification: "email",
         steps: "all",
         userId: 1
       },
       {
-        id: "test-job3",
+        id: "success-submit-job",
         createdAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
         codeUrl: "http://cs-thurgood.s3.amazonaws.com/sfdc-test-thurgood-src.zip",
         endTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
@@ -116,11 +170,27 @@ var createJobs = function() {
         platform: "Salesforce",
         startTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
         updatedAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        project: "ACME",
         status: "created",
         notification: "email",
         steps: "all",
         userId: 1
-      }
+      },
+      {
+        id: "no-servers-job",
+        createdAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        codeUrl: "http://cs-thurgood.s3.amazonaws.com/sfdc-test-thurgood-src.zip",
+        endTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        language: "Apex",
+        platform: "Salesforce",
+        startTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        updatedAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        project: "ACME",
+        status: "created",
+        notification: "email",
+        steps: "all",
+        userId: 1
+      },
     ], function(err, records) {
       if (err) reject(err);
       if (!err) resolve(records);
