@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"">
+<head>
+  <meta charset="utf-8">
+  <title>Test</title>
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.11/angular.min.js"></script>
+
+</head>
+<body>
+
+  <h1>Papertrail Test</h1>
+
+  <p>In the code below, add timestamp and token with the values returned from calling /libs/papertrail.token().</p>
+
+  <form action="https://papertrailapp.com/distributors/session" method="post" id="papertrail">
+  <input type="hidden" name="account_id" value="thurgood">
+  <input type="hidden" name="user_id" value="thurgood">
+  <input type="hidden" name="timestamp" value="{{timestamp}}">
+  <input type="hidden" name="token" value="{{token}}">
+  <input type="hidden" name="distributor" value="CloudSpokes">
+  <input type="hidden" name="email" value="some@email.com">
+  <input  type="hidden" name="system_id"  value="thurgood">
+  <button type="submit" class="btn btn-primary">Open PT Logs</button>
+  </form>
+
+</body>
+</html>
