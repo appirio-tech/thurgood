@@ -26,7 +26,7 @@ describe('Authenticated User - No Available Servers', function() {
       if (err) { console.log(err); }
       accessToken = results.id;
       // find the existing salesforce server and make it complete
-      Server.findOne({ where: {and: [{platform: 'Salesforce'}, {status: 'available'}]}}, function(err, server){
+      Server.findOne({ where: {and: [{platform: 'salesforce'}, {status: 'available'}]}}, function(err, server){
         if (server) {
           server.updateAttributes({jobId: server.jobId, status: 'reserved'})
           done();
@@ -35,7 +35,7 @@ describe('Authenticated User - No Available Servers', function() {
     });
   });
 
-  it('handles no servers available for processing for Saleforce job', function(done) {
+  it('handles no servers available', function(done) {
 
     api.put('/jobs/no-servers-job/submit?access_token='+accessToken)
     .expect(200)
@@ -50,7 +50,7 @@ describe('Authenticated User - No Available Servers', function() {
 
   after(function(done){
     // find the existing salesforce server and make it complete
-    Server.findOne({ where: {and: [{platform: 'Salesforce'}, {status: 'reserved'}]}}, function(err, server){
+    Server.findOne({ where: {and: [{platform: 'salesforce'}, {status: 'reserved'}]}}, function(err, server){
       if (server) {
         server.updateAttributes({jobId: server.jobId, status: 'available'})
         done();
@@ -105,6 +105,7 @@ describe('Authenticated User', function() {
     .expect(200)
     .expect(function (res) {
       assert.equal(res.body.status, 'complete');
+      assert.isUndefined(res.body.server);
     })
     .end(done);
   });

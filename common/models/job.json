@@ -53,7 +53,12 @@
       "type": "belongsTo",
       "model": "User",
       "foreignKey": ""
-    }
+    },
+    "server": {
+      "type": "hasOne",
+      "model": "Server",
+      "foreignKey": ""
+    }    
   },
   "acls": [
     {

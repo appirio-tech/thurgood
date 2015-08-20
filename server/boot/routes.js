@@ -28,12 +28,7 @@ module.exports = function(app) {
       platform: 'Salesforce'
     }
 
-    addShells(job)
-      .then(function(job){
-        console.log(job);
-      })
-
-    res.send('test done');
+    res.send('test done!');
   });
 
 }

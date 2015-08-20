@@ -20,7 +20,7 @@ module.exports = {
       var repoDir = path.resolve(__dirname, '../../tmp/' + job.id.toString());
       var settings = {
         JOB_ID: job.id,
-        SFDC_DEPLOY: job.platform === 'Salesforce' && job.steps === 'all'
+        SFDC_DEPLOY: job.platform.toLowerCase() === 'salesforce' && job.steps.toLowerCase() === 'all'
       };
       properties.stringify(settings, {path: repoDir + '/job.properties'}, function(err, results) {
         if (err) reject(err);
@@ -38,7 +38,7 @@ module.exports = {
    */
   addBuildProperties: function(job) {
     return new Promise(function(resolve, reject) {
-      if (job.platform === 'Salesforce' && job.steps === 'all') {
+      if (job.platform.toLowerCase() === 'salesforce' && job.steps.toLowerCase() === 'all') {
         var repoDir = path.resolve(__dirname, '../../tmp/' + job.id.toString());
         app.models.Server.findOne({ where: {jobId: job.id}}, function(err, server){
           if (!server) reject('Server not found for job');
@@ -68,7 +68,7 @@ module.exports = {
    */
   addShellAssets: function(job) {
     return new Promise(function(resolve, reject) {
-      if (job.platform === 'Salesforce' && job.steps === 'all') {
+      if (job.platform.toLowerCase() === 'salesforce' && job.steps.toLowerCase() === 'all') {
         var repoDir = path.resolve(__dirname, '../../tmp/' + job.id.toString());
         var apexDir = path.resolve(__dirname, '../../shells/apex');
         fse.copyAsync(apexDir + '/lib', repoDir + '/lib')

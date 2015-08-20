@@ -27,28 +27,168 @@ var createUsers = function() {
   });
 };
 
+var createJobs = function() {
+  return new Promise(function(resolve, reject) {
+    Job.create([
+      {
+        id: "bad-zip-job",
+        createdAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        codeUrl: "http://cs-production.s3.amazonaws.com/bad-zip.zip",
+        endTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        language: "Apex",
+        platform: "other",
+        startTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        updatedAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        status: "created",
+        notification: "email",
+        steps: "all",
+        userId: 1
+      },
+      {
+        id: "message-job",
+        createdAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        codeUrl: "http://cs-thurgood.s3.amazonaws.com/sfdc-test-thurgood-src.zip",
+        endTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        language: "Apex",
+        platform: "other",
+        startTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        updatedAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        project: "ACME",
+        status: "in progress",
+        notification: "email",
+        steps: "all",
+        userId: 1
+      },
+      {
+        id: "complete-job",
+        createdAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        codeUrl: "http://cs-thurgood.s3.amazonaws.com/sfdc-test-thurgood-src.zip",
+        endTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        language: "Apex",
+        platform: "other",
+        startTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        updatedAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        project: "ACME",
+        status: "in progress",
+        notification: "email",
+        steps: "all",
+        userId: 1
+      },
+      {
+        id: "success-submit-job",
+        createdAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        codeUrl: "http://cs-thurgood.s3.amazonaws.com/sfdc-test-thurgood-src.zip",
+        endTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        language: "Apex",
+        platform: "salesforce",
+        startTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        updatedAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        project: "ACME",
+        status: "created",
+        notification: "email",
+        steps: "all",
+        userId: 1
+      },
+      {
+        id: "no-servers-job",
+        createdAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        codeUrl: "http://cs-thurgood.s3.amazonaws.com/sfdc-test-thurgood-src.zip",
+        endTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        language: "Apex",
+        platform: "salesforce",
+        startTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        updatedAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        project: "ACME",
+        status: "created",
+        notification: "email",
+        steps: "all",
+        userId: 1
+      },
+      {
+        id: "processor-reserve-job",
+        createdAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        codeUrl: "http://cs-thurgood.s3.amazonaws.com/sfdc-test-thurgood-src.zip",
+        endTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        language: "Apex",
+        platform: "appengine", // doesn't really matter
+        startTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        updatedAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        project: "ACME",
+        status: "created",
+        notification: "email",
+        steps: "all",
+        userId: 1
+      },
+      {
+        id: "processor-reserve-release-job",
+        createdAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        codeUrl: "http://cs-thurgood.s3.amazonaws.com/sfdc-test-thurgood-src.zip",
+        endTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        language: "Apex",
+        platform: "openshift", // doesn't really matter
+        startTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        updatedAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        project: "ACME",
+        status: "created",
+        notification: "email",
+        steps: "all",
+        userId: 1
+      },
+      {
+        id: "processor-no-server-available-job",
+        createdAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        codeUrl: "http://cs-thurgood.s3.amazonaws.com/sfdc-test-thurgood-src.zip",
+        endTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        language: "Apex",
+        platform: "bad-platform",
+        startTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        updatedAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        project: "ACME",
+        status: "created",
+        notification: "email",
+        steps: "all",
+        userId: 1
+      },
+      {
+        id: "download-zip-job",
+        createdAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        codeUrl: "http://cs-thurgood.s3.amazonaws.com/sfdc-test-thurgood-src.zip",
+        endTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        language: "Apex",
+        platform: "bad-platform",
+        startTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        updatedAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        project: "ACME",
+        status: "created",
+        notification: "email",
+        steps: "all",
+        userId: 1
+      },
+      {
+        id: "rollback-job",
+        createdAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        codeUrl: "http://cs-thurgood.s3.amazonaws.com/sfdc-test-thurgood-src.zip",
+        endTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        language: "Apex",
+        platform: "rollback",
+        startTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        updatedAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        project: "ACME",
+        status: "in progress",
+        notification: "email",
+        steps: "all",
+        userId: 1
+      },
+    ], function(err, records) {
+      if (err) reject(err);
+      if (!err) resolve(records);
+    });
+  });
+};
+
 var createServers = function(users) {
   return new Promise(function(resolve, reject) {
     Server.create([
-      // {
-      //   id: "test-server1",
-      //   installedServices: [
-      //     "ANT", "Jetty"
-      //   ],
-      //   instanceUrl: "http://www.myjavaserver.com",
-      //   languages: [
-      //     "java"
-      //   ],
-      //   name: "Java Server 1",
-      //   operatingSystem: "Linux",
-      //   password: "234567",
-      //   platform: "java",
-      //   repoName: "http://www.github.com/java1",
-      //   status: "available",
-      //   updatedAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
-      //   username: "jeff",
-      //   jobId: 'test-job1'
-      // },
       {
         id: "bad-zip-server",
         installedServices: [
@@ -61,8 +201,8 @@ var createServers = function(users) {
         name: "DE Org 1",
         operatingSystem: "Linux",
         password: "111111",
-        platform: "Java",
-        repoName: "http://www.github.com/force1",
+        platform: "other",
+        repoName: "git@github.com:jeffdonthemic/push-test.git",
         status: "reserved", // setup so test suceeds for 'no servers'
         updatedAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
         username: "steve",
@@ -81,8 +221,8 @@ var createServers = function(users) {
         name: "Java Server 1",
         operatingSystem: "Linux",
         password: "234567",
-        platform: "java",
-        repoName: "http://www.github.com/java1",
+        platform: "other",
+        repoName: "git@github.com:jeffdonthemic/push-test.git",
         status: "reserved",
         updatedAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
         username: "jeff",
@@ -100,100 +240,71 @@ var createServers = function(users) {
         name: "Java Server 1",
         operatingSystem: "Linux",
         password: "234567",
-        platform: "Salesforce",
-        repoName: "http://www.github.com/java1",
+        platform: "salesforce",
+        repoName: "git@github.com:jeffdonthemic/push-test.git",
         status: "available",
         updatedAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
         username: "jeff",
         jobId: 'success-submit-job'
       },
+      {
+        id: "processor-reserve-server",
+        installedServices: [
+          "ANT", "Jetty"
+        ],
+        instanceUrl: "http://www.myjavaserver.com",
+        languages: [
+          "java"
+        ],
+        name: "Java Server 1",
+        operatingSystem: "Linux",
+        password: "234567",
+        platform: "appengine",
+        repoName: "git@github.com:jeffdonthemic/push-test.git",
+        status: "available",
+        updatedAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
+        username: "jeff"
+      },
+      {
+        id: "processor-reserve-release-server",
+        installedServices: [
+          "ANT", "Jetty"
+        ],
+        instanceUrl: "http://www.myjavaserver.com",
+        languages: [
+          "java"
+        ],
+        name: "Java Server 1",
+        operatingSystem: "Linux",
+        password: "234567",
+        platform: "openshift",
+        repoName: "git@github.com:jeffdonthemic/push-test.git",
+        status: "available",
+        updatedAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
+        username: "jeff"
+      },
+      {
+        id: "rollback-server",
+        installedServices: [
+          "ANT", "Jetty"
+        ],
+        instanceUrl: "http://www.myjavaserver.com",
+        languages: [
+          "java"
+        ],
+        name: "Java Server 1",
+        operatingSystem: "Linux",
+        password: "234567",
+        platform: "rollback",
+        repoName: "git@github.com:jeffdonthemic/push-test.git",
+        status: "available",
+        updatedAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
+        username: "jeff",
+        jobId: 'rollback-job'
+      },
     ], function(err, records) {
       if (err) reject(err);
       if (!err) resolve(users);
-    });
-  });
-};
-
-var createJobs = function() {
-  return new Promise(function(resolve, reject) {
-    Job.create([
-      {
-        id: "bad-zip-job",
-        createdAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
-        codeUrl: "http://cs-production.s3.amazonaws.com/bad-zip.zip",
-        endTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
-        language: "Apex",
-        platform: "Java",
-        startTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
-        updatedAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
-        status: "created",
-        notification: "email",
-        steps: "all",
-        userId: 1
-      },
-      {
-        id: "message-job",
-        createdAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
-        codeUrl: "http://cs-thurgood.s3.amazonaws.com/sfdc-test-thurgood-src.zip",
-        endTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
-        language: "Apex",
-        platform: "Heroku",
-        startTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
-        updatedAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
-        project: "ACME",
-        status: "in progress",
-        notification: "email",
-        steps: "all",
-        userId: 1
-      },
-      {
-        id: "complete-job",
-        createdAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
-        codeUrl: "http://cs-thurgood.s3.amazonaws.com/sfdc-test-thurgood-src.zip",
-        endTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
-        language: "Apex",
-        platform: "Heroku",
-        startTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
-        updatedAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
-        project: "ACME",
-        status: "in progress",
-        notification: "email",
-        steps: "all",
-        userId: 1
-      },
-      {
-        id: "success-submit-job",
-        createdAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
-        codeUrl: "http://cs-thurgood.s3.amazonaws.com/sfdc-test-thurgood-src.zip",
-        endTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
-        language: "Apex",
-        platform: "Salesforce",
-        startTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
-        updatedAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
-        project: "ACME",
-        status: "created",
-        notification: "email",
-        steps: "all",
-        userId: 1
-      },
-      {
-        id: "no-servers-job",
-        createdAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
-        codeUrl: "http://cs-thurgood.s3.amazonaws.com/sfdc-test-thurgood-src.zip",
-        endTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
-        language: "Apex",
-        platform: "Salesforce",
-        startTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
-        updatedAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
-        project: "ACME",
-        status: "created",
-        notification: "email",
-        steps: "all",
-        userId: 1
-      },
-    ], function(err, records) {
-      if (err) reject(err);
-      if (!err) resolve(records);
     });
   });
 };

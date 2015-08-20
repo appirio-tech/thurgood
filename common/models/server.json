@@ -56,13 +56,7 @@
     }
   },
   "validations": [],
-  "relations": {
-    "job": {
-      "type": "belongsTo",
-      "model": "Job",
-      "foreignKey": ""
-    }
-  },
+  "relations": {},
   "acls": [
     {
       "accessType": "*",

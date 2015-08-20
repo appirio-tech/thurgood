@@ -7,12 +7,12 @@ Thurgood is a multi-part application. Here is a high level overview of the appli
 * User log into Thurgood, creates a job and submits it for processing.
 * Thurgood downloads the job's zip file, uppacks it, adds in any necessary build or authentication files and pushes it to a github repo.
 * Github post-commit webhook notifies Jenkins of new code.
-* Jenkins pulls code, run Checkmarx scan and deploys to Salesforce if necessary. 
+* Jenkins pulls code, run Checkmarx scan and deploys to Salesforce if necessary.
 * During the Jenkins process, it send status updates back to the API and writes to the job's log file.
 
 ## Jenkins & Checkmark
 
-You can log into the Jenkins server at: [http://ec2-54-158-149-254.compute-1.amazonaws.com/jenkins/login](http://ec2-54-158-149-254.compute-1.amazonaws.com/jenkins/login). The Checkmarx server is located at: 
+You can log into the Jenkins server at: [http://ec2-54-158-149-254.compute-1.amazonaws.com/jenkins/login](http://ec2-54-158-149-254.compute-1.amazonaws.com/jenkins/login). The Checkmarx server is located at:
 
 ## Job
 
@@ -20,7 +20,7 @@ A job has the following parameters:
 
 * codeUrl - The complete URL to the zip file with the code to be processed.
 * language - The primary language of the code, e.g., Java, Apex.
-* platform - The platform for the code. Typically only applicable when set to 'Salesforce'. 
+* platform - The platform for the code. Typically only applicable when set to 'Salesforce'.
 * project - The associated project. Not being used at this time.
 * status - The current status of the job, i.e., created, in progress or complete.
 * startTime - The datetime the job started
@@ -33,13 +33,19 @@ A job has the following parameters:
 
 See /test/setup.js for sample data.
 
+## Sample REST endpoints
+
+**GET a Job with Server**
+
+http://localhost:3000/api/jobs/55a3f8b69d015b3da7f6d960?filter[include]=server&access_token=ACCESS_TOKEN
+
 ## Authentication
 
 You can use the default admin user to authenticate and return an access_token. Username is `thurgood` and the password is set via an environment variable `THURGOOD_ADMIN_PASSWORD`. Use the StrongLoop API Explorer (http://localhost:3000/explorer) with the User/login request section or POST to http://localhost:3000/Users/login with the following JSON.
 
 ```
-{ 
-  "username": "thurgood", 
+{
+  "username": "thurgood",
   "password": THURGOOD_ADMIN_PASSWORD
 }
 ```

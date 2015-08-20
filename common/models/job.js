@@ -10,191 +10,10 @@ var properties = require ("properties");
 var fse = Promise.promisifyAll(require('fs-extra'));
 var github = require('../../server/libs/github');
 var repo = require('../../server/libs/repo');
+var processor = require('../../server/libs/processor');
 var ThurgoodException = require('../../server/libs/exception');
 
 module.exports = function(Job) {
-
-  /**
-   * Returns the job by id from MongoDB.
-   * Loopback doesn't support promises at this time :(
-   *
-   * @param <String> id
-   * @return <Job> job
-   */
-  var findJobById = function(id) {
-    return new Promise(function(resolve, reject) {
-      Job.findById(id, function(err, job){
-        if (!err && job) {
-          resolve(job);
-        } else {
-          if (err) reject(err);
-          if (!err) reject('job not found with Id: ' + id);
-        }
-      });
-    });
-  };
-
-  /**
-   * Returns the server for the specified job from MongoDB.
-   *
-   * @param <String> id
-   * @return <Server> server
-   */
-  var findServerByJob = function(job) {
-    return new Promise(function(resolve, reject) {
-      var Server = Job.app.models.Server;
-      Server.findOne({ where: {jobId: job.id}}, function(err, server){
-        if (!err && server) {
-          resolve(server);
-        } else {
-          if (err) reject(server);
-          if (!err) reject('server not found for job with Id: ' + job.id);
-        }
-      });
-    });
-  };
-
-  /**
-   * Updates the job in MongoDB with the passed attributes.
-   *
-   * @param <Job> job
-   * @param <Object> attributes to be updated
-   * @return <Job> job
-   */
-  var updateJob = function(job, attributes) {
-    return new Promise(function(resolve, reject) {
-      job.updateAttributes(attributes, function(err, job){
-        if (err) reject(err);
-        if (!err) resolve(job);
-      });
-    });
-  };
-
-  /**
-   * Reserves a server for processing, only if the platform is
-   * 'Salesforce' and the steps is 'all' (meaning scan & deploy
-   * to a DE org for testing).
-   *
-   * @param <Job> job
-   * @return <Job> job
-   */
-  var reserveServer = function(job) {
-    return new Promise(function(resolve, reject) {
-      // only reserve server if Salesforce
-      if (job.platform === 'Salesforce' && job.steps === 'all') {
-        var Server = Job.app.models.Server;
-        Server.findOne({ where: {and: [{platform: job.platform}, {status: 'available'}]}}, function(err, server){
-          if (server) {
-            server.updateAttributes({jobId: job.id, status: 'reserved', updatedAt: new Date()}, function(err, server){
-              if (err) reject(err);
-              if (!err) resolve(job);
-            });
-          }
-          if (!server) reject(new ThurgoodException('NO_SERVER_AVAILABLE'));
-        });
-      } else {
-        resolve(job);
-      }
-    });
-  };
-
-  /**
-   * Updates the server and marks it available.
-   *
-   * @param <Server> server
-   * @return <Server> server
-   */
-  var releaseServer = function(server) {
-    return new Promise(function(resolve, reject) {
-      server.updateAttributes({jobId: null, status: 'available', updatedAt: new Date()}, function(err, server){
-        if (err) reject(err);
-        if (!err) resolve(server);
-      });
-    });
-  };
-
-  /**
-   * Sends 'Job Complete' notification if mode is production.
-   *
-   * @param <Job> job
-   * @return <Job> job
-   */
-  var sendMail = function(job) {
-    return new Promise(function(resolve, reject) {
-      if (process.env.NODE_ENV === 'production' && job.notification === 'email') {
-        sendgrid.send({
-          to:       job.user().email,
-          from:     'Thurgood',
-          subject:  'Job ' + job.id + ' Complete',
-          text:     'Your Thurgood job has been completed. You can view the job logs at ' + process.env.APP_URL + '/#/jobs/'+job.id+'/events.'
-        }, function(err, json) {
-          if (err) reject(err);
-          if (!err) resolve(job);
-        });
-      } else {
-        resolve(job);
-      }
-    });
-  };
-
-  /**
-   * Downloads the job's zip file and upzips it into a tmp dir.
-   *
-   * @param <Job> job
-   * @return <Job> job
-   */
-  var downloadZip = function(job) {
-    return new Promise(function(resolve, reject) {
-      // create the job directory
-      var dir = path.resolve(__dirname, '../../tmp/' + job.id.toString());
-      fse.ensureDirAsync(path.resolve(__dirname, dir));
-
-      // download and upzip all contents
-      var download = request(job.codeUrl)
-        .pipe(fse.createWriteStream('tmp/' + job.id + '/archive.zip'));
-      download.on('finish', function(){
-        logger.info('[job-'+job.id+'] code successfully downloaded.');
-        try {
-          var zip = new AdmZip('tmp/' + job.id + '/archive.zip');
-          zip.extractAllTo('tmp/' + job.id, true);
-          logger.info('[job-'+job.id+'] code successfully unzipped.');
-          // delete the archive file so it doesn't get pushed
-          fse.delete(dir + "/archive.zip");
-          resolve(job);
-        } catch (err) {
-          reject(err);
-        }
-      })
-    });
-  }
-
-  /**
-   * Returns the job by id from MongoDB.
-   * Loopback doesn't support promises at this time :(
-   *
-   * @param <String> id
-   * @return <Job> job
-   */
-  var rollback = function(id) {
-    return new Promise(function(resolve, reject) {
-      findJobById(id)
-        .then(function(job){
-          updateJob(job, {status: 'created', startTime: null, endTime: null, updatedAt: new Date()})
-            .then(findServerByJob)
-            .then(releaseServer)
-            .catch(function(err){
-              // most likely there is not a server for this job but no big deal
-              logger.info('[job-'+id+'] ' + err);
-            })
-            .finally(function(){
-              resolve();
-            });
-        })
-        .catch(function(err){
-          reject(err);
-        });
-    });
-  };
 
   // Register a 'message' remote method: /jobs/some-id/message
   Job.remoteMethod(
@@ -239,19 +58,19 @@ module.exports = function(Job) {
 
   //the actual function called by the route to do the work
   Job.submit = function(id, cb) {
-    findJobById(id)
+    processor.findJobById(id)
      .then(function(job){
        if (job.status === 'in progress') throw new ThurgoodException('IN_PROGRESS');
        return job;
      })
-     .then(reserveServer)
-     .then(downloadZip)
+     .then(processor.reserveServer)
+     .then(processor.downloadZip)
      .then(repo.addJobProperties)
      .then(repo.addBuildProperties)
      .then(repo.addShellAssets)
      .then(github.push)
      .then(function(job) {
-       updateJob(job, {status: 'in progress', startTime: new Date(), endTime: null, updatedAt: new Date()})
+       processor.updateJob(job, {status: 'in progress', startTime: new Date(), endTime: null, updatedAt: new Date()})
          .then(function(job) {
            var msg = {
              id: job.id,
@@ -279,7 +98,7 @@ module.exports = function(Job) {
        } else {
          logger.error('[job-'+id+'] ' + err);
          // rollback the job and server to previous state
-         rollback(id)
+         processor.rollback(id)
           .then(function(){
             logger.info('[job-'+id+'] server & job rolled back due to error');
           })
@@ -291,7 +110,7 @@ module.exports = function(Job) {
           })
        }
      }).finally(function(){
-       // clean up after ourselves by deleting downloading directories
+       // clean up after ourselves by deleting downloading directories & keys
        var repoDir = path.resolve(__dirname, '../../tmp/' + id.toString());
        var keysDir = path.resolve(__dirname, '../../tmp/keys/' + id.toString());
        fse.delete(repoDir, function (err) {
@@ -319,14 +138,13 @@ module.exports = function(Job) {
   // the actual function called by the route to do the work
   Job.complete = function(id, cb) {
 
-    Job.findOne({ where: {id: id}, include: 'user'}, function(err, job){
+    Job.findOne({ where: {id: id}, include: ['user','server']}, function(err, job){
       if (err) cb(err);
       if (!err) {
-        updateJob(job, {status: 'complete', endTime: new Date(), updatedAt: new Date()})
-          .then(sendMail)
-          .then(findServerByJob)
-          .then(releaseServer)
-          .then(function(server) {
+        processor.updateJob(job, {status: 'complete', endTime: new Date(), updatedAt: new Date()})
+          .then(processor.releaseServer)
+          .then(processor.sendMail)
+          .then(function(job) {
             logger.info('[job-'+job.id+'] marked as complete.');
             cb(null, job);
           }).catch(function(err) {
