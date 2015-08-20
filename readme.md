@@ -19,9 +19,9 @@ You can log into the Jenkins server at: [http://ec2-54-158-149-254.compute-1.ama
 A job has the following parameters:
 
 * codeUrl - The complete URL to the zip file with the code to be processed.
-* language - The primary language of the code, e.g., Java, Apex.
-* platform - The platform for the code. Typically only applicable when set to 'Salesforce'.
-* project - The associated project. Not being used at this time.
+* language - The primary language of the code, e.g., Java, Apex. Legacy property reserved for future functionality. Not being used.
+* platform - The platform for the code; Salesforce or Other. Typically only applicable when set to 'Salesforce'.
+* project - The associated project. Not being used at this time. Reserved for future development.
 * status - The current status of the job, i.e., created, in progress or complete.
 * startTime - The datetime the job started
 * endTime - The datetime the job finished
