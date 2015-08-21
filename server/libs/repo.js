@@ -40,20 +40,19 @@ module.exports = {
     return new Promise(function(resolve, reject) {
       if (job.platform.toLowerCase() === 'salesforce' && job.steps.toLowerCase() === 'all') {
         var repoDir = path.resolve(__dirname, '../../tmp/' + job.id.toString());
-        app.models.Server.findOne({ where: {jobId: job.id}}, function(err, server){
-          if (!server) reject('Server not found for job');
-          if (server) {
-            var settings = {
-              'sf.username': server.username,
-              'sf.password': server.password,
-              'sf.serverurl': server.instanceUrl
-            };
-            properties.stringify(settings, {path: repoDir + '/build.properties'}, function(err, results) {
-              if (err) reject(err);
-              if (!err) resolve(job);
-            });
-          }
-        });
+        if (job.server()) {
+          var settings = {
+            'sf.username': job.server().username,
+            'sf.password': job.server().password,
+            'sf.serverurl': job.server().instanceUrl
+          };
+          properties.stringify(settings, {path: repoDir + '/build.properties'}, function(err, results) {
+            if (err) reject(err);
+            if (!err) resolve(job);
+          });
+        } else {
+          reject('No server assigned to job');
+        }
       } else {
         resolve(job);
       }
