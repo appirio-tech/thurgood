@@ -33,13 +33,13 @@ A job has the following parameters:
 
 See /test/setup.js for sample data.
 
-## Salesforce jobs
+## Salesforce Jobs
 
 This is important.... for Saleforce jobs the files need be all be contained in an `src` root folder as the build process specifically looks for that directory.
 
 Either add files to a `src` directory or create it from your Eclipse project with the manifest structure. Just right click on the 'src' directory from Eclipse and zip up everything you want submitted. Your zip file should unzip in the following structure:
 
-
+![](https://raw.githubusercontent.com/appirio-tech/thurgood/v3/submission-structure.png)
 
 ## Sample REST endpoints
 
