@@ -124,6 +124,8 @@ module.exports = {
           logger.info('[job-'+job.id+'] code successfully unzipped.');
           // delete the archive file so it doesn't get pushed
           fse.delete(dir + "/archive.zip");
+          // try and delete a '__MACOSX' if it exists
+          fse.removeSync(path.resolve(dir, '__MACOSX'));
           resolve(job);
         } catch (err) {
           reject(err);
