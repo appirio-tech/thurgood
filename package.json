@@ -27,7 +27,9 @@
     "sendgrid": "^1.9.0",
     "serve-favicon": "^2.0.1",
     "ssh-keygen": "^0.2.1",
-    "strong-logger": "0.0.3"
+    "strong-logger": "0.0.3",
+    "winston": "^1.0.1",
+    "winston-papertrail": "^1.0.1"
   },
   "optionalDependencies": {
     "loopback-explorer": "^1.1.0"

@@ -1,9 +1,26 @@
-'use strict'
-
 var Promise = require("bluebird");
 var crypto = require('crypto');
+var winston = require('winston');
+require('winston-papertrail').Papertrail;
 
 module.exports = {
+
+  log: function(text, sender) {
+
+    var logger = new winston.Logger({
+      transports: [
+        new winston.transports.Papertrail({
+          host: 'logs3.papertrailapp.com',
+          port: 44970,
+          colorize: true,
+          logFormat: function(level, message) {
+            return message;
+          }
+        })
+      ]
+     });
+     logger.info(text);
+  },
 
   token: function() {
     return new Promise(function(resolve, reject) {
@@ -17,6 +34,6 @@ module.exports = {
       };
       resolve(sso);
     });
-  }
+  },
 
 }
