@@ -63,7 +63,7 @@ module.exports = {
         return repository.createCommit("HEAD", author, committer, "Commit courtesy of Thurgood!", oid, []);
       })
       .then(function(){
-        return nodegit.Remote.create(repository, "origin", process.env.REPO);
+        return nodegit.Remote.create(repository, "origin", job.server().repoName);
       })
       .then(function(remoteResult){
         remote = remoteResult;
