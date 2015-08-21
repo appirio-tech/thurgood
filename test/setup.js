@@ -241,7 +241,7 @@ var createServers = function(users) {
         operatingSystem: "Linux",
         password: "234567",
         platform: "salesforce",
-        repoName: "git@github.com:jeffdonthemic/push-test.git",
+        repoName: "git@github.com:squirrelforce/mocha-test",
         status: "available",
         updatedAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
         username: "jeff",

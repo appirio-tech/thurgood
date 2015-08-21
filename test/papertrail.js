@@ -15,7 +15,7 @@ describe('Papertrail', function() {
       });
   });
 
-  it.only('logs a message to papertrail', function(done) {
+  it('logs a message to papertrail', function(done) {
     pt.log('this is my message', 'mocha');
     done();
   });

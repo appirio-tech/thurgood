@@ -16,7 +16,7 @@ describe('Repo Processor', function() {
     // populate the test db with data
     require('./setup');
     // find a specific job
-    app.models.Job.findById('success-submit-job', function(err, obj){
+    app.models.Job.findById('success-submit-job', {include: 'server'},  function(err, obj){
       job = obj;
       tmpDir = path.resolve(__dirname, '../tmp/' + job.id);
       fse.ensureDirAsync(tmpDir);

@@ -110,7 +110,7 @@ describe('Authenticated User', function() {
     .end(done);
   });
 
-  it('submits a job for processing', function(done) {
+  it('submits a job for processing successfully', function(done) {
     this.timeout(10000);
     api.put('/jobs/success-submit-job/submit?access_token='+accessToken)
     .expect(200)

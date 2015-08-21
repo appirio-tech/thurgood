@@ -6,10 +6,7 @@ var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.S
 var request = require('request');
 var AdmZip = require('adm-zip');
 var path = require("path");
-var properties = require ("properties");
 var fse = Promise.promisifyAll(require('fs-extra'));
-var github = require('../../server/libs/github');
-var repo = require('../../server/libs/repo');
 var ThurgoodException = require('../../server/libs/exception');
 
 var app = require('../../server/server.js');
