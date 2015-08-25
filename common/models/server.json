@@ -32,10 +32,6 @@
       "type": "string",
       "required": true
     },
-    "platform": {
-      "type": "string",
-      "required": true
-    },
     "repoName": {
       "type": "string",
       "required": true
@@ -50,9 +46,6 @@
     "username": {
       "type": "string",
       "required": true
-    },
-    "project": {
-      "type": "string"
     }
   },
   "validations": [],

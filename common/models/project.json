@@ -11,16 +11,12 @@
       "type": "string",
       "required": true
     },
-    "repoUrl": {
+    "repo": {
       "type": "string",
       "required": true
     },
     "description": {
       "type": "string"
-    },
-    "notification": {
-      "type": "string",
-      "required": true
     },
     "createdAt": {
       "type": "date",
@@ -31,11 +27,15 @@
       "required": true
     }
   },
-  "validations": [],
   "relations": {
     "user": {
       "type": "belongsTo",
       "model": "User",
+      "foreignKey": ""
+    },
+    "job": {
+      "type": "hasOne",
+      "model": "Job",
       "foreignKey": ""
     }
   },

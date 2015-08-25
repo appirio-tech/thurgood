@@ -73,7 +73,7 @@ module.exports = {
               userName,
               keysDir + '/id_thurgood.pub',
               keysDir + '/id_thurgood',
-              "thurgoodisawesome"); // this is the password from the keygen function
+              process.env.GITHUB_SECRET); // this is the password from the keygen function
           }
         });
         return remote.connect(nodegit.Enums.DIRECTION.PUSH);
@@ -123,7 +123,7 @@ var createSshKeys = function(job) {
     });
 
     keygen({
-      password: 'thurgoodisawesome', // generic password
+      password: process.env.GITHUB_SECRET, // generic password
       read: true
     }, function(err, out){
       if (err) reject(err);

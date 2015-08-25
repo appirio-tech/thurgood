@@ -1,8 +1,11 @@
+'use strict'
+
 var processor = require('../server/libs/processor');
 var ThurgoodException = require('../server/libs/exception');
 var Promise = require("bluebird");
-var path = require("path");
 var fse = Promise.promisifyAll(require('fs-extra'));
+var path = require("path");
+var request = require('request');
 var should = require('chai').should();
 var assert = require('chai').assert;
 
@@ -76,6 +79,19 @@ describe('Job Processor', function() {
       .then(function(job){
         // assert there's a /tmp/download-zip-job/src directory
         assert.isTrue(fse.existsSync(path.resolve(__dirname, '../tmp', job.id.toString(), 'src')))
+        // delete the test directory
+        fse.removeSync(path.resolve(__dirname, '../tmp', job.id.toString()));
+        done();
+      });
+  });
+
+  it('downloads github zip archive successfully', function(done) {
+    this.timeout(10000);
+    processor.findJobById('webhook-job')
+      .then(processor.downloadZip)
+      .then(function(job){
+        // assert there's is no /tmp/webhook-job/push-test-master directory
+        assert.isFalse(fse.existsSync(path.resolve(__dirname, '../tmp', job.id.toString(), 'push-test-master')))
         // delete the test directory
         fse.removeSync(path.resolve(__dirname, '../tmp', job.id.toString()));
         done();

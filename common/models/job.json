@@ -32,9 +32,6 @@
       "type": "date",
       "required": true
     },
-    "project": {
-      "type": "string"
-    },
     "status": {
       "type": "string",
       "required": true
@@ -54,11 +51,16 @@
       "model": "User",
       "foreignKey": ""
     },
+    "project": {
+      "type": "belongsTo",
+      "model": "Project",
+      "foreignKey": ""
+    },
     "server": {
       "type": "hasOne",
       "model": "Server",
       "foreignKey": ""
-    }    
+    }
   },
   "acls": [
     {

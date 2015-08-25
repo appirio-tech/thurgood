@@ -1,5 +1,8 @@
 'use strict'
 
+/**
+ * A custom exception object
+ */
 module.exports = function ThurgoodException(message, extra) {
   Error.captureStackTrace(this, this.constructor);
   this.name = this.constructor.name;

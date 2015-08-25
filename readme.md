@@ -41,6 +41,18 @@ Either add files to a `src` directory or create it from your Eclipse project wit
 
 ![](https://raw.githubusercontent.com/appirio-tech/thurgood/v3/submission-structure.png)
 
+## Server
+
+## Project
+
+### Github Setup
+
+You have to give Squirrelforce access to the repo.
+
+### Sample Job Zip URL
+
+ZipFile: https://api.github.com/repos/jeffdonthemic/push-test/zipball/master
+
 ## Sample REST endpoints
 
 **GET a Job with Server**

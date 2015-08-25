@@ -111,12 +111,26 @@ describe('Authenticated User', function() {
   });
 
   it('submits a job for processing successfully', function(done) {
-    this.timeout(10000);
+    this.timeout(20000);
     api.put('/jobs/success-submit-job/submit?access_token='+accessToken)
     .expect(200)
     .expect(function (res) {
       assert.equal(res.body.success, true);
       assert.equal(res.body.id, 'success-submit-job');
+      assert.equal(res.body.message, 'Job in progress');
+      assert.equal(res.body.job.status, 'in progress');
+    })
+    .end(done);
+  });
+
+  it('submits a github project for processing successfully', function(done) {
+    this.timeout(20000);
+    api.put('/jobs/webhook-job/submit?access_token='+accessToken)
+    .expect(200)
+    .expect(function (res) {
+      console.log(res.body);
+      assert.equal(res.body.success, true);
+      assert.equal(res.body.id, 'webhook-job');
       assert.equal(res.body.message, 'Job in progress');
       assert.equal(res.body.job.status, 'in progress');
     })

@@ -3,6 +3,7 @@ var Promise = require("bluebird");
 var Server = app.models.Server;
 var Job = app.models.Job;
 var User = app.models.User;
+var Project = app.models.Project;
 
 
 var createUsers = function() {
@@ -53,7 +54,6 @@ var createJobs = function() {
         platform: "other",
         startTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
         updatedAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
-        project: "ACME",
         status: "in progress",
         notification: "email",
         steps: "all",
@@ -68,7 +68,6 @@ var createJobs = function() {
         platform: "other",
         startTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
         updatedAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
-        project: "ACME",
         status: "in progress",
         notification: "email",
         steps: "all",
@@ -83,7 +82,6 @@ var createJobs = function() {
         platform: "salesforce",
         startTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
         updatedAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
-        project: "ACME",
         status: "created",
         notification: "email",
         steps: "all",
@@ -98,7 +96,6 @@ var createJobs = function() {
         platform: "salesforce",
         startTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
         updatedAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
-        project: "ACME",
         status: "created",
         notification: "email",
         steps: "all",
@@ -113,7 +110,6 @@ var createJobs = function() {
         platform: "appengine", // doesn't really matter
         startTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
         updatedAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
-        project: "ACME",
         status: "created",
         notification: "email",
         steps: "all",
@@ -128,7 +124,6 @@ var createJobs = function() {
         platform: "openshift", // doesn't really matter
         startTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
         updatedAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
-        project: "ACME",
         status: "created",
         notification: "email",
         steps: "all",
@@ -143,7 +138,6 @@ var createJobs = function() {
         platform: "bad-platform",
         startTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
         updatedAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
-        project: "ACME",
         status: "created",
         notification: "email",
         steps: "all",
@@ -158,7 +152,6 @@ var createJobs = function() {
         platform: "bad-platform",
         startTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
         updatedAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
-        project: "ACME",
         status: "created",
         notification: "email",
         steps: "all",
@@ -173,11 +166,25 @@ var createJobs = function() {
         platform: "rollback",
         startTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
         updatedAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
-        project: "ACME",
         status: "in progress",
         notification: "email",
         steps: "all",
         userId: 1
+      },
+      {
+        id: "webhook-job",
+        createdAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        codeUrl: "https://github.com/jeffdonthemic/push-test/archive/master.zip",
+        endTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        language: "Apex",
+        platform: "webhook",
+        startTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        updatedAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        status: "created",
+        notification: "email",
+        steps: "all",
+        userId: 1,
+        projectId: 'webhook-project'
       },
     ], function(err, records) {
       if (err) reject(err);
@@ -202,11 +209,10 @@ var createServers = function(users) {
         operatingSystem: "Linux",
         password: "111111",
         platform: "other",
-        repoName: "git@github.com:jeffdonthemic/push-test.git",
+        repoName: "git@github.com:squirrelforce/mocha-test",
         status: "reserved", // setup so test suceeds for 'no servers'
         updatedAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
         username: "steve",
-        project: "ACME",
         jobId: 'bad-zip-job'
       },
       {
@@ -222,7 +228,7 @@ var createServers = function(users) {
         operatingSystem: "Linux",
         password: "234567",
         platform: "other",
-        repoName: "git@github.com:jeffdonthemic/push-test.git",
+        repoName: "git@github.com:squirrelforce/mocha-test",
         status: "reserved",
         updatedAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
         username: "jeff",
@@ -260,7 +266,7 @@ var createServers = function(users) {
         operatingSystem: "Linux",
         password: "234567",
         platform: "appengine",
-        repoName: "git@github.com:jeffdonthemic/push-test.git",
+        repoName: "git@github.com:squirrelforce/mocha-test",
         status: "available",
         updatedAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
         username: "jeff"
@@ -278,7 +284,7 @@ var createServers = function(users) {
         operatingSystem: "Linux",
         password: "234567",
         platform: "openshift",
-        repoName: "git@github.com:jeffdonthemic/push-test.git",
+        repoName: "git@github.com:squirrelforce/mocha-test",
         status: "available",
         updatedAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
         username: "jeff"
@@ -302,9 +308,46 @@ var createServers = function(users) {
         username: "jeff",
         jobId: 'rollback-job'
       },
+      {
+        id: "webhook-server",
+        installedServices: [
+          "ANT", "Jetty"
+        ],
+        instanceUrl: "http://www.myjavaserver.com",
+        languages: [
+          "java"
+        ],
+        name: "Java Server 1",
+        operatingSystem: "Linux",
+        password: "234567",
+        platform: "webhook",
+        repoName: "git@github.com:squirrelforce/mocha-test",
+        status: "available",
+        updatedAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
+        username: "jeff"
+      },
     ], function(err, records) {
       if (err) reject(err);
       if (!err) resolve(users);
+    });
+  });
+};
+
+var createProjects = function() {
+  return new Promise(function(resolve, reject) {
+    Project.create([
+      {
+        id: 'webhook-project',
+        name: 'Webhook Project',
+        repo: 'jeffdonthemic/push-test',
+        description: 'Test project',
+        createdAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
+        updatedAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
+        userId: 1
+      }
+    ], function(err, records) {
+      if (err) reject(err);
+      if (!err) resolve(records);
     });
   });
 };
@@ -313,13 +356,16 @@ before(function(done) {
 
   createUsers()
     .then(function(users) {
+      createProjects();
+    })
+    .then(function() {
       createJobs();
     })
     .then(function(jobs) {
       createServers(jobs);
     })
     // .then(function() {
-    //   return User.find({}, function(err, users) {
+    //   return Project.find({}, function(err, users) {
     //     console.log(users);
     //   });
     // })
@@ -335,5 +381,6 @@ after(function(done) {
    Server.destroyAll();
    Job.destroyAll();
    User.destroyAll();
+   Project.destroyAll();
    done();
 })

@@ -57,6 +57,7 @@ module.exports = function(Job) {
   );
 
   //the actual function called by the route to do the work
+  // TODO This should probably be moved to a queue
   Job.submit = function(id, cb) {
     processor.findJobById(id)
      .then(function(job){
@@ -97,7 +98,7 @@ module.exports = function(Job) {
          cb(null, msg);
        } else {
          logger.error('[job-'+id+'] ' + err);
-         // rollback the job and server to previous state
+         // rollback the job and server to previous state if there was an error
          processor.rollback(id)
           .then(function(){
             logger.info('[job-'+id+'] server & job rolled back due to error');
@@ -113,10 +114,10 @@ module.exports = function(Job) {
        // clean up after ourselves by deleting downloading directories & keys
        var repoDir = path.resolve(__dirname, '../../tmp/' + id.toString());
        var keysDir = path.resolve(__dirname, '../../tmp/keys/' + id.toString());
-       fse.delete(repoDir, function (err) {
+       fse.removeSync(repoDir, function (err) {
          if (err) logger.fatal('[job-'+job.id+'] error deleting repo directory:' + err);
        });
-       fse.delete(keysDir, function (err) {
+       fse.removeSync(keysDir, function (err) {
          if (err) logger.fatal('[job-'+job.id+'] error deleting key directory:' + err);
        });
      });

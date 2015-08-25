@@ -108,6 +108,22 @@ module.exports = {
    * @return <Job> job
    */
   downloadZip: function(job) {
+
+    var githubRootFolder = function(folder) {
+      return new Promise(function(resolve, reject) {
+        fse.readdirAsync(folder)
+          .then(function(files){
+            files.map(function(filename){
+              var file = path.resolve(folder, filename);
+              fse.statAsync(file)
+                .then(function(stats){
+                  if (stats.isDirectory()) resolve(file);
+                });
+            });
+          });
+      });
+    };
+
     return new Promise(function(resolve, reject) {
       // create the job directory
       var dir = path.resolve(__dirname, '../../tmp/' + job.id.toString());
@@ -115,18 +131,36 @@ module.exports = {
 
       // download and upzip all contents
       var download = request(job.codeUrl)
-        .pipe(fse.createWriteStream('tmp/' + job.id + '/archive.zip'));
+        .pipe(fse.createWriteStream('tmp/' + job.id.toString() + '/archive.zip'));
       download.on('finish', function(){
         logger.info('[job-'+job.id+'] code successfully downloaded.');
         try {
-          var zip = new AdmZip('tmp/' + job.id + '/archive.zip');
-          zip.extractAllTo('tmp/' + job.id, true);
+          var zip = new AdmZip('tmp/' + job.id.toString() + '/archive.zip');
+          zip.extractAllTo('tmp/' + job.id.toString(), true);
           logger.info('[job-'+job.id+'] code successfully unzipped.');
           // delete the archive file so it doesn't get pushed
-          fse.delete(dir + "/archive.zip");
-          // try and delete a '__MACOSX' if it exists
-          fse.removeSync(path.resolve(dir, '__MACOSX'));
-          resolve(job);
+          fse.removeSync(dir + "/archive.zip");
+          /* See if the code is from github and them move
+          * the contents up a folder. When the zip is downloaded
+          * from github it is buried inside a folder named after
+          * the branch. So the file will be in something like
+          * '/tmp/job1/push-test-master' instead of '/tmp/job1'.
+          * We need to move everything up into the tmp dir for
+          * for the project so it is a consistent structure.
+          */
+          if (job.codeUrl.split('/')[2].indexOf('github.com') != -1) {
+            githubRootFolder(dir)
+              .then(function(githubDir){
+                fse.copySync(githubDir, dir, {clobber: true});
+                fse.removeSync(githubDir);
+                fse.removeSync(path.resolve(dir, '__MACOSX'));
+                resolve(job);
+              })
+          } else {
+            // try and delete a '__MACOSX' if it exists
+            fse.removeSync(path.resolve(dir, '__MACOSX'));
+            resolve(job);
+          }
         } catch (err) {
           reject(err);
         }
