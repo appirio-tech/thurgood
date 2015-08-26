@@ -32,15 +32,15 @@
     "dataSource": "thurgood",
     "public": false
   },
-  "Server": {
-    "dataSource": "thurgood",
-    "public": true
-  },
   "Job": {
     "dataSource": "thurgood",
     "public": true
   },
   "Project": {
+    "dataSource": "thurgood",
+    "public": true
+  },
+  "Environment": {
     "dataSource": "thurgood",
     "public": true
   }

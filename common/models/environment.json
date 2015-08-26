@@ -1,38 +1,17 @@
 {
-  "name": "Server",
-  "plural": "servers",
+  "name": "Environment",
+  "plural": "environments",
   "base": "PersistedModel",
   "idInjection": true,
   "options": {
     "validateUpsert": true
   },
   "properties": {
-    "installedServices": {
-      "type": [
-        "string"
-      ]
-    },
-    "instanceUrl": {
-      "type": "string",
-      "required": true
-    },
-    "languages": {
-      "type": [
-        "string"
-      ]
-    },
     "name": {
       "type": "string",
       "required": true
     },
-    "operatingSystem": {
-      "type": "string"
-    },
-    "password": {
-      "type": "string",
-      "required": true
-    },
-    "repoName": {
+    "repo": {
       "type": "string",
       "required": true
     },
@@ -40,16 +19,31 @@
       "type": "string",
       "required": true
     },
-    "updatedAt": {
-      "type": "date"
+    "instanceUrl": {
+      "type": "string"
     },
     "username": {
-      "type": "string",
+      "type": "string"
+    },
+    "password": {
+      "type": "string"
+    },
+    "createdAt": {
+      "type": "date",
       "required": true
+    },
+    "updatedAt": {
+      "type": "date"
     }
   },
   "validations": [],
-  "relations": {},
+  "relations": {
+    "job": {
+      "type": "belongsTo",
+      "model": "Job",
+      "foreignKey": ""
+    }
+  },
   "acls": [
     {
       "accessType": "*",

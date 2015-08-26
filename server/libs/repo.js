@@ -40,19 +40,21 @@ module.exports = {
     return new Promise(function(resolve, reject) {
       if (job.platform.toLowerCase() === 'salesforce' && job.steps.toLowerCase() === 'all') {
         var repoDir = path.resolve(__dirname, '../../tmp/' + job.id.toString());
-        if (job.server()) {
-          var settings = {
-            'sf.username': job.server().username,
-            'sf.password': job.server().password,
-            'sf.serverurl': job.server().instanceUrl
-          };
-          properties.stringify(settings, {path: repoDir + '/build.properties'}, function(err, results) {
-            if (err) reject(err);
-            if (!err) resolve(job);
-          });
-        } else {
-          reject('No server assigned to job');
-        }
+        job.environment(function(err, env){
+          if (env) {
+            var settings = {
+              'sf.username': env.username,
+              'sf.password': env.password,
+              'sf.serverurl': env.instanceUrl
+            };
+            properties.stringify(settings, {path: repoDir + '/build.properties'}, function(err, results) {
+              if (err) reject(err);
+              if (!err) resolve(job);
+            });
+          } else {
+            reject('No environment assigned to job');
+          }
+        })
       } else {
         resolve(job);
       }

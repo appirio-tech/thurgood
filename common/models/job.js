@@ -64,7 +64,7 @@ module.exports = function(Job) {
        if (job.status === 'in progress') throw new ThurgoodException('IN_PROGRESS');
        return job;
      })
-     .then(processor.reserveServer)
+     .then(processor.reserveEnvironment)
      .then(processor.downloadZip)
      .then(repo.addJobProperties)
      .then(repo.addBuildProperties)
@@ -89,22 +89,22 @@ module.exports = function(Job) {
            id: id,
            success: false
          }
-         if (err.message === 'NO_SERVER_AVAILABLE') {
-           msg['message'] = 'No Salesforce servers available for processing at this time. Please submit your job later.';
-          logger.warn('[job-'+id+'] no servers available');
+         if (err.message === 'NO_ENVIRONMENT_AVAILABLE') {
+           msg['message'] = 'No Salesforce environments available for processing at this time. Please submit your job later.';
+           logger.warn('[job-'+id+'] no environments available');
          } else if (err.message === 'IN_PROGRESS') {
            msg['message'] = 'Job already in progress. Please wait patiently.';
          }
          cb(null, msg);
        } else {
          logger.error('[job-'+id+'] ' + err);
-         // rollback the job and server to previous state if there was an error
+         // rollback the job and environment to previous state if there was an error
          processor.rollback(id)
           .then(function(){
-            logger.info('[job-'+id+'] server & job rolled back due to error');
+            logger.info('[job-'+id+'] environment & job rolled back due to error');
           })
           .catch(function(err){
-            logger.error('[job-'+id+'] error rolling back job and releasing server: ' + err);
+            logger.error('[job-'+id+'] error rolling back job and releasing environment: ' + err);
           })
           .finally(function(){
             cb(err)
@@ -132,18 +132,18 @@ module.exports = function(Job) {
         {arg: 'id', type: 'string', required: true, http: { source: 'path' }}
       ],
       returns: {root: true, type: 'object'},
-      description: 'Marks a job as complete & releases server.'
+      description: 'Marks a job as complete & releases environment.'
     }
   );
 
   // the actual function called by the route to do the work
   Job.complete = function(id, cb) {
 
-    Job.findOne({ where: {id: id}, include: ['user','server']}, function(err, job){
+    Job.findOne({ where: {id: id}, include: ['user','environment']}, function(err, job){
       if (err) cb(err);
       if (!err) {
         processor.updateJob(job, {status: 'complete', endTime: new Date(), updatedAt: new Date()})
-          .then(processor.releaseServer)
+          .then(processor.releaseEnvironment)
           .then(processor.sendMail)
           .then(function(job) {
             logger.info('[job-'+job.id+'] marked as complete.');

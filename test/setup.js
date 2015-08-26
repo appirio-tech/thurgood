@@ -1,6 +1,6 @@
 var app = require('../server/server.js');
 var Promise = require("bluebird");
-var Server = app.models.Server;
+var Environment = app.models.Environment;
 var Job = app.models.Job;
 var User = app.models.User;
 var Project = app.models.Project;
@@ -37,7 +37,7 @@ var createJobs = function() {
         codeUrl: "http://cs-production.s3.amazonaws.com/bad-zip.zip",
         endTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
         language: "Apex",
-        platform: "other",
+        platform: "bad-zip-job",
         startTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
         updatedAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
         status: "created",
@@ -88,7 +88,7 @@ var createJobs = function() {
         userId: 1
       },
       {
-        id: "no-servers-job",
+        id: "no-environments-job",
         createdAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
         codeUrl: "http://cs-thurgood.s3.amazonaws.com/sfdc-test-thurgood-src.zip",
         endTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
@@ -130,7 +130,7 @@ var createJobs = function() {
         userId: 1
       },
       {
-        id: "processor-no-server-available-job",
+        id: "processor-no-environment-available-job",
         createdAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
         codeUrl: "http://cs-thurgood.s3.amazonaws.com/sfdc-test-thurgood-src.zip",
         endTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
@@ -186,6 +186,21 @@ var createJobs = function() {
         userId: 1,
         projectId: 'webhook-project'
       },
+      {
+        id: "github-webhook-job",
+        createdAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        codeUrl: "https://github.com/jeffdonthemic/push-test/archive/master.zip",
+        endTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        language: "Apex",
+        platform: "github-webhook",
+        startTime: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        updatedAt: "Mon Jul 13 2015 11:10:03 GMT-0600 (MDT)",
+        status: "created",
+        notification: "email",
+        steps: "all",
+        userId: 1,
+        projectId: 'github-webhook-project'
+      },
     ], function(err, records) {
       if (err) reject(err);
       if (!err) resolve(records);
@@ -193,138 +208,108 @@ var createJobs = function() {
   });
 };
 
-var createServers = function(users) {
+var createEnvironments = function(users) {
   return new Promise(function(resolve, reject) {
-    Server.create([
+    Environment.create([
       {
-        id: "bad-zip-server",
-        installedServices: [
-          "Force.com", "MongoDB"
-        ],
+        id: "bad-zip-environment",
         instanceUrl: "http://www.force.com",
-        languages: [
-          "Apex", "Visualforce"
-        ],
         name: "DE Org 1",
-        operatingSystem: "Linux",
         password: "111111",
-        platform: "other",
-        repoName: "git@github.com:squirrelforce/mocha-test",
-        status: "reserved", // setup so test suceeds for 'no servers'
+        platform: "bad-zip-job",
+        repo: "git@github.com:squirrelforce/mocha-test",
+        status: "available",
+        createdAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
         updatedAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
         username: "steve",
         jobId: 'bad-zip-job'
       },
       {
-        id: "complete-server",
-        installedServices: [
-          "ANT", "Jetty"
-        ],
-        instanceUrl: "http://www.myjavaserver.com",
-        languages: [
-          "java"
-        ],
-        name: "Java Server 1",
-        operatingSystem: "Linux",
+        id: "complete-environment",
+        instanceUrl: "http://www.myjavaenvironment.com",
+        name: "Java Environment 1",
         password: "234567",
         platform: "other",
-        repoName: "git@github.com:squirrelforce/mocha-test",
+        repo: "git@github.com:squirrelforce/mocha-test",
         status: "reserved",
         updatedAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
+        createdAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
         username: "jeff",
         jobId: "complete-job"
       },
       {
-        id: "success-submit-server",
-        installedServices: [
-          "ANT", "Jetty"
-        ],
-        instanceUrl: "http://www.myjavaserver.com",
-        languages: [
-          "java"
-        ],
-        name: "Java Server 1",
-        operatingSystem: "Linux",
+        id: "success-submit-environment",
+        instanceUrl: "http://www.myjavaenvironment.com",
+        name: "Java Environment 1",
         password: "234567",
         platform: "salesforce",
-        repoName: "git@github.com:squirrelforce/mocha-test",
+        repo: "git@github.com:squirrelforce/mocha-test",
         status: "available",
         updatedAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
+        createdAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
         username: "jeff",
         jobId: 'success-submit-job'
       },
       {
-        id: "processor-reserve-server",
-        installedServices: [
-          "ANT", "Jetty"
-        ],
-        instanceUrl: "http://www.myjavaserver.com",
-        languages: [
-          "java"
-        ],
-        name: "Java Server 1",
-        operatingSystem: "Linux",
+        id: "processor-reserve-environment",
+        instanceUrl: "http://www.myjavaenvironment.com",
+        name: "Java Environment 1",
         password: "234567",
         platform: "appengine",
-        repoName: "git@github.com:squirrelforce/mocha-test",
+        repo: "git@github.com:squirrelforce/mocha-test",
         status: "available",
         updatedAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
+        createdAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
         username: "jeff"
       },
       {
-        id: "processor-reserve-release-server",
-        installedServices: [
-          "ANT", "Jetty"
-        ],
-        instanceUrl: "http://www.myjavaserver.com",
-        languages: [
-          "java"
-        ],
-        name: "Java Server 1",
-        operatingSystem: "Linux",
+        id: "processor-reserve-release-environment",
+        instanceUrl: "http://www.myjavaenvironment.com",
+        name: "Java Environment 1",
         password: "234567",
         platform: "openshift",
-        repoName: "git@github.com:squirrelforce/mocha-test",
+        repo: "git@github.com:squirrelforce/mocha-test",
         status: "available",
         updatedAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
+        createdAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
         username: "jeff"
       },
       {
-        id: "rollback-server",
-        installedServices: [
-          "ANT", "Jetty"
-        ],
-        instanceUrl: "http://www.myjavaserver.com",
-        languages: [
-          "java"
-        ],
-        name: "Java Server 1",
-        operatingSystem: "Linux",
+        id: "rollback-environment",
+        instanceUrl: "http://www.myjavaenvironment.com",
+        name: "Java Environment 1",
         password: "234567",
         platform: "rollback",
-        repoName: "git@github.com:jeffdonthemic/push-test.git",
+        repo: "git@github.com:jeffdonthemic/push-test.git",
         status: "available",
         updatedAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
+        createdAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
         username: "jeff",
         jobId: 'rollback-job'
       },
       {
-        id: "webhook-server",
-        installedServices: [
-          "ANT", "Jetty"
-        ],
-        instanceUrl: "http://www.myjavaserver.com",
-        languages: [
-          "java"
-        ],
-        name: "Java Server 1",
-        operatingSystem: "Linux",
+        id: "webhook-environment",
+        instanceUrl: "http://www.myjavaenvironment.com",
+        name: "Java Environment 1",
         password: "234567",
         platform: "webhook",
-        repoName: "git@github.com:squirrelforce/mocha-test",
+        repo: "git@github.com:squirrelforce/mocha-test",
         status: "available",
         updatedAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
+        createdAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
         username: "jeff"
+      },
+      {
+        id: "github-webhook-environment",
+        instanceUrl: "http://www.myjavaenvironment.com",
+        name: "Java Environment 1",
+        password: "234567",
+        platform: "github-webhook",
+        repo: "git@github.com:squirrelforce/mocha-test",
+        status: "available",
+        updatedAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
+        createdAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
+        username: "jeff",
       },
     ], function(err, records) {
       if (err) reject(err);
@@ -344,6 +329,16 @@ var createProjects = function() {
         createdAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
         updatedAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
         userId: 1
+      },
+      {
+        id: 'github-webhook-project',
+        name: 'Webhook Project',
+        repo: 'jeffdonthemic/github-push-test',
+        description: 'Test project',
+        createdAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
+        updatedAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
+        userId: 1,
+        jobId: 'github-webhook-environment'
       }
     ], function(err, records) {
       if (err) reject(err);
@@ -362,7 +357,7 @@ before(function(done) {
       createJobs();
     })
     .then(function(jobs) {
-      createServers(jobs);
+      createEnvironments(jobs);
     })
     // .then(function() {
     //   return Project.find({}, function(err, users) {
@@ -378,7 +373,7 @@ before(function(done) {
 })
 
 after(function(done) {
-   Server.destroyAll();
+   Environment.destroyAll();
    Job.destroyAll();
    User.destroyAll();
    Project.destroyAll();

@@ -41,7 +41,7 @@ Either add files to a `src` directory or create it from your Eclipse project wit
 
 ![](https://raw.githubusercontent.com/appirio-tech/thurgood/v3/submission-structure.png)
 
-## Server
+## Environment
 
 ## Project
 
@@ -55,9 +55,9 @@ ZipFile: https://api.github.com/repos/jeffdonthemic/push-test/zipball/master
 
 ## Sample REST endpoints
 
-**GET a Job with Server**
+**GET a Job with Environment**
 
-http://localhost:3000/api/jobs/55a3f8b69d015b3da7f6d960?filter[include]=server&access_token=ACCESS_TOKEN
+http://localhost:3000/api/jobs/55a3f8b69d015b3da7f6d960?filter[include]=environment&access_token=ACCESS_TOKEN
 
 ## Authentication
 

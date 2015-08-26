@@ -25,7 +25,7 @@ describe('Job Processor', function() {
     processor.findJobById('success-submit-job')
       .then(function(job){
         assert.equal(job.id, 'success-submit-job');
-        assert.isNotNull(job.server);
+        assert.isNotNull(job.environment);
         done();
       });
   });
@@ -41,34 +41,34 @@ describe('Job Processor', function() {
       });
   });
 
-  it('reserves a server', function(done) {
+  it('reserves a environment', function(done) {
     processor.findJobById('processor-reserve-job')
-      .then(processor.reserveServer)
+      .then(processor.reserveEnvironment)
       .then(function(job){
-        assert.isNotNull(job.server);
+        assert.isNotNull(job.environment);
         done();
       });
   });
 
-  it('releases a server', function(done) {
+  it('releases a environment', function(done) {
     processor.findJobById('processor-reserve-release-job')
-      .then(processor.reserveServer)
+      .then(processor.reserveEnvironment)
       .then(function(job){
-        assert.isNotNull(job.server);
-        processor.releaseServer(job)
+        assert.isNotNull(job.environment);
+        processor.releaseEnvironment(job)
           .then(function(job){
-            assert.isFunction(job.server);
+            assert.isFunction(job.environment);
             done();
           })
 
       });
   });
 
-  it('no server available', function(done) {
-    processor.findJobById('processor-no-server-available-job')
-      .then(processor.reserveServer)
+  it('no environment available', function(done) {
+    processor.findJobById('processor-no-environment-available-job')
+      .then(processor.reserveEnvironment)
       .catch(function(err){
-        assert.equal(err.message, 'NO_SERVER_AVAILABLE');
+        assert.equal(err.message, 'NO_ENVIRONMENT_AVAILABLE');
         done();
       });
   });
@@ -103,7 +103,7 @@ describe('Job Processor', function() {
       .then(function(job){
         processor.rollback(job.id)
           .then(function(job){
-            assert.isFunction(job.server);
+            assert.isFunction(job.environment);
             assert.equal(job.status, 'created');
             assert.isNull(job.startTime);
             assert.isNull(job.endTime);

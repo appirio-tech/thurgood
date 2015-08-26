@@ -22,7 +22,7 @@ module.exports = {
    */
   findJobById: function(id) {
     return new Promise(function(resolve, reject) {
-      app.models.Job.findById(id, {include: 'server'}, function(err, job){
+      app.models.Job.findById(id, {include: 'environment'}, function(err, job){
         if (!err && job) {
           resolve(job);
         } else {
@@ -50,52 +50,52 @@ module.exports = {
   },
 
   /**
-   * Reserves a server for processing, only if the platform is
+   * Reserves an environment for processing, only if the platform is
    * 'Salesforce' and the steps is 'all' (meaning scan & deploy
    * to a DE org for testing).
    *
    * @param <Job> job
    * @return <Job> job
    */
-  reserveServer: function(job) {
+  reserveEnvironment: function(job) {
     return new Promise(function(resolve, reject) {
-      app.models.Server.findOne({ where: {and: [{platform: job.platform}, {status: 'available'}]}}, function(err, server){
-        if (server) {
-          server.updateAttributes({jobId: job.id, status: 'reserved', updatedAt: new Date()}, function(err, server){
+      app.models.Environment.findOne({ where: {and: [{platform: job.platform}, {status: 'available'}]}}, function(err, environment){
+        if (environment) {
+          environment.updateAttributes({jobId: job.id, status: 'reserved', updatedAt: new Date()}, function(err, environment){
             if (err) reject(err);
             if (!err) {
-              app.models.Job.findById(job.id, {include: 'server'}, function(err, job){
+              app.models.Job.findById(job.id, {include: 'environment'}, function(err, job){
                 resolve(job);
               });
             }
           });
         }
-        if (!server) reject(new ThurgoodException('NO_SERVER_AVAILABLE'));
+        if (!environment) reject(new ThurgoodException('NO_ENVIRONMENT_AVAILABLE'));
       });
     });
   },
 
   /**
-   * Updates the server and marks it available.
+   * Updates the environment and marks it available.
    *
    * @param <Job> job
    * @return <Job> job
    */
-  releaseServer: function(job) {
+  releaseEnvironment: function(job) {
     return new Promise(function(resolve, reject) {
-      app.models.Server.findOne({where: {jobId: job.id}}, function(err, server){
-        if (server && !err) {
-          server.updateAttributes({jobId: null, status: 'available', updatedAt: new Date()}, function(err, server){
+      app.models.Environment.findOne({where: {jobId: job.id}}, function(err, environment){
+        if (environment && !err) {
+          environment.updateAttributes({jobId: null, status: 'available', updatedAt: new Date()}, function(err, environment){
             if (err) reject(err);
             if (!err) {
-              app.models.Job.findById(job.id, {include: 'server'}, function(err, job){
+              app.models.Job.findById(job.id, {include: 'environment'}, function(err, job){
                 resolve(job);
               });
             }
           });
         } else {
           if (err) reject(err);
-          if (!err) reject('server not found for job with Id: ' + job.id);
+          if (!err) reject('environment not found for job with Id: ' + job.id);
         }
       });
     });
@@ -193,7 +193,7 @@ module.exports = {
   },
 
   /**
-   * Rolls back the job to 'created' state and releases the server
+   * Rolls back the job to 'created' state and releases the environment
    * Method implements 'callback hell' since Loopback doesn't
    * support promises
    *
@@ -202,7 +202,7 @@ module.exports = {
    */
   rollback: function(id) {
     return new Promise(function(resolve, reject) {
-      app.models.Job.findById(id, {include: 'server'}, function(err, job){
+      app.models.Job.findById(id, {include: 'environment'}, function(err, job){
         var attributes = {
           status: 'created',
           startTime: null,
@@ -212,18 +212,18 @@ module.exports = {
         job.updateAttributes(attributes, function(err, job){
           if (err) reject(err);
           if (!err) {
-            app.models.Server.findOne({where: {jobId: id}}, function(err, server){
+            app.models.Environment.findOne({where: {jobId: id}}, function(err, environment){
               if (err) reject(err);
-              if (server && !err) {
+              if (environment && !err) {
                 var attributes = {
                   jobId: null,
                   status: 'available',
                   updatedAt: new Date()
                 }
-                server.updateAttributes(attributes, function(err, server){
+                environment.updateAttributes(attributes, function(err, environment){
                   if (err) reject(err);
                   if (!err) {
-                    app.models.Job.findById(id, {include: 'server'}, function(err, job){
+                    app.models.Job.findById(id, {include: 'environment'}, function(err, job){
                       resolve(job);
                     });
                   };

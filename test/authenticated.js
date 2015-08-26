@@ -5,7 +5,7 @@ var supertest = require('supertest');
 var api = supertest('http://localhost:3000/api');
 
 var User = app.models.User;
-var Server = app.models.Server;
+var Environment = app.models.Environment;
 
 var accessToken;
 var username = 'test-user1';
@@ -13,10 +13,10 @@ var password = 'password'
 
 /*
   This suite is needed to that before the test runs, it can ensure that
-  there are 0 available server for Salesforce jobs and can return the
+  there are 0 available environment for Salesforce jobs and can return the
   proper error
 */
-describe('Authenticated User - No Available Servers', function() {
+describe('Authenticated User - No Available Environments', function() {
 
   before(function(done){
     // populate the test db with data
@@ -25,34 +25,34 @@ describe('Authenticated User - No Available Servers', function() {
     User.login({username: username, password: password}, function(err, results) {
       if (err) { console.log(err); }
       accessToken = results.id;
-      // find the existing salesforce server and make it complete
-      Server.findOne({ where: {and: [{platform: 'salesforce'}, {status: 'available'}]}}, function(err, server){
-        if (server) {
-          server.updateAttributes({jobId: server.jobId, status: 'reserved'})
+      // find the existing salesforce environment and make it complete
+      Environment.findOne({ where: {and: [{platform: 'salesforce'}, {status: 'available'}]}}, function(err, environment){
+        if (environment) {
+          environment.updateAttributes({jobId: environment.jobId, status: 'reserved'})
           done();
         }
       })
     });
   });
 
-  it('handles no servers available', function(done) {
+  it('handles no environments available', function(done) {
 
-    api.put('/jobs/no-servers-job/submit?access_token='+accessToken)
+    api.put('/jobs/no-environments-job/submit?access_token='+accessToken)
     .expect(200)
     .expect(function (res) {
-      assert.equal(res.body.id, 'no-servers-job');
+      assert.equal(res.body.id, 'no-environments-job');
       assert.equal(res.body.success, false);
-      assert.equal(res.body.message, 'No Salesforce servers available for processing at this time. Please submit your job later.');
+      assert.equal(res.body.message, 'No Salesforce environments available for processing at this time. Please submit your job later.');
     })
     .end(done);
 
   });
 
   after(function(done){
-    // find the existing salesforce server and make it complete
-    Server.findOne({ where: {and: [{platform: 'salesforce'}, {status: 'reserved'}]}}, function(err, server){
-      if (server) {
-        server.updateAttributes({jobId: server.jobId, status: 'available'})
+    // find the existing salesforce environment and make it complete
+    Environment.findOne({ where: {and: [{platform: 'salesforce'}, {status: 'reserved'}]}}, function(err, environment){
+      if (environment) {
+        environment.updateAttributes({jobId: environment.jobId, status: 'available'})
         done();
       }
     })
@@ -78,12 +78,12 @@ describe('Authenticated User', function() {
     .expect(200, done);
   });
 
-  it('reads all servers correctly', function(done) {
-    api.get('/servers?access_token='+accessToken)
+  it('reads all environments correctly', function(done) {
+    api.get('/environments?access_token='+accessToken)
     .expect(200, done);
   });
 
-  it('reads all projects currectly', function(done) {
+  it('reads all projects correctly', function(done) {
     api.get('/projects?access_token='+accessToken)
     .expect(200, done);
   });
@@ -105,7 +105,7 @@ describe('Authenticated User', function() {
     .expect(200)
     .expect(function (res) {
       assert.equal(res.body.status, 'complete');
-      assert.isUndefined(res.body.server);
+      assert.isUndefined(res.body.environment);
     })
     .end(done);
   });
@@ -128,7 +128,6 @@ describe('Authenticated User', function() {
     api.put('/jobs/webhook-job/submit?access_token='+accessToken)
     .expect(200)
     .expect(function (res) {
-      console.log(res.body);
       assert.equal(res.body.success, true);
       assert.equal(res.body.id, 'webhook-job');
       assert.equal(res.body.message, 'Job in progress');

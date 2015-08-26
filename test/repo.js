@@ -16,7 +16,7 @@ describe('Repo Processor', function() {
     // populate the test db with data
     require('./setup');
     // find a specific job
-    app.models.Job.findById('success-submit-job', {include: 'server'},  function(err, obj){
+    app.models.Job.findById('success-submit-job', {include: 'environment'},  function(err, obj){
       job = obj;
       tmpDir = path.resolve(__dirname, '../tmp/' + job.id);
       fse.ensureDirAsync(tmpDir);
@@ -49,7 +49,7 @@ describe('Repo Processor', function() {
         properties.parse(tmpDir + '/build.properties', { path: true, namespaces: true }, function (error, props){
           assert.equal(props.sf.username, 'jeff');
           assert.equal(props.sf.password, '234567');
-          assert.equal(props.sf.serverurl, 'http://www.myjavaserver.com');
+          assert.equal(props.sf.serverurl, 'http://www.myjavaenvironment.com');
           done();
         });
       })
