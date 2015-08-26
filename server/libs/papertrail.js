@@ -11,7 +11,9 @@ module.exports = {
       transports: [
         new winston.transports.Papertrail({
           host: 'logs3.papertrailapp.com',
-          port: 44970,
+          port: parseInt(process.env.PAPERTRAIL_PORT),
+          hostname: process.env.PAPERTRAIL_DIST_ACCOUNT,
+          program: sender,
           colorize: true,
           logFormat: function(level, message) {
             return message;
@@ -19,7 +21,7 @@ module.exports = {
         })
       ]
      });
-     logger.info(text);
+    logger.info(text);
   },
 
   token: function() {

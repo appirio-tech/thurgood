@@ -5,6 +5,7 @@ var logger = require('strong-logger');
 var path = require("path");
 var processor = require('../../server/libs/processor');
 var ThurgoodException = require('../../server/libs/exception');
+var pt = require('../../server/libs/papertrail');
 
 module.exports = function(Job) {
 
@@ -28,6 +29,7 @@ module.exports = function(Job) {
     Job.findById(id, function(err, job){
       if (err) cb(err);
       if (!err) {
+        pt.log('[' +sender+ '] ' + message, job.id);
         logger.info('[job-'+job.id+']['+sender+'] ' + message);
         var msg = {
           success: true,
@@ -67,6 +69,7 @@ module.exports = function(Job) {
              message: 'Job in progress',
              job: job
            }
+           pt.log('[thurgood] job submitted for processing.', job.id);
            cb(null, msg);
          })
      }).catch(function(err) {
@@ -83,7 +86,9 @@ module.exports = function(Job) {
            msg['message'] = 'Job already in progress. Please wait patiently.';
          }
          cb(null, msg);
+         pt.log('[thurgood] job submitted but: ' + msg.message, id);
        } else {
+         pt.log('[thurgood] job submitted but error: ' + err, id);
          logger.error('[job-'+id+'] ' + err);
          cb(err)
        }
@@ -113,6 +118,7 @@ module.exports = function(Job) {
           .then(processor.releaseEnvironment)
           .then(processor.sendJobCompleteMail)
           .then(function(job) {
+            pt.log('[thurgood] job marked as complete.', id);
             logger.info('[job-'+job.id+'] marked as complete.');
             cb(null, job);
           }).catch(function(err) {

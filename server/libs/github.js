@@ -9,6 +9,7 @@ var path = require("path");
 var fse = Promise.promisifyAll(require('fs-extra'));
 var _ = require('lodash');
 var GitHubApi = require("github");
+var pt = require('../../server/libs/papertrail');
 
 module.exports = {
 
@@ -31,6 +32,7 @@ module.exports = {
       var index;
 
       logger.info('[job-'+job.id+'] creating local git repo.');
+      pt.log('[thurgood] creating local git repo.', job.id);
 
       createSshKeys(job)
       .then(function(keys) {
@@ -69,6 +71,7 @@ module.exports = {
       })
       .then(function(remoteResult){
         logger.info('[job-'+job.id+'] pushing code to github.');
+        pt.log('[thurgood] pushing code to github.', job.id);
         remote = remoteResult;
         remote.setCallbacks({
           credentials: function(url, userName) {
@@ -89,6 +92,7 @@ module.exports = {
             "Push to master")
       })
       .then(function(result) {
+        pt.log('[thurgood] code pushed to github.', job.id);
         logger.info('[job-'+job.id+'] code pushed to github.');
         resolve(job);
       })

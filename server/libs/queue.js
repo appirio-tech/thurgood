@@ -7,6 +7,7 @@ var logger = require('strong-logger');
 var processor = require('./processor');
 var repo = require('./repo');
 var github = require('./github');
+var pt = require('../../server/libs/papertrail');
 
 /*
 * Submit job for processing
@@ -17,11 +18,17 @@ exports.submitJob = function(job){
  });
 
  job
+   .on('enqueue', function (){
+     pt.log('[queue] job has been added to the queue.', job.data.job.id);
+     logger.info('[job-'+job.data.job.id+'] job has been added to the queue.');
+   })
    .on('complete', function (){
-     logger.info('[job-'+job.data.job.id+'] exited the queue successfully.');
+     pt.log('[queue] job exited the queue successfully.', job.data.job.id);
+     logger.info('[job-'+job.data.job.id+'] job exited the queue successfully.');
    })
    .on('failed', function (err){
-     logger.info('[job-'+job.data.job.id+'] failed in the queue with the following error: ' + err);
+     pt.log('[queue] job failed in the queue with the following error: ' + err, job.data.job.id);
+     logger.info('[job-'+job.data.job.id+'] job failed in the queue with the following error: ' + err);
    })
  job.save();
 }

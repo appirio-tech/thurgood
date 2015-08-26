@@ -8,6 +8,7 @@ var AdmZip = require('adm-zip');
 var path = require("path");
 var fse = Promise.promisifyAll(require('fs-extra'));
 var ThurgoodException = require('../../server/libs/exception');
+var pt = require('../../server/libs/papertrail');
 
 var app = require('../../server/server.js');
 
@@ -138,10 +139,12 @@ module.exports = {
       var download = request(job.codeUrl)
         .pipe(fse.createWriteStream('tmp/' + job.id.toString() + '/archive.zip'));
       download.on('finish', function(){
+        pt.log('[thurgood] code successfully downloaded.', job.id);
         logger.info('[job-'+job.id+'] code successfully downloaded.');
         try {
           var zip = new AdmZip('tmp/' + job.id.toString() + '/archive.zip');
           zip.extractAllTo('tmp/' + job.id.toString(), true);
+          pt.log('[thurgood] code successfully unzipped.', job.id);
           logger.info('[job-'+job.id+'] code successfully unzipped.');
           // delete the archive file so it doesn't get pushed
           fse.removeSync(dir + "/archive.zip");
