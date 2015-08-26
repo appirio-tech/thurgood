@@ -22,8 +22,9 @@
       "type": "string",
       "required": true
     },
-    "platform": {
-      "type": "string"
+    "jobType": {
+      "type": "string",
+      "required": true
     },
     "startTime": {
       "type": "date"

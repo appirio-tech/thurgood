@@ -26,7 +26,7 @@ describe('Authenticated User - No Available Environments', function() {
       if (err) { console.log(err); }
       accessToken = results.id;
       // find the existing salesforce environment and make it complete
-      Environment.findOne({ where: {and: [{platform: 'salesforce'}, {status: 'available'}]}}, function(err, environment){
+      Environment.findOne({ where: {and: [{jobType: 'salesforce'}, {status: 'available'}]}}, function(err, environment){
         if (environment) {
           environment.updateAttributes({jobId: environment.jobId, status: 'reserved'})
           done();
@@ -50,7 +50,7 @@ describe('Authenticated User - No Available Environments', function() {
 
   after(function(done){
     // find the existing salesforce environment and make it complete
-    Environment.findOne({ where: {and: [{platform: 'salesforce'}, {status: 'reserved'}]}}, function(err, environment){
+    Environment.findOne({ where: {and: [{jobType: 'salesforce'}, {status: 'reserved'}]}}, function(err, environment){
       if (environment) {
         environment.updateAttributes({jobId: environment.jobId, status: 'available'})
         done();

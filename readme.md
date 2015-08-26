@@ -20,13 +20,13 @@ A job has the following parameters:
 
 * codeUrl - The complete URL to the zip file with the code to be processed.
 * language - The primary language of the code, e.g., Java, Apex. Legacy property reserved for future functionality. Not being used.
-* platform - The platform for the code; Salesforce or Other. Typically only applicable when set to 'Salesforce'.
+* jobType - The jobType for the code; Salesforce or Other. Typically only applicable when set to 'Salesforce'.
 * project - The associated project. Not being used at this time. Reserved for future development.
 * status - The current status of the job, i.e., created, in progress or complete.
 * startTime - The datetime the job started
 * endTime - The datetime the job finished
 * notification - If set to 'email' it will notify the job owner when the job completes.
-* steps - default is 'scan' but if set to 'all' for 'Salesforce' platform jobs, will additionally deploy to a Salesforce DE org and run all tests.
+* steps - default is 'scan' but if set to 'all' for 'Salesforce' jobType jobs, will additionally deploy to a Salesforce DE org and run all tests.
 * user - The job owner
 * createdAt - The datetime the job was created
 * updatedAt - The datetime the job was last updated.

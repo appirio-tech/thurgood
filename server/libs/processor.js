@@ -55,7 +55,7 @@ module.exports = {
   },
 
   /**
-   * Reserves an environment for processing, only if the platform is
+   * Reserves an environment for processing, only if the jobType is
    * 'Salesforce' and the steps is 'all' (meaning scan & deploy
    * to a DE org for testing).
    *
@@ -64,7 +64,7 @@ module.exports = {
    */
   reserveEnvironment: function(job) {
     return new Promise(function(resolve, reject) {
-      app.models.Environment.findOne({ where: {and: [{platform: job.platform}, {status: 'available'}]}}, function(err, environment){
+      app.models.Environment.findOne({ where: {and: [{jobType: job.jobType}, {status: 'available'}]}}, function(err, environment){
         if (environment) {
           environment.updateAttributes({jobId: job.id, status: 'reserved', updatedAt: new Date()}, function(err, environment){
             if (err) reject(err);
