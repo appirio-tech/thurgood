@@ -102,12 +102,15 @@ describe('Job Processor', function() {
     processor.findJobById('rollback-job')
       .then(function(job){
         processor.rollback(job.id)
-          .then(function(job){
-            assert.isFunction(job.environment);
-            assert.equal(job.status, 'created');
-            assert.isNull(job.startTime);
-            assert.isNull(job.endTime);
-            done()
+          .then(function(jobId){
+            processor.findJobById(jobId)
+              .then(function(job){
+                assert.isFunction(job.environment);
+                assert.equal(job.status, 'created');
+                assert.isNull(job.startTime);
+                assert.isNull(job.endTime);
+                done();
+              });
           })
       });
   });

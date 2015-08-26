@@ -2,14 +2,7 @@
 
 var Promise = require("bluebird");
 var logger = require('strong-logger');
-var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
-var request = require('request');
-var AdmZip = require('adm-zip');
 var path = require("path");
-var properties = require ("properties");
-var fse = Promise.promisifyAll(require('fs-extra'));
-var github = require('../../server/libs/github');
-var repo = require('../../server/libs/repo');
 var processor = require('../../server/libs/processor');
 var ThurgoodException = require('../../server/libs/exception');
 
@@ -57,7 +50,6 @@ module.exports = function(Job) {
   );
 
   //the actual function called by the route to do the work
-  // TODO This should probably be moved to a queue
   Job.submit = function(id, cb) {
     processor.findJobById(id)
      .then(function(job){
@@ -65,12 +57,8 @@ module.exports = function(Job) {
        return job;
      })
      .then(processor.reserveEnvironment)
-     .then(processor.downloadZip)
-     .then(repo.addJobProperties)
-     .then(repo.addBuildProperties)
-     .then(repo.addShellAssets)
-     .then(github.push)
      .then(function(job) {
+       // push to queue
        processor.updateJob(job, {status: 'in progress', startTime: new Date(), endTime: null, updatedAt: new Date()})
          .then(function(job) {
            var msg = {
@@ -79,7 +67,6 @@ module.exports = function(Job) {
              message: 'Job in progress',
              job: job
            }
-           logger.info('[job-'+id+'] job successfully submitted');
            cb(null, msg);
          })
      }).catch(function(err) {
@@ -98,28 +85,8 @@ module.exports = function(Job) {
          cb(null, msg);
        } else {
          logger.error('[job-'+id+'] ' + err);
-         // rollback the job and environment to previous state if there was an error
-         processor.rollback(id)
-          .then(function(){
-            logger.info('[job-'+id+'] environment & job rolled back due to error');
-          })
-          .catch(function(err){
-            logger.error('[job-'+id+'] error rolling back job and releasing environment: ' + err);
-          })
-          .finally(function(){
-            cb(err)
-          })
+         cb(err)
        }
-     }).finally(function(){
-       // clean up after ourselves by deleting downloading directories & keys
-       var repoDir = path.resolve(__dirname, '../../tmp/' + id.toString());
-       var keysDir = path.resolve(__dirname, '../../tmp/keys/' + id.toString());
-       fse.removeSync(repoDir, function (err) {
-         if (err) logger.fatal('[job-'+job.id+'] error deleting repo directory:' + err);
-       });
-       fse.removeSync(keysDir, function (err) {
-         if (err) logger.fatal('[job-'+job.id+'] error deleting key directory:' + err);
-       });
      });
   };
 
@@ -144,7 +111,7 @@ module.exports = function(Job) {
       if (!err) {
         processor.updateJob(job, {status: 'complete', endTime: new Date(), updatedAt: new Date()})
           .then(processor.releaseEnvironment)
-          .then(processor.sendMail)
+          .then(processor.sendJobCompleteMail)
           .then(function(job) {
             logger.info('[job-'+job.id+'] marked as complete.');
             cb(null, job);

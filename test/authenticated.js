@@ -136,14 +136,4 @@ describe('Authenticated User', function() {
     .end(done);
   });
 
-  it('handles BAD ZIP job submission error', function(done) {
-    this.timeout(2000);
-    api.put('/jobs/bad-zip-job/submit?access_token='+accessToken)
-    .expect(500)
-    .expect(function (res) {
-      assert.equal(res.body.error.message, 'Invalid or unsupported zip format. No END header found');
-    })
-    .end(done);
-  });
-
 });

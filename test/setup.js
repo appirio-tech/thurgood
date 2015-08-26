@@ -5,6 +5,7 @@ var Job = app.models.Job;
 var User = app.models.User;
 var Project = app.models.Project;
 
+var thurgoodUserId;
 
 var createUsers = function() {
   return new Promise(function(resolve, reject) {
@@ -43,7 +44,7 @@ var createJobs = function() {
         status: "created",
         notification: "email",
         steps: "all",
-        userId: 1
+        userId: thurgoodUserId
       },
       {
         id: "message-job",
@@ -57,7 +58,7 @@ var createJobs = function() {
         status: "in progress",
         notification: "email",
         steps: "all",
-        userId: 1
+        userId: thurgoodUserId
       },
       {
         id: "complete-job",
@@ -71,7 +72,7 @@ var createJobs = function() {
         status: "in progress",
         notification: "email",
         steps: "all",
-        userId: 1
+        userId: thurgoodUserId
       },
       {
         id: "success-submit-job",
@@ -85,7 +86,7 @@ var createJobs = function() {
         status: "created",
         notification: "email",
         steps: "all",
-        userId: 1
+        userId: thurgoodUserId
       },
       {
         id: "no-environments-job",
@@ -99,7 +100,7 @@ var createJobs = function() {
         status: "created",
         notification: "email",
         steps: "all",
-        userId: 1
+        userId: thurgoodUserId
       },
       {
         id: "processor-reserve-job",
@@ -113,7 +114,7 @@ var createJobs = function() {
         status: "created",
         notification: "email",
         steps: "all",
-        userId: 1
+        userId: thurgoodUserId
       },
       {
         id: "processor-reserve-release-job",
@@ -127,7 +128,7 @@ var createJobs = function() {
         status: "created",
         notification: "email",
         steps: "all",
-        userId: 1
+        userId: thurgoodUserId
       },
       {
         id: "processor-no-environment-available-job",
@@ -141,7 +142,7 @@ var createJobs = function() {
         status: "created",
         notification: "email",
         steps: "all",
-        userId: 1
+        userId: thurgoodUserId
       },
       {
         id: "download-zip-job",
@@ -155,7 +156,7 @@ var createJobs = function() {
         status: "created",
         notification: "email",
         steps: "all",
-        userId: 1
+        userId: thurgoodUserId
       },
       {
         id: "rollback-job",
@@ -169,7 +170,7 @@ var createJobs = function() {
         status: "in progress",
         notification: "email",
         steps: "all",
-        userId: 1
+        userId: thurgoodUserId
       },
       {
         id: "webhook-job",
@@ -183,7 +184,7 @@ var createJobs = function() {
         status: "created",
         notification: "email",
         steps: "all",
-        userId: 1,
+        userId: thurgoodUserId,
         projectId: 'webhook-project'
       },
       {
@@ -198,7 +199,7 @@ var createJobs = function() {
         status: "created",
         notification: "email",
         steps: "all",
-        userId: 1,
+        userId: thurgoodUserId,
         projectId: 'github-webhook-project'
       },
     ], function(err, records) {
@@ -328,7 +329,7 @@ var createProjects = function() {
         description: 'Test project',
         createdAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
         updatedAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
-        userId: 1
+        userId: thurgoodUserId
       },
       {
         id: 'github-webhook-project',
@@ -337,7 +338,7 @@ var createProjects = function() {
         description: 'Test project',
         createdAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
         updatedAt: "Mon Jul 13 2015 10:34:59 GMT-0600 (MDT)",
-        userId: 1,
+        userId: thurgoodUserId,
         jobId: 'github-webhook-environment'
       }
     ], function(err, records) {
@@ -349,27 +350,32 @@ var createProjects = function() {
 
 before(function(done) {
 
-  createUsers()
-    .then(function(users) {
-      createProjects();
-    })
-    .then(function() {
-      createJobs();
-    })
-    .then(function(jobs) {
-      createEnvironments(jobs);
-    })
-    // .then(function() {
-    //   return Project.find({}, function(err, users) {
-    //     console.log(users);
-    //   });
-    // })
-    .finally(function() {
-      done();
-    })
-    .catch(function(e) {
-      console.log(e);
-    });
+  User.findOne({where: {username: 'thurgood'}}, function(err, user) {
+    // set the admin user id so it can be used setup data
+    thurgoodUserId = user.id;
+    createUsers()
+      .then(function(users) {
+        createProjects();
+      })
+      .then(function() {
+        createJobs();
+      })
+      .then(function(jobs) {
+        createEnvironments(jobs);
+      })
+      // .then(function() {
+      //   return User.find({}, function(err, users) {
+      //     console.log(users);
+      //   });
+      // })
+      .finally(function() {
+        done();
+      })
+      .catch(function(e) {
+        console.log(e);
+      });
+
+  });
 })
 
 after(function(done) {

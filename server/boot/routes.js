@@ -30,7 +30,6 @@ module.exports = function(app) {
             } else {
               request.put(process.env.APP_URL + '/api/jobs/' + project.job().id + '/submit?access_token='+accessToken.id, function(err, results){
                 if (err) {
-                  console.log('here');
                   logger.err(err);
                   res.send(err);
                 }
@@ -51,16 +50,7 @@ module.exports = function(app) {
   })
 
   app.get('/test', function(req, res) {
-    // req.body.repository.full_name
-    app.models.Project.findOne({ where: { repo: 'jeffdonthemic/push-test' }}, function(err, project){
-      if (project && !err) {
-        console.log(project);
-      } else {
-        console.log(err);
-      }
-    });
-
-    res.send('test done!');
+    res.send('done');
   });
 
 }

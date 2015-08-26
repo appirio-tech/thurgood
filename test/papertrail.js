@@ -1,4 +1,3 @@
-// var app = require('../server/server.js');
 var Promise = require("bluebird");
 var pt = require('../server/libs/papertrail');
 var should = require('chai').should();

@@ -29,8 +29,8 @@ module.exports = {
       var repository = nodegit.Repository.init(repoDir, 0);
       var remote;
       var index;
-      // set the repo for ease of use.
-      var repo = job.environment().repo;
+
+      logger.info('[job-'+job.id+'] creating local git repo.');
 
       createSshKeys(job)
       .then(function(keys) {
@@ -65,9 +65,10 @@ module.exports = {
         return repository.createCommit("HEAD", author, committer, "Commit courtesy of Thurgood!", oid, []);
       })
       .then(function(){
-        return nodegit.Remote.create(repository, "origin", repo);
+        return nodegit.Remote.create(repository, "origin", job.environment.repo);
       })
       .then(function(remoteResult){
+        logger.info('[job-'+job.id+'] pushing code to github.');
         remote = remoteResult;
         remote.setCallbacks({
           credentials: function(url, userName) {
