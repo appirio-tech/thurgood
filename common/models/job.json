@@ -7,6 +7,10 @@
     "validateUpsert": true
   },
   "properties": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
     "createdAt": {
       "type": "date",
       "required": true
@@ -18,11 +22,7 @@
     "endTime": {
       "type": "date"
     },
-    "language": {
-      "type": "string",
-      "required": true
-    },
-    "jobType": {
+    "type": {
       "type": "string",
       "required": true
     },

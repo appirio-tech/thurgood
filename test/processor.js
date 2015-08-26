@@ -33,9 +33,9 @@ describe('Job Processor', function() {
   it('updates a job', function(done) {
     processor.findJobById('success-submit-job')
       .then(function(job){
-        processor.updateJob(job, {language: 'Go'})
+        processor.updateJob(job, {notification: 'carrier pigeon'})
           .then(function(job){
-            assert.equal(job.language, 'Go');
+            assert.equal(job.notification, 'carrier pigeon');
             done();
           })
       });

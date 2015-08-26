@@ -4,7 +4,7 @@
   "main": "server/server.js",
   "scripts": {
     "test": "NODE_ENV=test mocha --reporter spec",
-    "start": "NODE_ENV=test nodemon ."
+    "start": "node ."
   },
   "dependencies": {
     "adm-zip": "^0.4.7",

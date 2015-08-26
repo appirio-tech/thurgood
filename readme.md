@@ -1,37 +1,74 @@
 # Thurgood
 
+Thurgood is an automated build, testing and security tool for Appirio and topcoder utilizing Jenkins and Checkmarx.
+
 ## Overview
 
 Thurgood is a multi-part application. Here is a high level overview of the application.
 
-* User log into Thurgood, creates a job and submits it for processing.
+![](https://raw.githubusercontent.com/appirio-tech/thurgood/v3/thurgood-process.png)
+
+* User creates a new job one of two ways:
+    * User logs into Thurgood, creates a job, uploads zipped code and submits it for processing
+    * User logs into Thurgood, creates a job and a project (pointing to a github project repo), and configures commits to this repo to fire a webhook to thurgood that submits the job for processing using the code from the project repo.
 * Thurgood downloads the job's zip file, uppacks it, adds in any necessary build or authentication files and pushes it to a github repo.
-* Github post-commit webhook notifies Jenkins of new code.
+* Github post-commit webhook notifies Jenkins of new code. Each specific job listens for a webhook from a specific github repo. Therefore, there is a one-to-one relationship between repos and jenkins jobs.
 * Jenkins pulls code, run Checkmarx scan and deploys to Salesforce if necessary.
 * During the Jenkins process, it send status updates back to the API and writes to the job's log file.
 
 ## Jenkins & Checkmark
 
-You can log into the Jenkins server at: [http://ec2-54-158-149-254.compute-1.amazonaws.com/jenkins/login](http://ec2-54-158-149-254.compute-1.amazonaws.com/jenkins/login). The Checkmarx server is located at:
+You can log into the Jenkins server at: [http://ec2-54-158-149-254.compute-1.amazonaws.com/jenkins/login](http://ec2-54-158-149-254.compute-1.amazonaws.com/jenkins/login). 
 
-## Job
+The Checkmarx server is located at:
 
-A job has the following parameters:
+## Models
 
+### Job Model
+
+The job is the heart of Thurgood and has the following properties:
+
+* name - the display name of the jobs
 * codeUrl - The complete URL to the zip file with the code to be processed.
-* language - The primary language of the code, e.g., Java, Apex. Legacy property reserved for future functionality. Not being used.
-* jobType - The jobType for the code; Salesforce or Other. Typically only applicable when set to 'Salesforce'.
-* project - The associated project. Not being used at this time. Reserved for future development.
-* status - The current status of the job, i.e., created, in progress or complete.
+* type - The type for the job which determines some internal processing. Typically only applicable when set to 'Salesforce'. Possible values: `salesforce`, `other`.
+* status - The current status of the job. Possible values: `created`, `in progress` or `complete`.
 * startTime - The datetime the job started
 * endTime - The datetime the job finished
-* notification - If set to 'email' it will notify the job owner when the job completes.
-* steps - default is 'scan' but if set to 'all' for 'Salesforce' jobType jobs, will additionally deploy to a Salesforce DE org and run all tests.
-* user - The job owner
+* notification - If set to 'email' it will notify the job owner when the job completes. Possible values: `email', `null`.
+* steps - default is 'scan' but if set to 'all' for 'Salesforce' type jobs, will additionally deploy to a Salesforce DE org and run all tests. Possible values: `scan`, `all`.
+* user - The job owner.
+* project - The id of the project that the job corresponds to. When a webhook is received that matches a project, the corresponding job will be submitted for processing.
+* environment - The testing environment (github, Jenkins job, etc) for the job. The environment is selected at runtime by Thurgood and matches the environment based upon an `available` environment with the same `type` value as the job's `type` value. After the job completes, this value should be null as the job will no longer have an environment assigned.
 * createdAt - The datetime the job was created
 * updatedAt - The datetime the job was last updated.
 
-See /test/setup.js for sample data.
+### Environment Model
+
+The testing environment used for a job. This is a combination of a github repo, possible testing login credentials and it's associated Jenkins job. 
+
+* name - the display environment's name  
+* repo - the github repo that the job's code is pushed to, e.g., `git@github.com:squirrelforce/mocha-test`
+* status - the status of the environment. Possible values: `available`, `reserved`. 
+* instanceUrl - the url for any testing environment, i.e., salesforce login url `https://login.salesforce.com` 
+* username - the username for any testing environment
+* password - the password for any testing environment
+* job - the job that the environment is currently assigned to. Done at runtime by Thurgood.
+* createdAt - The datetime the job was created  
+* updatedAt - The datetime the job was last updated.  
+
+### Project Model
+
+The project is used to automatically submit a job when Thurgood receives a webhook from another project github repo. See the instructions below.
+
+* name - the display name of the project.
+* repo - the :user/:repo that Thurgood will receive the webhook from when new code is pushed, e.g., `jeffdonthemic/github-push-test` 
+* description - some description of the project.
+* user - The project's owner.
+* job - the job that is submitted when a webhook is received.
+* createdAt - The datetime the job was created  
+* updatedAt - The datetime the job was last updated.  
+
+**See /test/setup.js for sample data.**
 
 ## Salesforce Jobs
 
@@ -41,23 +78,14 @@ Either add files to a `src` directory or create it from your Eclipse project wit
 
 ![](https://raw.githubusercontent.com/appirio-tech/thurgood/v3/submission-structure.png)
 
-## Environment
+**See the sample-salesforce.zip file in the project root for an example.**
 
-## Project
+### Setting up a project
 
-### Github Setup
+Thurgood can automatically pull code from your project's github and submit a corresponding job each time you make a commit to your project's repo. First, create a new job record with the repo as :user/:repo (e.g., `jeffdonthemic/github-push-test` and then create a job using the id of this newly create project. 
 
-You have to give Squirrelforce access to the repo.
+In your project's github repo, make the `squirrelforce` github user a collaborator on your repo and create a webhook for `push` events with the payload URL of `https://[thurgood-production-url]//webhook`. You will also need the `secret` which you can find once you log into Thurgood and click the create new project button.
 
-### Sample Job Zip URL
-
-ZipFile: https://api.github.com/repos/jeffdonthemic/push-test/zipball/master
-
-## Sample REST endpoints
-
-**GET a Job with Environment**
-
-http://localhost:3000/api/jobs/55a3f8b69d015b3da7f6d960?filter[include]=environment&access_token=ACCESS_TOKEN
 
 ## Authentication
 
@@ -76,9 +104,11 @@ http://localhost:3000/api/jobs?access_token=ACCESS_TOKEN
 
 ## Testing
 
-Mocha tests uses a `test` MongoDB connection (`mongodb://localhost/thurgood-test`). Check the file in /server/datasources.test.json for more details. The /test/setup.js script runs before each set of test and populates the test database. You can modify test data there.
+Mocha tests uses a `test` MongoDB connection (`mongodb://localhost/thurgood-test`). Check the file in /server/datasources.test.json for more details. The /test/setup.js script runs before each set of test and populates the test database. You can modify test data there but you shouldn't need to.
 
-Run the application in one terminal tab:
+You will need to add some settings to your local .env files. First copy `.env-sample` and rename it `.env`. If you want to actually push code to a github repo, you'll need to add your `GITHUB_USERNAME` and `GITHUB_PASSWORD`. You'll also need change the `repo` setting for each each of the environments in the /test/setup.js file so that your user can push to these repos.
+
+To run the mocha tests, run the application in one terminal tab:
 
 ```
 source .env
@@ -91,8 +121,3 @@ Run the test in another terminal tab:
 source .env
 npm test
 ```
-
-## Todos
-
-Set status (created) and any other other properties when created
-bake in salesforce ant files

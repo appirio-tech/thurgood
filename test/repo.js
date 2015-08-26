@@ -49,7 +49,7 @@ describe('Repo Processor', function() {
         properties.parse(tmpDir + '/build.properties', { path: true, namespaces: true }, function (error, props){
           assert.equal(props.sf.username, 'jeff');
           assert.equal(props.sf.password, '234567');
-          assert.equal(props.sf.serverurl, 'http://www.myjavaenvironment.com');
+          assert.equal(props.sf.serverurl, 'https://login.salesforce.com');
           done();
         });
       })
