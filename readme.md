@@ -1,10 +1,12 @@
 # Thurgood
 
-Thurgood is an automated build, testing and security tool for Appirio and topcoder utilizing Jenkins and Checkmarx.
+Thurgood is an automated build, testing and security tool for Appirio and topcoder utilizing Jenkins and Checkmarx. 
+
+You can run the API from the API Explorer [https://[thurgood-production-url]/explorer](https://[thurgood-production-url]/explorer) or [http://localhost:3000/explorer](http://localhost:3000/explorer) if you are running it locally. See below for more info.
 
 ## Overview
 
-Thurgood is a multi-part application. Here is a high level overview of the application.
+Thurgood is a multi-part application. Here is a high level overview of the application. 
 
 ![](https://raw.githubusercontent.com/appirio-tech/thurgood/v3/thurgood-process.png)
 
@@ -87,7 +89,11 @@ Thurgood can automatically pull code from your project's github and submit a cor
 In your project's github repo, make the `squirrelforce` github user a collaborator on your repo and create a webhook for `push` events with the payload URL of `https://[thurgood-production-url]//webhook`. You will also need the `secret` which you can find once you log into Thurgood and click the create new project button.
 
 
-## Authentication
+## API Explorer
+
+The documentation for the API is available at the API Explorer. The API is locked down so you'll need to authenticate first and then set the returned id as the access token in the upper right.
+
+### Authentication
 
 You can use the default admin user to authenticate and return an access_token. Username is `thurgood` and the password is set via an environment variable `THURGOOD_ADMIN_PASSWORD`. Use the StrongLoop API Explorer (http://localhost:3000/explorer) with the User/login request section or POST to http://localhost:3000/Users/login with the following JSON.
 
