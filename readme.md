@@ -1,12 +1,12 @@
 # Thurgood
 
-Thurgood is an automated build, testing and security tool for Appirio and topcoder utilizing Jenkins and Checkmarx. 
+Thurgood is an automated build, testing and security tool for Appirio and topcoder utilizing Jenkins and Checkmarx.
 
 You can run the API from the API Explorer [https://[thurgood-production-url]/explorer](https://[thurgood-production-url]/explorer) or [http://localhost:3000/explorer](http://localhost:3000/explorer) if you are running it locally. See below for more info.
 
 ## Overview
 
-Thurgood is a multi-part application. Here is a high level overview of the application. 
+Thurgood is a multi-part application. Here is a high level overview of the application.
 
 ![](https://raw.githubusercontent.com/appirio-tech/thurgood/v3/thurgood-process.png)
 
@@ -20,7 +20,7 @@ Thurgood is a multi-part application. Here is a high level overview of the appli
 
 ## Jenkins & Checkmark
 
-You can log into the Jenkins server at: [http://ec2-54-158-149-254.compute-1.amazonaws.com/jenkins/login](http://ec2-54-158-149-254.compute-1.amazonaws.com/jenkins/login). 
+You can log into the Jenkins server at: [http://ec2-54-158-149-254.compute-1.amazonaws.com/jenkins/login](http://ec2-54-158-149-254.compute-1.amazonaws.com/jenkins/login).
 
 The Checkmarx server is located at:
 
@@ -31,30 +31,30 @@ The Checkmarx server is located at:
 The job is the heart of Thurgood and has the following properties:
 
 * name - the display name of the jobs
-* codeUrl - The complete URL to the zip file with the code to be processed.
-* type - The type for the job which determines some internal processing. Typically only applicable when set to 'Salesforce'. Possible values: `salesforce`, `other`.
-* status - The current status of the job. Possible values: `created`, `in progress` or `complete`.
-* startTime - The datetime the job started
-* endTime - The datetime the job finished
-* notification - If set to 'email' it will notify the job owner when the job completes. Possible values: `email', `null`.
-* steps - default is 'scan' but if set to 'all' for 'Salesforce' type jobs, will additionally deploy to a Salesforce DE org and run all tests. Possible values: `scan`, `all`.
-* user - The job owner.
-* project - The id of the project that the job corresponds to. When a webhook is received that matches a project, the corresponding job will be submitted for processing.
-* environment - The testing environment (github, Jenkins job, etc) for the job. The environment is selected at runtime by Thurgood and matches the environment based upon an `available` environment with the same `type` value as the job's `type` value. After the job completes, this value should be null as the job will no longer have an environment assigned.
+* codeUrl - The complete URL to the zip file with the code to be processed. Either by typing in the URL or upload code to S3.
+* type - The type for the job which determines some internal processing. Typically only applicable when set to 'salesforce'. Possible picklist values: `salesforce`, `other`.
+* status - The current status of the job. Possible picklist values: `created`, `in progress` or `complete`.
+* startTime - The datetime the job started. Set by Thurgood at runtime.
+* endTime - The datetime the job finished. Set by Thurgood at runtime.
+* notification - If set to 'email' it will notify the job owner when the job completes. Possible picklist values: `email', blank (null).
+* steps - default is 'scan' but if set to 'all' for 'Salesforce' type jobs, will additionally deploy to a Salesforce DE org and run all tests. Possible picklist values: `scan`, `all`. 'All' should only be visible/selectable if the type is currently set to 'salesforce'.
+* userId - The id job owner. Set only when the record is created.
+* projectId - The id of the project that the job corresponds to. When a webhook is received that matches a project, the corresponding job will be submitted for processing. User will need to manually enter the projectId when setting up the job.
+* environmentId - The testing environment (github, Jenkins job, etc) for the job. The environment is selected at runtime by Thurgood and matches the environment based upon an `available` environment with the same `type` value as the job's `type` value. After the job completes, this value should be null as the job will no longer have an environment assigned.
 * createdAt - The datetime the job was created
 * updatedAt - The datetime the job was last updated.
 
 ### Environment Model
 
-The testing environment used for a job. This is a combination of a github repo, possible testing login credentials and it's associated Jenkins job. 
+The testing environment used for a job. This is a combination of a github repo, possible testing login credentials and it's associated Jenkins job.
 
 * name - the display environment's name  
-* repo - the github repo that the job's code is pushed to, e.g., `git@github.com:squirrelforce/mocha-test`
-* status - the status of the environment. Possible values: `available`, `reserved`. 
-* instanceUrl - the url for any testing environment, i.e., salesforce login url `https://login.salesforce.com` 
+* repo - the github repo that the job's code is pushed to, e.g., `git@github.com:thurgoodpush/mocha-test`
+* status - the status of the environment. Possible picklist values: `available`, `reserved`.
+* instanceUrl - the url for any testing environment, i.e., salesforce login url `https://login.salesforce.com`
 * username - the username for any testing environment
 * password - the password for any testing environment
-* job - the job that the environment is currently assigned to. Done at runtime by Thurgood.
+* jobId - the job that the environment is currently assigned to. Done at runtime by Thurgood.
 * createdAt - The datetime the job was created  
 * updatedAt - The datetime the job was last updated.  
 
@@ -63,10 +63,10 @@ The testing environment used for a job. This is a combination of a github repo, 
 The project is used to automatically submit a job when Thurgood receives a webhook from another project github repo. See the instructions below.
 
 * name - the display name of the project.
-* repo - the :user/:repo that Thurgood will receive the webhook from when new code is pushed, e.g., `jeffdonthemic/github-push-test` 
+* repo - the :user/:repo that Thurgood will receive the webhook from when new code is pushed, e.g., `jeffdonthemic/github-push-test`
 * description - some description of the project.
-* user - The project's owner.
-* job - the job that is submitted when a webhook is received.
+* userId - The id job owner. Set only when the record is created.
+* jobId - the job that is submitted when a webhook is received.
 * createdAt - The datetime the job was created  
 * updatedAt - The datetime the job was last updated.  
 
@@ -84,7 +84,7 @@ Either add files to a `src` directory or create it from your Eclipse project wit
 
 ### Setting up a project
 
-Thurgood can automatically pull code from your project's github and submit a corresponding job each time you make a commit to your project's repo. First, create a new job record with the repo as :user/:repo (e.g., `jeffdonthemic/github-push-test` and then create a job using the id of this newly create project. 
+Thurgood can automatically pull code from your project's github and submit a corresponding job each time you make a commit to your project's repo. First, create a new job record with the repo as :user/:repo (e.g., `jeffdonthemic/github-push-test` and then create a job using the id of this newly create project.
 
 In your project's github repo, make the `squirrelforce` github user a collaborator on your repo and create a webhook for `push` events with the payload URL of `https://[thurgood-production-url]//webhook`. You will also need the `secret` which you can find once you log into Thurgood and click the create new project button.
 
@@ -118,7 +118,7 @@ To run the mocha tests, run the application in one terminal tab:
 
 ```
 source .env
-NODE_ENV=test nodemon .
+NODE_ENV=test node .
 ```
 
 Run the test in another terminal tab:
