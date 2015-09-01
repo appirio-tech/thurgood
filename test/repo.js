@@ -3,6 +3,7 @@ var Promise = require("bluebird");
 var repo = require('../server/libs/repo');
 var properties = require ("properties");
 var path = require("path");
+var appRoot = require('app-root-path');
 var fse = Promise.promisifyAll(require('fs-extra'));
 var should = require('chai').should();
 var assert = require('chai').assert;
@@ -18,7 +19,7 @@ describe('Repo Processor', function() {
     // find a specific job
     app.models.Job.findById('success-submit-job', {include: 'environment'},  function(err, obj){
       job = obj;
-      tmpDir = path.resolve(__dirname, '../app/tmp/' + job.id);
+      tmpDir = path.resolve(appRoot.path, '/tmp/' + job.id);
       fse.ensureDirAsync(tmpDir);
       done();
     });

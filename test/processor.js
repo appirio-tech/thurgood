@@ -5,6 +5,7 @@ var ThurgoodException = require('../server/libs/exception');
 var Promise = require("bluebird");
 var fse = Promise.promisifyAll(require('fs-extra'));
 var path = require("path");
+var appRoot = require('app-root-path');
 var request = require('request');
 var should = require('chai').should();
 var assert = require('chai').assert;
@@ -77,10 +78,10 @@ describe('Job Processor', function() {
     processor.findJobById('download-zip-job')
       .then(processor.downloadZip)
       .then(function(job){
-        // assert there's a /app/tmp/download-zip-job/src directory
-        assert.isTrue(fse.existsSync(path.resolve(__dirname, '../app/tmp', job.id.toString(), 'src')))
+        // assert there's a /tmp/download-zip-job/src directory
+        assert.isTrue(fse.existsSync(path.resolve(appRoot.path, '/tmp', job.id.toString(), 'src')))
         // delete the test directory
-        fse.removeSync(path.resolve(__dirname, '../app/tmp', job.id.toString()));
+        fse.removeSync(path.resolve(appRoot.path, '/tmp', job.id.toString()));
         done();
       });
   });
@@ -90,10 +91,10 @@ describe('Job Processor', function() {
     processor.findJobById('webhook-job')
       .then(processor.downloadZip)
       .then(function(job){
-        // assert there's is no /app/tmp/webhook-job/push-test-master directory
-        assert.isFalse(fse.existsSync(path.resolve(__dirname, '../app/tmp', job.id.toString(), 'push-test-master')))
+        // assert there's is no /tmp/webhook-job/push-test-master directory
+        assert.isFalse(fse.existsSync(path.resolve(appRoot.path, '/tmp', job.id.toString(), 'push-test-master')))
         // delete the test directory
-        fse.removeSync(path.resolve(__dirname, '../app/tmp', job.id.toString()));
+        fse.removeSync(path.resolve(appRoot.path, '/tmp', job.id.toString()));
         done();
       });
   });

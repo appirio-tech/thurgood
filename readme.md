@@ -119,7 +119,7 @@ To run the mocha tests, run the application in one terminal tab:
 
 ```
 source .env
-NODE_ENV=test node .
+NODE_ENV=test nodemon .
 ```
 
 Run the test in another terminal tab:

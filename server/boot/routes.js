@@ -53,7 +53,6 @@ module.exports = function(app) {
     var path = require("path");
     var appRoot = require('app-root-path');
     console.log(appRoot.path);
-    //console.log(path.resolve(appRoot, '../app/tmp'));
     // var queue = require('../../server/libs/queue');
     // queue.submitTest({id: 1});
     res.send('done');

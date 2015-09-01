@@ -6,6 +6,7 @@ var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.S
 var request = require('request');
 var AdmZip = require('adm-zip');
 var path = require("path");
+var appRoot = require('app-root-path');
 var fse = Promise.promisifyAll(require('fs-extra'));
 var ThurgoodException = require('../../server/libs/exception');
 var pt = require('../../server/libs/papertrail');
@@ -132,18 +133,18 @@ module.exports = {
 
     return new Promise(function(resolve, reject) {
       // create the job directory
-      var dir = path.resolve(__dirname, '../../app/tmp/' + job.id.toString());
+      var dir = path.resolve(appRoot.path, '/tmp/' + job.id.toString());
       fse.ensureDirAsync(path.resolve(__dirname, dir));
 
       // download and upzip all contents
       var download = request(job.codeUrl)
-        .pipe(fse.createWriteStream('app/tmp/' + job.id.toString() + '/archive.zip'));
+        .pipe(fse.createWriteStream(dir + '/archive.zip'));
       download.on('finish', function(){
         pt.log('[thurgood] code successfully downloaded.', job.id);
         logger.info('[job-'+job.id+'] code successfully downloaded.');
         try {
-          var zip = new AdmZip('app/tmp/' + job.id.toString() + '/archive.zip');
-          zip.extractAllTo('app/tmp/' + job.id.toString(), true);
+          var zip = new AdmZip(dir + '/archive.zip');
+          zip.extractAllTo(dir, true);
           pt.log('[thurgood] code successfully unzipped.', job.id);
           logger.info('[job-'+job.id+'] code successfully unzipped.');
           // delete the archive file so it doesn't get pushed
@@ -152,7 +153,7 @@ module.exports = {
           * the contents up a folder. When the zip is downloaded
           * from github it is buried inside a folder named after
           * the branch. So the file will be in something like
-          * '/app/tmp/job1/push-test-master' instead of '/app/tmp/job1'.
+          * '/tmp/job1/push-test-master' instead of '/tmp/job1'.
           * We need to move everything up into the tmp dir for
           * for the project so it is a consistent structure.
           */

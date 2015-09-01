@@ -1,4 +1,5 @@
 var path = require("path");
+var appRoot = require('app-root-path');
 var Promise = require("bluebird");
 var fse = Promise.promisifyAll(require('fs-extra'));
 var logger = require('strong-logger');
@@ -67,8 +68,8 @@ queue.process('submit', function (job, done){
        })
     }).finally(function(){
       // clean up after ourselves by deleting downloading directories & keys
-      fse.removeSync(path.resolve(__dirname, '../../app/tmp/' + jobId));
-      fse.removeSync(path.resolve(__dirname, '../../app/tmp/keys/' + jobId));
+      fse.removeSync(path.resolve(appRoot.path, '/tmp/' + jobId));
+      fse.removeSync(path.resolve(appRoot.path, '/tmp/keys/' + jobId));
     });
 });
 

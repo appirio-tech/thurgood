@@ -10,6 +10,7 @@ var fse = Promise.promisifyAll(require('fs-extra'));
 var _ = require('lodash');
 var GitHubApi = require("github");
 var pt = require('../../server/libs/papertrail');
+var appRoot = require('app-root-path');
 
 module.exports = {
 
@@ -25,8 +26,8 @@ module.exports = {
    */
   push: function(job) {
     return new Promise(function(resolve, reject) {
-      var repoDir = path.resolve(__dirname, '../../app/tmp/', job.id.toString());
-      var keysDir = path.resolve(__dirname, '../../app/tmp/keys/', job.id.toString());
+      var repoDir = path.resolve(appRoot.path, '/tmp/', job.id.toString());
+      var keysDir = path.resolve(appRoot.path, '/tmp/keys/', job.id.toString());
       var repository = nodegit.Repository.init(repoDir, 0);
       var remote;
       var index;
