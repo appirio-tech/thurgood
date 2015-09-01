@@ -56,3 +56,29 @@ queue.process('submit', function (job, done){
       fse.removeSync(path.resolve(__dirname, '../../tmp/keys/' + jobId));
     });
 });
+
+/*
+* Submit test job for processing
+*/
+exports.submitTest = function(job){
+ var job = queue.create('test', {
+   job: job
+ });
+
+ job
+   .on('enqueue', function (){
+     logger.info('[test] job has been added to the queue.');
+   })
+   .on('complete', function (){
+     logger.info('[test] job exited the queue successfully.');
+   })
+   .on('failed', function (err){
+     logger.info('[test] job failed in the queue with the following error: ' + err);
+   })
+ job.save();
+}
+
+queue.process('test', function (job, done){
+  logger.info('[test] submitted successfully and finished processing');
+  done && done();
+});
