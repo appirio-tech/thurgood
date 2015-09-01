@@ -50,6 +50,8 @@ module.exports = function(app) {
   })
 
   app.get('/test', function(req, res) {
+    var queue = require('../../server/libs/queue');
+    queue.submitTest({id: 1});
     res.send('done');
   });
 
