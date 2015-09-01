@@ -1,0 +1,122 @@
+<div class="page-header">
+  <button type="button" class="btn btn-primary pull-right" ng-show="action == 'view'" ng-click="editEnvironment(Environment.id)">Edit</button>
+  <button type="button" class="btn btn-primary pull-right back-button" ng-show="action == 'view'" ng-click="back()">BACK</button>
+  <h1>Environment/{{Environment.name || environmentId}}</h1>
+</div>
+
+<div class="alert" ng-class="Shared.alertClass" ng-show="Shared.alertShow">
+  <span>{{ Shared.alertMsg }}</span>
+</div>
+
+<!-- View Container -->
+<div class="well detail" ng-if="action == 'view'">
+  <form class="form-horizontal">
+    <fieldset>
+      <div class="form-group">
+        <span class="col-lg-2 control-label detail-key">Name</span>
+        <span class="col-lg-10 detail-value">{{Environment.name}}</span>
+      </div>
+      <div class="form-group">
+        <span class="col-lg-2 control-label detail-key">Repo</span>
+        <span class="col-lg-10 detail-value">{{Environment.repo}}</span>
+      </div>
+      <div class="form-group">
+        <span class="col-lg-2 control-label detail-key">Type</span>
+        <span class="col-lg-10 detail-value">{{Environment.type}}</span>
+      </div>
+      <div class="form-group">
+        <span class="col-lg-2 control-label detail-key">Status</span>
+        <span class="col-lg-10 detail-value">{{ Environment.status }}</span>
+      </div>
+      <div class="form-group">
+        <span class="col-lg-2 control-label detail-key">Instance Url</span>
+        <span class="col-lg-10 detail-value">
+          <a ng-href="{{ Environment.instanceUrl }}">{{Environment.instanceUrl}}</a>
+        </span>
+      </div>
+      <div class="form-group">
+        <span class="col-lg-2 control-label detail-key">Username</span>
+        <span class="col-lg-10 detail-value">{{Environment.username}}</span>
+      </div>
+      <div class="form-group">
+        <span class="col-lg-2 control-label detail-key">Password</span>
+        <span class="col-lg-10 detail-value">{{Environment.password}}</span>
+      </div>
+      <div class="form-group">
+        <span class="col-lg-2 control-label detail-key">Job Id</span>
+        <span class="col-lg-10 detail-value">{{Environment.jobId}}</span>
+      </div>
+      <div class="form-group">
+        <span class="col-lg-2 control-label detail-key">Created</span>
+        <span class="col-lg-10 detail-value">{{Environment.createdAt | date: 'medium'}}</span>
+      </div>
+      <div class="form-group">
+        <span class="col-lg-2 control-label detail-key">Updated</span>
+        <span class="col-lg-10 detail-value">{{Environment.updatedAt | date: 'medium'}}</span>
+      </div>
+    </fieldset>
+  </form>
+</div>
+
+
+<!-- Create/Edit Container -->
+<div ng-if="action == 'create' || action == 'edit'">
+  <div class="form-horizontal">
+    <div class="form-group">
+      <span class="col-lg-3 control-label mModal-key">Name</span>
+      <div class="col-lg-9">
+        <input type="text" class="form-control mModal-input" ng-model="Environment.name" placeholder="Environment Name">
+      </div>
+    </div>
+    <div class="form-group">
+      <span class="col-lg-3 control-label mModal-key">Repo</span>
+      <div class="col-lg-9">
+        <input type="text" class="form-control mModal-input" ng-model="Environment.repo" placeholder="Environment Repo">
+      </div>
+    </div>
+    <div class="form-group">
+      <span class="col-lg-3 control-label mModal-key">Type</span>
+      <div class="col-lg-9">
+        <select class="form-control mModal-input" ng-model="Environment.type">
+          <option value="salesforce">Salesforce</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <span class="col-lg-3 control-label mModal-key">Status</span>
+      <div class="col-lg-9">
+        <select class="form-control mModal-input" ng-model="Environment.status">
+          <option value="available">Available</option>
+          <option value="reserved">Reserved</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <span class="col-lg-3 control-label mModal-key">Instance Url</span>
+      <div class="col-lg-9">
+        <input type="text" class="form-control mModal-input" ng-model="Environment.instanceUrl" placeholder="Environment Instance Url">
+      </div>
+    </div>
+    <div class="form-group">
+      <span class="col-lg-3 control-label mModal-key">Username</span>
+      <div class="col-lg-9">
+        <input type="text" class="form-control mModal-input" ng-model="Environment.username" placeholder="Environment Username">
+      </div>
+    </div>
+    <div class="form-group">
+      <span class="col-lg-3 control-label mModal-key">Password</span>
+      <div class="col-lg-9">
+        <input type="text" class="form-control mModal-input" ng-model="Environment.password" placeholder="Environment Password">
+      </div>
+    </div>
+    <div class="form-group">
+      <span class="col-lg-3 control-label mModal-key">Job Id</span>
+      <div class="col-lg-9">
+        <input type="text" class="form-control mModal-input" ng-model="Environment.jobId" placeholder="Environment Job Id">
+      </div>
+    </div>
+  </div>
+  <button type="button" class="btn btn-primary pull-right" ng-click="saveEnvironment(Environment)">{{ action == 'create' ? 'CREATE' : 'SAVE' }}</button>
+  <button type="button" class="btn btn-primary pull-right cancel-button" ng-click="cancelEnvironment()">CANCEL</button>
+</div>

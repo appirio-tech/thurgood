@@ -1,0 +1,77 @@
+<div class="page-header">
+    <button type="button" class="btn btn-primary pull-right" ng-show="action == 'view'" ng-click="editProject(Project.id)">Edit</button>
+    <button type="button" class="btn btn-primary pull-right back-button" ng-show="action == 'view'" ng-click="back()">BACK</button>
+    <h1>Project/{{Project.name || projectId}}</h1>
+</div>
+
+<div class="alert" ng-class="Shared.alertClass" ng-show="Shared.alertShow">
+    <span>{{ Shared.alertMsg }}</span>
+</div>
+
+<!-- View Container -->
+<div class="well detail" ng-if="action == 'view'">
+    <form class="form-horizontal">
+        <fieldset>
+            <div class="form-group">
+                <span class="col-lg-2 control-label detail-key">Name</span>
+                <span class="col-lg-10 detail-value">{{Project.name}}</span>
+            </div>
+            <div class="form-group">
+                <span class="col-lg-2 control-label detail-key">Repo</span>
+                <span class="col-lg-10 detail-value">{{Project.repo}}</span>
+            </div>
+            <div class="form-group">
+                <span class="col-lg-2 control-label detail-key">Description</span>
+                <span class="col-lg-10 detail-value">{{ Project.description }}</span>
+            </div>
+            <div class="form-group">
+                <span class="col-lg-2 control-label detail-key">User Id</span>
+                <span class="col-lg-10 detail-value">{{Project.userId}}</span>
+            </div>
+            <div class="form-group">
+                <span class="col-lg-2 control-label detail-key">Job Id</span>
+                <span class="col-lg-10 detail-value">{{Project.jobId}}</span>
+            </div>
+            <div class="form-group">
+                <span class="col-lg-2 control-label detail-key">Created</span>
+                <span class="col-lg-10 detail-value">{{Project.createdAt | date: 'medium'}}</span>
+            </div>
+            <div class="form-group">
+                <span class="col-lg-2 control-label detail-key">Updated</span>
+                <span class="col-lg-10 detail-value">{{Project.updatedAt | date: 'medium'}}</span>
+            </div>
+        </fieldset>
+    </form>
+</div>
+
+<!-- Create/Edit Container -->
+<div ng-if="action == 'create' || action == 'edit'">
+    <div class="form-horizontal">
+        <div class="form-group">
+            <span class="col-lg-3 control-label mModal-key">Name</span>
+            <div class="col-lg-9">
+                <input type="text" class="form-control mModal-input" ng-model="Project.name" placeholder="Project Name">
+            </div>
+        </div>
+        <div class="form-group">
+            <span class="col-lg-3 control-label mModal-key">Repo</span>
+            <div class="col-lg-9">
+                <input type="text" class="form-control mModal-input" ng-model="Project.repo" placeholder="Project Repo">
+            </div>
+        </div>
+        <div class="form-group">
+            <span class="col-lg-3 control-label mModal-key">Description</span>
+            <div class="col-lg-9">
+                <textarea type="text" class="form-control mModal-input" ng-model="Project.description" placeholder="Project Description"></textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <span class="col-lg-3 control-label mModal-key">Job Id</span>
+            <div class="col-lg-9">
+                <input type="text" class="form-control mModal-input" ng-model="Project.jobId" placeholder="Project Job Id">
+            </div>
+        </div>
+    </div>
+    <button type="button" class="btn btn-primary pull-right" ng-click="saveProject(Project)">{{ action == 'create' ? 'CREATE' : 'SAVE' }}</button>
+    <button type="button" class="btn btn-primary pull-right cancel-button" ng-click="cancelProject()">CANCEL</button>
+</div>

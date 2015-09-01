@@ -51,7 +51,6 @@ The testing environment used for a job. This is a combination of a github repo, 
 * name - the display environment's name  
 * repo - the github repo that the job's code is pushed to, e.g., `git@github.com:thurgoodpush/mocha-test`
 * status - the status of the environment. Possible picklist values: `available`, `reserved`.
-* type - The type of environemnt which is used for reserving an environment for a job. Possible picklist values: `salesforce`, `other`. Default is 'other'. At runtime, Thurgood matches the job's type with the environment's type to reserve an environment for processing.
 * instanceUrl - the url for any testing environment, i.e., salesforce login url `https://login.salesforce.com`
 * username - the username for any testing environment
 * password - the password for any testing environment

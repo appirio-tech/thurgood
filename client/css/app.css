@@ -1,0 +1,276 @@
+/* General styles */
+body {
+  margin-top: 50px;
+  font-size: 16px;
+}
+
+footer {
+  margin: 0 0 10px;
+}
+
+h1 {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.nav, .pagination, .carousel a {
+  cursor: pointer;
+}
+
+.hero-spacer {
+  margin-top: 50px;
+}
+
+.hero-feature {
+  margin-bottom: 30px;
+}
+
+.alert {
+  margin-bottom: 0;
+  text-align: center;
+}
+
+.alert h2 {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.s3Upload [type="submit"] {
+  display: none;
+}
+
+.s3Upload .clickArea {
+  width: 100%;
+  height: 43px;
+  overflow: hidden;
+}
+
+.s3Upload .clickArea button {
+  width: 100%;
+  height: 43px;
+}
+
+.s3Upload .clickArea input[type="file"] {
+  width: 60px;
+  height: 43px;
+  opacity: 0;
+  position: absolute;
+}
+
+.s3Upload .clickArea :hover {
+  cursor: pointer;
+}
+
+.s3Upload>div {
+  display: inline-block;
+  width: 86%;
+}
+
+.s3Upload>form {
+  width: 12%;
+  float: right;
+}
+
+@media (max-width: 1200px) {
+  .s3Upload>form {
+    margin-top: 7px;
+  }
+}
+
+@media (max-width: 478px) {
+  .s3Upload>div {
+    width: 78%;
+  }
+
+  .s3Upload>form {
+    width: 20%;
+  }
+}
+
+/* Modal */
+.modal {
+  display: block;
+}
+
+.modal-body:before, .modal-body:after {
+  display: table;
+  content: " ";
+}
+
+.modal-header:before, .modal-header:after {
+  display: table;
+  content: " ";
+}
+
+.modal-content {
+  background-color: rgb(253, 253, 253);
+}
+
+.modal-footer {
+  margin-top: -15px;
+}
+
+.mModal .mModal-key {
+  font-weight: bold;
+  width: 22%;
+}
+
+.mModal h4.delete {
+  margin-bottom: 15px;
+}
+
+@media (max-width: 1200px) {
+  .mModal .mModal-input {
+    margin-top: 7px;
+  }
+}
+
+.mModal h4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.mModal .alert {
+  margin-bottom: 20px
+}
+
+.mModal .alert[ng-show="uploadWarning"] {
+  margin-bottom: 10px;
+}
+
+/* Page header */
+.page-header {
+  padding-bottom: 20px;
+}
+
+.page-header h1 {
+  display: inline;
+}
+
+.page-header .icon-chevron-left {
+  font-size: 27px;
+  margin-right: 5px;
+  vertical-align: text-bottom;
+}
+
+.page-header .back {
+  color: #2c3e50;
+}
+
+.page-header .back :hover {
+  text-decoration: none;
+  color: #1e2a36;
+}
+
+.page-header .search {
+  max-width: 300px;
+  margin-top: 5px;
+}
+
+.page-header .btn {
+  margin-top: 5px;
+  margin-left: 5px;
+}
+
+/* Detail page */
+.detail .detail-value {
+  line-height: 43px;
+}
+
+.detail .detail-key {
+  font-weight: bold;
+}
+
+.detail .form-group {
+  margin-bottom: 0;
+}
+
+/* Loader */
+.loading {
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.loading h2 {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+/* Table */
+.ng-table th.sortable.sort-desc, .ng-table th.sortable.sort-asc {
+  background-color: rgba(20, 52, 68, 0.01);
+}
+
+.table tr [data-title="'Action'"] > .btn {
+  width: 100%;
+}
+
+/* Table pagination */
+.pagination {
+  display: inherit;
+}
+
+.pager {
+  margin-bottom: 10px;
+}
+
+.pager>li>a.btn-pagination {
+  background-color: #2c3e50;
+  border-color: #2c3e50;
+  display: inline-block;
+  padding: 10px 15px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+.pager>li>a.btn-pagination:hover {
+  color: #fff;
+  background-color: #1e2a36;
+  border-color: #161f29;
+}
+
+.pager>li.disabled>a.btn-pagination {
+  background-color: #1e2a36;
+}
+
+.pager>li.disabled>a.btn-pagination:hover {
+  background-color: #1e2a36;
+}
+
+.hand-cursor {
+  cursor: pointer;
+}
+
+
+.navbar .btn.login {
+  margin-top: 10px;
+}
+
+.alert-success a{
+  color: #2B3E50;
+}
+
+.alert{
+  margin-bottom: 20px;
+}
+
+.cancel-button, .back-button{
+  margin-right: 10px;
+}
+
+.environments-wrap td{
+  font-size: 14px;
+}
+
+.jobs-wrap td{
+  font-size: 14px;
+}
+
+.progress-striped{
+  margin-top: 5px;
+}
+
+.pic-wrap{
+  padding-left:25px;
+  padding-bottom:15px;
+}

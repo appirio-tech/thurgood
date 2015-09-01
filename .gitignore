@@ -6,3 +6,5 @@ pids
 dump.rdb
 npm-debug.log
 node_modules
+client/lib
+.idea

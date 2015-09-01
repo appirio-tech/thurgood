@@ -1,0 +1,178 @@
+<div class="page-header">
+    <button type="button" class="btn btn-primary pull-right" ng-if="action == 'view'" ng-click="editJob(Job.id)">
+        Edit
+    </button>
+    <button type="button" class="btn btn-primary pull-right back-button" ng-if="action == 'view'" ng-click="eventViewer(Job.id)">
+        Event Viewer
+    </button>
+    <button type="button" class="btn btn-primary pull-right back-button" ng-if="action == 'view'" ng-disabled="submittingJob" ng-click="submitJob(Job.id)">
+        Submit
+    </button>
+    <h1>Job/{{Job.name || jobId}}</h1>
+</div>
+
+<div class="alert" ng-class="Shared.alertClass" ng-show="Shared.alertShow">
+    <span>{{ Shared.alertMsg }}</span>
+</div>
+
+<!-- View Container -->
+<div class="well detail" ng-if="action == 'view'">
+    <form class="form-horizontal">
+        <fieldset>
+            <div class="form-group">
+                <span class="col-lg-2 control-label detail-key">Name</span>
+                <span class="col-lg-10 detail-value">{{Job.name}}</span>
+            </div>
+            <div class="form-group">
+                <span class="col-lg-2 control-label detail-key">Code Url</span>
+        <span class="col-lg-10 detail-value">
+          <a href="javascript:" ng-click="downloadCode(Job.codeUrl)">{{Job.codeUrl}}</a>
+        </span>
+            </div>
+            <div class="form-group">
+                <span class="col-lg-2 control-label detail-key">Type</span>
+                <span class="col-lg-10 detail-value">{{ Job.type }}</span>
+            </div>
+            <div class="form-group">
+                <span class="col-lg-2 control-label detail-key">Status</span>
+                <span class="col-lg-10 detail-value">{{Job.status}}</span>
+            </div>
+            <div class="form-group">
+                <span class="col-lg-2 control-label detail-key">Start Time</span>
+                <span class="col-lg-10 detail-value">{{Job.startTime | date: 'medium'}}</span>
+            </div>
+            <div class="form-group">
+                <span class="col-lg-2 control-label detail-key">End Time</span>
+                <span class="col-lg-10 detail-value">{{Job.endTime | date: 'medium'}}</span>
+            </div>
+            <div class="form-group">
+                <span class="col-lg-2 control-label detail-key">Notification</span>
+                <span class="col-lg-10 detail-value">{{Job.notification}}</span>
+            </div>
+            <div class="form-group">
+                <span class="col-lg-2 control-label detail-key">Steps</span>
+                <span class="col-lg-10 detail-value">{{Job.steps}}</span>
+            </div>
+            <div class="form-group">
+                <span class="col-lg-2 control-label detail-key">User Id</span>
+                <span class="col-lg-10 detail-value">{{Job.userId}}</span>
+            </div>
+            <div class="form-group">
+                <span class="col-lg-2 control-label detail-key">Project Id</span>
+                <span class="col-lg-10 detail-value">{{Job.projectId}}</span>
+            </div>
+            <div class="form-group">
+                <span class="col-lg-2 control-label detail-key">Environment Id</span>
+                <span class="col-lg-10 detail-value">{{Job.environmentId}}</span>
+            </div>
+            <div class="form-group">
+                <span class="col-lg-2 control-label detail-key">Created</span>
+                <span class="col-lg-10 detail-value">{{Job.createdAt | date: 'medium'}}</span>
+            </div>
+            <div class="form-group">
+                <span class="col-lg-2 control-label detail-key">Updated</span>
+                <span class="col-lg-10 detail-value">{{Job.updatedAt | date: 'medium'}}</span>
+            </div>
+        </fieldset>
+    </form>
+</div>
+
+
+<!-- Papertrail Submission -->
+<form action="https://papertrailapp.com/distributors/session" method="post" id="papertrail" class="hide">
+    <input type="hidden" name="account_id" value="{{Job.userId}}">
+    <input type="hidden" name="user_id" value="{{Job.userId}}">
+    <input type="hidden" name="timestamp" value="{{token.timestamp}}">
+    <input type="hidden" name="token" value="{{token.token}}">
+    <input type="hidden" name="distributor" value="{{token.distributor}}">
+    <input type="hidden" name="email" value="{{Job.email}}">
+    <input type="hidden" name="system_id" value="{{token.system}}">
+</form>
+
+
+<!-- Create/Edit Container -->
+<div ng-if="action == 'create' || action == 'edit'">
+    <div class="form-horizontal">
+        <div class="form-group">
+            <span class="col-lg-3 control-label mModal-key">Name</span>
+            <div class="col-lg-9">
+                <input type="text" class="form-control mModal-input" ng-model="Job.name" placeholder="Job Name">
+            </div>
+        </div>
+
+        <!-- S3 Upload Form -->
+        <div class="form-group">
+            <span class="col-lg-3 control-label mModal-key">Code URL</span>
+            <div class="col-lg-9 s3Upload">
+                <div>
+                    <input type="text" class="form-control mModal-input" ng-model="Job.codeUrl" placeholder="Code URL">
+                </div>
+                <form>
+                    <div class="clickArea">
+                        <input name="file" type="file" id="file" class="hide" onchange="angular.element(this).scope().upload(this.files[0])" />
+                        <button class="btn btn-primary" ng-click="uploadFile()" ng-disabled="percent">UPLOAD</button>
+                    </div>
+                    <div class="progress progress-striped active" ng-show="percent">
+                        <div class="progress-bar" ng-style="{ 'width': percent }"></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- S3 Upload Form -->
+
+        <div class="form-group">
+            <span class="col-lg-3 control-label mModal-key">Type</span>
+            <div class="col-lg-9">
+                <select class="form-control mModal-input" ng-model="Job.type">
+                    <option value="salesforce">Salesforce</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <span class="col-lg-3 control-label mModal-key">Steps</span>
+            <div class="col-lg-9">
+                <select class="form-control mModal-input" ng-model="Job.steps">
+                    <option value="scan">Scan</option>
+                    <option value="all" ng-if="Job.type == 'salesforce'">All</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <span class="col-lg-3 control-label mModal-key">Status</span>
+            <div class="col-lg-9">
+                <select class="form-control mModal-input" ng-model="Job.status">
+                    <option value="created">Created</option>
+                    <option value="in progress">In Progress</option>
+                    <option value="complete">Complete</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <span class="col-lg-3 control-label mModal-key">Notification</span>
+            <div class="col-lg-9">
+                <select class="form-control mModal-input" ng-model="Job.notification">
+                    <option value="email">Email</option>
+                    <option value="null">None</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <span class="col-lg-3 control-label mModal-key">Project Id</span>
+            <div class="col-lg-9">
+                <input type="text" class="form-control mModal-input" ng-model="Job.projectId" placeholder="Job Project Id">
+            </div>
+        </div>
+        <div class="form-group">
+            <span class="col-lg-3 control-label mModal-key">Environment Id</span>
+            <div class="col-lg-9">
+                <input type="text" class="form-control mModal-input" ng-model="Job.environmentId" placeholder="Job Environment Id">
+            </div>
+        </div>
+
+    </div>
+    <button type="button" class="btn btn-primary pull-right" ng-click="saveJob(Job)" ng-disabled="percent">
+        {{ action == 'create' ? 'CREATE' : 'SAVE' }}
+    </button>
+    <button type="button" class="btn btn-primary pull-right cancel-button" ng-click="cancelJob()">CANCEL</button>
+</div>

@@ -364,11 +364,6 @@ before(function(done) {
       .then(function(jobs) {
         createEnvironments(jobs);
       })
-      // .then(function() {
-      //   return User.find({}, function(err, users) {
-      //     console.log(users);
-      //   });
-      // })
       .finally(function() {
         done();
       })
