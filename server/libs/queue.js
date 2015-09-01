@@ -1,5 +1,3 @@
-var kue = require('kue');
-var queue = kue.createQueue();
 var path = require("path");
 var Promise = require("bluebird");
 var fse = Promise.promisifyAll(require('fs-extra'));
@@ -8,6 +6,23 @@ var processor = require('./processor');
 var repo = require('./repo');
 var github = require('./github');
 var pt = require('../../server/libs/papertrail');
+
+var url = require('url');
+var kue = require('kue');
+
+if (process.env.REDIS_URL) {
+  var redisURL = url.parse(process.env.REDIS_URL);
+  var queue = kue.createQueue({
+    prefix: 'q',
+    redis: {
+      port: redisURL.port,
+      host: redisURL.hostname,
+      auth: redisURL.auth.split(":")[1]
+    }
+  });
+} else {
+  var queue = kue.createQueue();
+}
 
 /*
 * Submit job for processing
