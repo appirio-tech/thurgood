@@ -62,7 +62,7 @@ queue.process('submit', function (job, done){
     }).catch(function(err) {
       // rollback the job and environment to previous state if there was an error
       processor.rollback(jobId)
-        .then(sendJobErrorMail)
+        .then(processor.sendJobErrorMail)
         .then(function(){
          return done(err);
        })
