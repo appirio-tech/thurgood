@@ -17,7 +17,7 @@ module.exports = {
    */
   addJobProperties: function(job) {
     return new Promise(function(resolve, reject) {
-      var repoDir = path.resolve(__dirname, '../../tmp/' + job.id.toString());
+      var repoDir = path.resolve(__dirname, '../../app/tmp/' + job.id.toString());
       var settings = {
         JOB_ID: job.id,
         SFDC_DEPLOY: job.type.toLowerCase() === 'salesforce' && job.steps.toLowerCase() === 'all'
@@ -39,7 +39,7 @@ module.exports = {
   addBuildProperties: function(job) {
     return new Promise(function(resolve, reject) {
       if (job.type.toLowerCase() === 'salesforce' && job.steps.toLowerCase() === 'all') {
-        var repoDir = path.resolve(__dirname, '../../tmp/' + job.id.toString());
+        var repoDir = path.resolve(__dirname, '../../app/tmp/' + job.id.toString());
         if (job.environment){
           var settings = {
             'sf.username': job.environment().username,
@@ -68,7 +68,7 @@ module.exports = {
   addShellAssets: function(job) {
     return new Promise(function(resolve, reject) {
       if (job.type.toLowerCase() === 'salesforce' && job.steps.toLowerCase() === 'all') {
-        var repoDir = path.resolve(__dirname, '../../tmp/' + job.id.toString());
+        var repoDir = path.resolve(__dirname, '../../app/tmp/' + job.id.toString());
         var apexDir = path.resolve(__dirname, '../../shells/apex');
         fse.copyAsync(apexDir + '/lib', repoDir + '/lib')
           .then(fse.copyAsync(apexDir + '/undeploy', repoDir + '/undeploy'))

@@ -18,7 +18,7 @@ describe('Repo Processor', function() {
     // find a specific job
     app.models.Job.findById('success-submit-job', {include: 'environment'},  function(err, obj){
       job = obj;
-      tmpDir = path.resolve(__dirname, '../tmp/' + job.id);
+      tmpDir = path.resolve(__dirname, '../app/tmp/' + job.id);
       fse.ensureDirAsync(tmpDir);
       done();
     });

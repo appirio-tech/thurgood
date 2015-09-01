@@ -25,8 +25,8 @@ module.exports = {
    */
   push: function(job) {
     return new Promise(function(resolve, reject) {
-      var repoDir = path.resolve(__dirname, '../../tmp/', job.id.toString());
-      var keysDir = path.resolve(__dirname, '../../tmp/keys/', job.id.toString());
+      var repoDir = path.resolve(__dirname, '../../app/tmp/', job.id.toString());
+      var keysDir = path.resolve(__dirname, '../../app/tmp/keys/', job.id.toString());
       var repository = nodegit.Repository.init(repoDir, 0);
       var remote;
       var index;

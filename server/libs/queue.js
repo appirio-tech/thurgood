@@ -67,8 +67,8 @@ queue.process('submit', function (job, done){
        })
     }).finally(function(){
       // clean up after ourselves by deleting downloading directories & keys
-      fse.removeSync(path.resolve(__dirname, '../../tmp/' + jobId));
-      fse.removeSync(path.resolve(__dirname, '../../tmp/keys/' + jobId));
+      fse.removeSync(path.resolve(__dirname, '../../app/tmp/' + jobId));
+      fse.removeSync(path.resolve(__dirname, '../../app/tmp/keys/' + jobId));
     });
 });
 
