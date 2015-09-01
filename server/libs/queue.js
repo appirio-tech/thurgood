@@ -44,7 +44,7 @@ exports.submitJob = function(job){
    })
    .on('failed', function (err){
      pt.log('[queue] job failed in the queue with the following error: ' + err, job.data.job.id);
-     logger.info('[job-'+job.data.job.id+'] job failed in the queue with the following error: ' + err);
+     logger.error('[job-'+job.data.job.id+'] job failed in the queue with the following error: ' + err);
    })
  job.save();
 }
@@ -60,6 +60,7 @@ queue.process('submit', function (job, done){
     .then(function() {
       done && done();
     }).catch(function(err) {
+      logger.error('[job-'+jobId+'] queue error: ' + err);
       // rollback the job and environment to previous state if there was an error
       processor.rollback(jobId)
         .then(processor.sendJobErrorMail)
