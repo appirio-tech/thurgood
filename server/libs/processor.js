@@ -188,7 +188,7 @@ module.exports = {
       if (process.env.NODE_ENV === 'production' && job.notification === 'email') {
         var subject = 'Job ' + job.id + ' Complete';
         var text = 'Your Thurgood job has been completed. You can view the job logs at ' + process.env.APP_URL + '/#/jobs/'+job.id+'/events.'
-        mailer(job.user().email, subject, text)
+        mailer(job.id, job.user().email, subject, text)
           .then(function(){
             resolve(job);
           })
@@ -210,7 +210,7 @@ module.exports = {
       if (process.env.NODE_ENV === 'production') {
         var subject = 'Job ' + job.id + ' in Process';
         var text = 'Congrats! Your Thurgood job is now in process. You can view the job logs at ' + process.env.APP_URL + '/#/jobs/'+job.id+'/events.'
-        mailer(job.user().email, subject, text)
+        mailer(job.id, job.user().email, subject, text)
           .then(function(){
             resolve(job);
           })
@@ -234,7 +234,7 @@ module.exports = {
           if (!err && job) {
             var subject = 'Error! Job ' + jobId;
             var text = 'Drats! An error occurred while processing your job.  You can view the job logs at ' + process.env.APP_URL + '/#/jobs/'+jobId+'/events.'
-            mailer(job.user().email, subject, text)
+            mailer(job.id, job.user().email, subject, text)
               .then(function(){
                 resolve(jobId);
               })
@@ -290,7 +290,7 @@ module.exports = {
 
 }
 
-var mailer = function(to, subject, text){
+var mailer = function(jobId, to, subject, text){
   return new Promise(function(resolve, reject) {
     sendgrid.send({
       to:       to,
@@ -299,7 +299,10 @@ var mailer = function(to, subject, text){
       text:     text
     }, function(err, json) {
       if (err) reject(err);
-      if (!err) resolve;
+      if (!err) {
+        logger.info('[job-'+jobId+'] email sent to ' + to + ' with subject: ' + subject);
+        resolve;
+      }
     });
   });
 }
