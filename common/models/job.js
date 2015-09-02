@@ -28,13 +28,19 @@ module.exports = function(Job) {
   // the actual function called by the route to do the work
   Job.message = function(id, message, sender, cb) {
     Job.findById(id, function(err, job){
-      if (err) cb(err);
-      if (!err) {
+      if (!err && job) {
         pt.log('[' +sender+ '] ' + message, job.id);
         logger.info('[job-'+job.id+']['+sender+'] ' + message);
         var msg = {
           success: true,
           message: 'Message sent to logger'
+        }
+        cb(null, msg);
+      } else {
+        logger.error('[job-'+id+']['+sender+'] could not find job for message!!');
+        var msg = {
+          success: false,
+          message: 'Job not found for message'
         }
         cb(null, msg);
       }
