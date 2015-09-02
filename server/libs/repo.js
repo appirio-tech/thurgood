@@ -21,6 +21,7 @@ module.exports = {
       var repoDir = path.resolve(appRoot.path, '/tmp/' + job.id.toString());
       var settings = {
         JOB_ID: job.id,
+        THURGOOD_URL: process.env.APP_URL,
         SFDC_DEPLOY: job.type.toLowerCase() === 'salesforce' && job.steps.toLowerCase() === 'all'
       };
       properties.stringify(settings, {path: repoDir + '/job.properties'}, function(err, results) {
