@@ -185,17 +185,22 @@ module.exports = {
    */
   sendJobCompleteMail: function(job) {
     return new Promise(function(resolve, reject) {
-      if (process.env.NODE_ENV === 'production' && job.notification === 'email') {
-        var subject = 'Job ' + job.id + ' Complete';
-        var text = 'Your Thurgood job has been completed. You can view the job logs at ' + process.env.APP_URL + '/#/jobs/'+job.id+'/events.'
-        mailer(job.id, job.user().email, subject, text)
-          .then(function(){
+      app.models.Job.findById(job.id, {include: ['user']}, function(err, job){
+        if (!err && job) {
+          if (process.env.NODE_ENV === 'production' && job.notification === 'email') {
+            var subject = 'Job ' + job.id + ' Complete';
+            var text = 'Your Thurgood job has been completed. You can view the job logs at ' + process.env.APP_URL + '/#/jobs/'+job.id+'/events.'
+            mailer(job.id, job.user().email, subject, text)
+              .then(function(){
+                resolve(job);
+              })
+          } else {
+            logger.info('[job-'+job.id+'][fake] sending job complete email to ' + job.user().email);
             resolve(job);
-          })
-      } else {
-        logger.info('[job-'+job.id+'][fake] sending job complete email to ' + job.user().email);
-        resolve(job);
-      }
+          }
+        }
+        if (err) reject(err);
+      });
     });
   },
 
@@ -207,44 +212,49 @@ module.exports = {
    */
   sendJobSubmittedMail: function(job) {
     return new Promise(function(resolve, reject) {
-      if (process.env.NODE_ENV === 'production') {
-        var subject = 'Job ' + job.id + ' in Process';
-        var text = 'Congrats! Your Thurgood job is now in process. You can view the job logs at ' + process.env.APP_URL + '/#/jobs/'+job.id+'/events.'
-        mailer(job.id, job.user().email, subject, text)
-          .then(function(){
+      app.models.Job.findById(job.id, {include: ['user']}, function(err, job){
+        if (!err && job) {
+          if (process.env.NODE_ENV === 'production') {
+            var subject = 'Job ' + job.id + ' in Process';
+            var text = 'Congrats! Your Thurgood job is now in process. You can view the job logs at ' + process.env.APP_URL + '/#/jobs/'+job.id+'/events.'
+            mailer(job.id, job.user().email, subject, text)
+              .then(function(){
+                resolve(job);
+              })
+          } else {
+            logger.info('[job-'+job.id+'][fake] sending job in process email to ' + job.user().email);
             resolve(job);
-          })
-      } else {
-        logger.info('[job-'+job.id+'][fake] sending job in process email to ' + job.user().email);
-        resolve(job);
-      }
+          }
+        }
+        if (err) reject(err);
+      });
     });
   },
 
   /**
    * Sends 'Job Error' notification if mode is production.
    *
-   * @param <Job> job
+   * @param <String> jobId
    * @return <Job> job
    */
   sendJobErrorMail: function(jobId) {
     return new Promise(function(resolve, reject) {
-      if (process.env.NODE_ENV === 'production') {
-        app.models.Job.findById(jobId, {include: ['user']}, function(err, job){
-          if (!err && job) {
+      app.models.Job.findById(jobId, {include: ['user']}, function(err, job){
+        if (!err && job) {
+          if (process.env.NODE_ENV === 'production') {
             var subject = 'Error! Job ' + jobId;
             var text = 'Drats! An error occurred while processing your job.  You can view the job logs at ' + process.env.APP_URL + '/#/jobs/'+jobId+'/events.'
             mailer(job.id, job.user().email, subject, text)
               .then(function(){
-                resolve(jobId);
+                resolve(job);
               })
+          } else {
+            logger.info('[job-'+job.id+'][fake] sending job error email to ' + job.user().email);
+            resolve(job);
           }
-          if (err) reject(err);
-        });
-      } else {
-        logger.info('[job-'+job.id+'][fake] sending job error email to ' + job.user().email);
-        resolve(job);
-      }
+        }
+        if (err) reject(err);
+      });
     });
   },
 
@@ -268,6 +278,7 @@ module.exports = {
         job.updateAttributes(attributes, function(err, job){
           if (err) reject(err);
           if (!err) {
+            logger.info('[job-'+id+'] job rolled back due to error');
             app.models.Environment.findOne({where: {jobId: id}}, function(err, environment){
               if (err) reject(err);
               if (environment && !err) {
@@ -278,7 +289,10 @@ module.exports = {
                 }
                 environment.updateAttributes(attributes, function(err, environment){
                   if (err) reject(err);
-                  if (!err) resolve(id);
+                  if (!err) {
+                    logger.info('[job-'+id+'] environment rolled back due to error');
+                    resolve(id);
+                  }
                 });
               }
             });
