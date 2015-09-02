@@ -3,7 +3,7 @@ var kue = require('kue').createQueue();
 var Promise = require("bluebird");
 var expect = require('chai').expect;
 
-describe.only('Queue', function() {
+describe('Queue', function() {
 
   var job;
 

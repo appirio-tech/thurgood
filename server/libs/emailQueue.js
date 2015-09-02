@@ -1,13 +1,5 @@
-var path = require("path");
 var appRoot = require('app-root-path');
-var Promise = require("bluebird");
-var fse = Promise.promisifyAll(require('fs-extra'));
 var logger = require('strong-logger');
-var github = require(appRoot + '/server/libs/github');
-var processor = require(appRoot + '/server/libs/processor');
-var repo = require(appRoot + '/server/libs/repo');
-var github = require(appRoot + '/server/libs/github');
-var pt = require(appRoot + '/server/libs/papertrail');
 var app = require(appRoot + '/server/server.js');
 var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
 
