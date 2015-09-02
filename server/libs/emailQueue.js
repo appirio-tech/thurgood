@@ -65,7 +65,7 @@ queue.process('sendMail', function (job, done){
             text:     job.data.text
           }, function(err, json) {
             if (!err) {
-              logger.info('[job-'+jobId+'] email sent to ' + to + ' with subject: ' + subject);
+              logger.info('[job-'+jobId+'] email sent to ' + rec.user().email + ' with subject: ' + subject);
               done(null, 'Email sent.');
             } else {
               logger.error('[job-'+jobId+'] error sending with sendgrid: ' + err);
