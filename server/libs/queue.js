@@ -68,7 +68,7 @@ queue.process('submit', function (job, done){
     .then(github.push)
     .then(processor.sendJobSubmittedMail)
     .then(function() {
-      done(null, 'Code successfully pushed to github for processing.');
+      done();
     }).catch(function(err) {
       logger.error('[job-'+jobId+'] queue error: ' + err);
       // rollback the job and environment to previous state if there was an error
