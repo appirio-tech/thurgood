@@ -57,7 +57,9 @@ queue.process('submit', function (job, done){
     .then(repo.addShellAssets)
     .then(github.push)
     .then(processor.sendJobSubmittedMail)
-    .then(function() {
+    .then(function(j) {
+      console.log('queue is done');
+      console.log(j);
       done();
     }).catch(function(err) {
       logger.error('[job-'+jobId+'] queue error: ' + err);
