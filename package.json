@@ -6,6 +6,9 @@
     "test": "NODE_ENV=test mocha --reporter spec",
     "start": "node ."
   },
+  "engines": {
+     "node": "0.10.x"
+   },  
   "dependencies": {
     "adm-zip": "^0.4.7",
     "app-root-path": "^1.0.0",

@@ -30,6 +30,7 @@ if (process.env.REDIS_URL) {
 */
 exports.submitJob = function(job){
  var job = queue.create('submit', {
+   title: 'job ' + job.id,
    job: job
  });
 
@@ -51,6 +52,8 @@ exports.submitJob = function(job){
 
 queue.process('submit', function (job, done){
   var jobId = job.data.job.id;
+  pt.log('[queue] job has started processing.', jobId);
+  logger.info('[job-'+jobId+'] job has started processing.');  
   processor.downloadZip(job.data.job)
     .then(repo.addJobProperties)
     .then(repo.addBuildProperties)
