@@ -26,6 +26,13 @@ if (process.env.REDIS_URL) {
 }
 
 /*
+* Watch for any errors in the queue
+*/
+queue.on( 'error', function( err ) {
+  logger.error('The queue threw an error: ' + error);
+});
+
+/*
 * Submit job for processing
 */
 exports.submitJob = function(job){
