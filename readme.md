@@ -22,6 +22,8 @@ Thurgood is a multi-part application. Here is a high level overview of the appli
 
 * The Jenkins account below is currently using the cxcloud.com server for scanning code. Once the Appirio Checkmarx server is running on AWS, the Checkmarx plugin in Jenkins needs to be updated with this URL.
 * Change the password for https://cxcloudscan.com/cxwebclient (jeff@appirio.com).
+* Post link to Thurgood queue
+* Upload to new repos
 
 
 ## Jenkins & Checkmark

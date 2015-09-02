@@ -107,7 +107,7 @@ module.exports = function(Job) {
   Job.remoteMethod(
     'complete',
     {
-      http: {path: '/:id/complete', verb: 'get'},
+      http: {path: '/:id/complete', verb: 'put'},
       accepts: [
         {arg: 'id', type: 'string', required: true, http: { source: 'path' }}
       ],

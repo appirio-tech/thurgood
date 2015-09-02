@@ -100,8 +100,8 @@ describe('Authenticated User', function() {
     .end(done);
   });
 
-  it('marks a job as complete', function(done) {
-    api.get('/jobs/complete-job/complete?access_token='+accessToken)
+  it.only('marks a job as complete', function(done) {
+    api.put('/jobs/complete-job/complete?access_token='+accessToken)
     .expect(200)
     .expect(function (res) {
       assert.equal(res.body.status, 'complete');
