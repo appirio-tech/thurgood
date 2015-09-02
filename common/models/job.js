@@ -4,7 +4,7 @@ var Promise = require("bluebird");
 var logger = require('strong-logger');
 var path = require("path");
 var processor = require('../../server/libs/processor');
-var queue = require('../../server/libs/queue');
+var queue = require('../../server/libs/jobQueue');
 var ThurgoodException = require('../../server/libs/exception');
 var pt = require('../../server/libs/papertrail');
 
@@ -61,8 +61,8 @@ module.exports = function(Job) {
      })
      .then(processor.reserveEnvironment)
      .then(function(job) {
-       // push to queue
-       queue.submitJob(job);
+       // push to queue if not in test environment (mocha)
+       if (process.env.NODE_ENV !== 'test') queue.submitJob(job);
        processor.updateJob(job, {status: 'in progress', startTime: new Date(), endTime: null, updatedAt: new Date()})
          .then(function(job) {
            var msg = {

@@ -2,7 +2,6 @@
 
 var Promise = require("bluebird");
 var logger = require('strong-logger');
-var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
 var request = require('request');
 var AdmZip = require('adm-zip');
 var path = require("path");
@@ -10,6 +9,7 @@ var appRoot = require('app-root-path');
 var fse = Promise.promisifyAll(require('fs-extra'));
 var ThurgoodException = require('../../server/libs/exception');
 var pt = require('../../server/libs/papertrail');
+var emailQueue = require('../../server/libs/emailQueue');
 
 var app = require('../../server/server.js');
 
@@ -185,22 +185,10 @@ module.exports = {
    */
   sendJobCompleteMail: function(job) {
     return new Promise(function(resolve, reject) {
-      app.models.Job.findById(job.id, {include: ['user']}, function(err, job){
-        if (!err && job) {
-          if (process.env.NODE_ENV === 'production' && job.notification === 'email') {
-            var subject = 'Job ' + job.id + ' Complete';
-            var text = 'Your Thurgood job has been completed. You can view the job logs at ' + process.env.APP_URL + '/#/jobs/'+job.id+'/events.'
-            mailer(job.id, job.user().email, subject, text)
-              .then(function(){
-                resolve(job);
-              })
-          } else {
-            logger.info('[job-'+job.id+'][fake] sending job complete email to ' + job.user().email);
-            resolve(job);
-          }
-        }
-        if (err) reject(err);
-      });
+      var subject = 'Job ' + job.id + ' Complete';
+      var text = 'Your Thurgood job has been completed. You can view the job logs at ' + process.env.APP_URL + '/#/jobs/'+job.id+'/events.'
+      emailQueue.sendMail(job.id, subject, text);
+      resolve(job);
     });
   },
 
@@ -212,22 +200,10 @@ module.exports = {
    */
   sendJobSubmittedMail: function(job) {
     return new Promise(function(resolve, reject) {
-      app.models.Job.findById(job.id, {include: ['user']}, function(err, job){
-        if (!err && job) {
-          if (process.env.NODE_ENV === 'production') {
-            var subject = 'Job ' + job.id + ' in Process';
-            var text = 'Congrats! Your Thurgood job is now in process. You can view the job logs at ' + process.env.APP_URL + '/#/jobs/'+job.id+'/events.'
-            mailer(job.id, job.user().email, subject, text)
-              .then(function(){
-                resolve(job);
-              })
-          } else {
-            logger.info('[job-'+job.id+'][fake] sending job in process email to ' + job.user().email);
-            resolve(job);
-          }
-        }
-        if (err) reject(err);
-      });
+      var subject = 'Job ' + job.id + ' in Process';
+      var text = 'Congrats! Your Thurgood job is now in process. You can view the job logs at ' + process.env.APP_URL + '/#/jobs/'+job.id+'/events.'
+      emailQueue.sendMail(job.id, subject, text);
+      resolve(job);
     });
   },
 
@@ -239,22 +215,10 @@ module.exports = {
    */
   sendJobErrorMail: function(jobId) {
     return new Promise(function(resolve, reject) {
-      app.models.Job.findById(jobId, {include: ['user']}, function(err, job){
-        if (!err && job) {
-          if (process.env.NODE_ENV === 'production') {
-            var subject = 'Error! Job ' + jobId;
-            var text = 'Drats! An error occurred while processing your job.  You can view the job logs at ' + process.env.APP_URL + '/#/jobs/'+jobId+'/events.'
-            mailer(job.id, job.user().email, subject, text)
-              .then(function(){
-                resolve(job);
-              })
-          } else {
-            logger.info('[job-'+job.id+'][fake] sending job error email to ' + job.user().email);
-            resolve(job);
-          }
-        }
-        if (err) reject(err);
-      });
+      var subject = 'Error! Job ' + jobId;
+      var text = 'Drats! An error occurred while processing your job.  You can view the job logs at ' + process.env.APP_URL + '/#/jobs/'+jobId+'/events.'
+      emailQueue.sendMail(jobId, subject, text);
+      resolve(jobId);
     });
   },
 
@@ -302,21 +266,4 @@ module.exports = {
     });
   },
 
-}
-
-var mailer = function(jobId, to, subject, text){
-  return new Promise(function(resolve, reject) {
-    sendgrid.send({
-      to:       to,
-      from:     'Thurgood',
-      subject:  subject,
-      text:     text
-    }, function(err, json) {
-      if (err) reject(err);
-      if (!err) {
-        logger.info('[job-'+jobId+'] email sent to ' + to + ' with subject: ' + subject);
-        resolve;
-      }
-    });
-  });
 }

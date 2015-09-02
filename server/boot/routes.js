@@ -50,11 +50,6 @@ module.exports = function(app) {
   })
 
   app.get('/test', function(req, res) {
-    var path = require("path");
-    var appRoot = require('app-root-path');
-    console.log(appRoot.path);
-    // var queue = require('../../server/libs/queue');
-    // queue.submitTest({id: 1});
     res.send('done');
   });
 

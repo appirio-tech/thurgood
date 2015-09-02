@@ -1,10 +1,9 @@
 var processor = require('../server/libs/processor');
-var queue = require('../server/libs/queue');
 var kue = require('kue').createQueue();
 var Promise = require("bluebird");
 var expect = require('chai').expect;
 
-describe('Queue', function() {
+describe.only('Queue', function() {
 
   var job;
 
@@ -33,6 +32,13 @@ describe('Queue', function() {
     expect(kue.testMode.jobs.length).to.eql(1);
     expect(kue.testMode.jobs[0].type).to.equal('submit');
     expect(kue.testMode.jobs[0].data).to.eql(job);
+    done();
+  });
+
+  it('adds email job to queue successfully', function(done) {
+    kue.createJob('sendMail', job.id, 'Some Subject', 'Some Text').save();
+    expect(kue.testMode.jobs.length).to.eql(1);
+    expect(kue.testMode.jobs[0].type).to.equal('sendMail');
     done();
   });
 
