@@ -53,7 +53,7 @@ exports.submitJob = function(job){
 queue.process('submit', function (job, done){
   var jobId = job.data.job.id;
   pt.log('[queue] job has started processing.', jobId);
-  logger.info('[job-'+jobId+'] job has started processing.');  
+  logger.info('[job-'+jobId+'] job has started processing.');
   processor.downloadZip(job.data.job)
     .then(repo.addJobProperties)
     .then(repo.addBuildProperties)
@@ -61,7 +61,7 @@ queue.process('submit', function (job, done){
     .then(github.push)
     .then(processor.sendJobSubmittedMail)
     .then(function() {
-      done();
+      done(null, 'Code successfully pushed to github for processing.');
     }).catch(function(err) {
       logger.error('[job-'+jobId+'] queue error: ' + err);
       // rollback the job and environment to previous state if there was an error
