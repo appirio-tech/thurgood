@@ -40,7 +40,7 @@ exports.submitJob = function(job){
    })
    .on('complete', function (){
      pt.log('[queue] job exited the queue successfully.', job.data.job.id);
-     logger.info('[job-'+job.data.job.id+'] job exited the queue successfully.');
+     logger.info('[job-'+job.data.job.id+'] job completed the queue successfully.');
    })
    .on('failed', function (err){
      pt.log('[queue] job failed in the queue with the following error: ' + err, job.data.job.id);
@@ -57,9 +57,7 @@ queue.process('submit', function (job, done){
     .then(repo.addShellAssets)
     .then(github.push)
     .then(processor.sendJobSubmittedMail)
-    .then(function(j) {
-      console.log('queue is done');
-      console.log(j);
+    .then(function() {
       done();
     }).catch(function(err) {
       logger.error('[job-'+jobId+'] queue error: ' + err);
