@@ -40,24 +40,29 @@ module.exports = {
    */
   addBuildProperties: function(job) {
     return new Promise(function(resolve, reject) {
-      if (job.type.toLowerCase() === 'salesforce' && job.steps.toLowerCase() === 'all') {
-        var repoDir = path.resolve(appRoot.path, '/tmp/' + job.id.toString());
-        if (job.environment){
-          var settings = {
-            'sf.username': job.environment().username,
-            'sf.password': job.environment().password,
-            'sf.serverurl': job.environment().instanceUrl
-          };
-          properties.stringify(settings, {path: repoDir + '/build.properties'}, function(err, results) {
-            if (err) reject(err);
-            if (!err) resolve(job);
-          });
-        } else {
-          reject('No environment assigned to job');
+      app.models.Job.findById(job.id, {include: ['environment','user']}, function(err, job){
+        if (!err && job) {
+          if (job.type.toLowerCase() === 'salesforce' && job.steps.toLowerCase() === 'all') {
+            var repoDir = path.resolve(appRoot.path, '/tmp/' + job.id.toString());
+            if (job.environment){
+              var settings = {
+                'sf.username': job.environment().username,
+                'sf.password': job.environment().password,
+                'sf.serverurl': job.environment().instanceUrl
+              };
+              properties.stringify(settings, {path: repoDir + '/build.properties'}, function(err, results) {
+                if (err) reject(err);
+                if (!err) resolve(job);
+              });
+            } else {
+              reject('No environment assigned to job');
+            }
+          } else {
+            resolve(job);
+          }
         }
-      } else {
-        resolve(job);
-      }
+        if (err) reject(err);
+      });
     });
   },
 
@@ -71,7 +76,7 @@ module.exports = {
     return new Promise(function(resolve, reject) {
       if (job.type.toLowerCase() === 'salesforce' && job.steps.toLowerCase() === 'all') {
         var repoDir = path.resolve(appRoot.path, '/tmp/' + job.id.toString());
-        var apexDir = path.resolve(appRoot.path, '/shells/apex');
+        var apexDir = path.resolve(appRoot.path, 'shells/apex');
         fse.copyAsync(apexDir + '/lib', repoDir + '/lib')
           .then(fse.copyAsync(apexDir + '/undeploy', repoDir + '/undeploy'))
           .then(fse.copyAsync(apexDir + '/build.xml', repoDir + '/build.xml'))

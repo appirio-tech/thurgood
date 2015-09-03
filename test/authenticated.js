@@ -100,7 +100,7 @@ describe('Authenticated User', function() {
     .end(done);
   });
 
-  it.only('marks a job as complete', function(done) {
+  it('marks a job as complete', function(done) {
     api.put('/jobs/complete-job/complete?access_token='+accessToken)
     .expect(200)
     .expect(function (res) {

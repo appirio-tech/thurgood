@@ -56,4 +56,19 @@ describe('Repo Processor', function() {
       })
   });
 
+  it('copies shell asset files successfully', function(done) {
+    repo.addShellAssets(job)
+      .then(function(){
+        Promise.join(
+          fse.readFileAsync(tmpDir + '/build.xml'),
+          fse.readFileAsync(tmpDir + '/log4j.xml'),
+          fse.readFileAsync(tmpDir + '/lib/ant-salesforce.jar'),
+          fse.readFileAsync(tmpDir + '/undeploy/package.xml'),
+          function(build, log4j, jar, xml) {
+            // if is passes, then all files exist
+            done();
+          });
+      })
+  });
+
 });
