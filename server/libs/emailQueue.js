@@ -57,7 +57,7 @@ queue.process('sendMail', function (job, done){
       var jobId = job.data.jobId;
       try {
         if (process.env.NODE_ENV === 'production' && rec.notification === 'email') {
-          logger.info('[job-'+jobId+'][queue] sending job email to ' + rec.user().email);
+          logger.info('[job-'+jobId+'] sending job email to ' + rec.user().email);
           sendgrid.send({
             to:       rec.user().email,
             from:     'Thurgood',
