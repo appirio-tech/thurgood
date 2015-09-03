@@ -2,13 +2,15 @@
 
 Thurgood is an automated build, testing and security tool for Appirio and topcoder utilizing Jenkins and Checkmarx.
 
-You can run the API from the API Explorer [https://[thurgood-production-url]/explorer](https://[thurgood-production-url]/explorer) or [http://localhost:3000/explorer](http://localhost:3000/explorer) if you are running it locally. See below for more info.
+You can run the API from the API Explorer [https://thurgood-production.herokuapp.com/explorer](https://thurgood-production.herokuapp.com/explorer) or [http://localhost:3000/explorer](http://localhost:3000/explorer) if you are running it locally. See below for more info.
+
+You can see the job queue at [http://thurgood-queue.herokuapp.com](http://thurgood-queue.herokuapp.com)
 
 ## Overview
 
 Thurgood is a multi-part application. Here is a high level overview of the application.
 
-![](https://raw.githubusercontent.com/appirio-tech/thurgood/v3/thurgood-process.png)
+![](https://raw.githubusercontent.com/appirio-tech/thurgood/master/thurgood-process.png)
 
 * User creates a new job one of two ways:
     * User logs into Thurgood, creates a job, uploads zipped code and submits it for processing
@@ -78,7 +80,7 @@ This is important.... for Saleforce jobs the files need be all be contained in a
 
 Either add files to a `src` directory or create it from your Eclipse project with the manifest structure. Just right click on the 'src' directory from Eclipse and zip up everything you want submitted. Your zip file should unzip in the following structure:
 
-![](https://raw.githubusercontent.com/appirio-tech/thurgood/v3/submission-structure.png)
+![](https://raw.githubusercontent.com/appirio-tech/thurgood/master/submission-structure.png)
 
 **See the sample-salesforce.zip file in the project root for an example.**
 
@@ -86,7 +88,7 @@ Either add files to a `src` directory or create it from your Eclipse project wit
 
 Thurgood can automatically pull code from your project's github and submit a corresponding job each time you make a commit to your project's repo. First, create a new job record with the repo as :user/:repo (e.g., `jeffdonthemic/github-push-test` and then create a job using the id of this newly create project.
 
-In your project's github repo, make the `squirrelforce` github user a collaborator on your repo and create a webhook for `push` events with the payload URL of `https://[thurgood-production-url]//webhook`. You will also need the `secret` which you can find once you log into Thurgood and click the create new project button.
+In your project's github repo, make the `squirrelforce` github user a collaborator on your repo and create a webhook for `push` events with the payload URL of `https://thurgood-production.herokuapp.com/webhook`. You will also need the `secret` which you can find once you log into Thurgood and click the create new project button.
 
 
 ## API Explorer
@@ -95,7 +97,7 @@ The documentation for the API is available at the API Explorer. The API is locke
 
 ### Authentication
 
-You can use the default admin user to authenticate and return an access_token. Username is `thurgood` and the password is set via an environment variable `THURGOOD_ADMIN_PASSWORD`. Use the StrongLoop API Explorer (http://localhost:3000/explorer) with the User/login request section or POST to http://localhost:3000/Users/login with the following JSON.
+You can use the default admin user to authenticate and return an access_token. Username is `thurgood` and the password is set via an environment variable `THURGOOD_ADMIN_PASSWORD`. Use the StrongLoop API Explorer (https://thurgood-production.herokuapp.com:3000/explorer) with the User/login request section or POST to https://thurgood-production.herokuapp.com/Users/login with the following JSON.
 
 ```
 {
@@ -105,7 +107,7 @@ You can use the default admin user to authenticate and return an access_token. U
 ```
 The resulting id is the access token when can be appended to all endpoints:
 
-http://localhost:3000/api/jobs?access_token=ACCESS_TOKEN
+https://thurgood-production.herokuapp.com/api/jobs?access_token=ACCESS_TOKEN
 
 
 ## Testing
