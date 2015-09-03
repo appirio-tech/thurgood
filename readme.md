@@ -13,24 +13,15 @@ Thurgood is a multi-part application. Here is a high level overview of the appli
 * User creates a new job one of two ways:
     * User logs into Thurgood, creates a job, uploads zipped code and submits it for processing
     * User logs into Thurgood, creates a job and a project (pointing to a github project repo), and configures commits to this repo to fire a webhook to thurgood that submits the job for processing using the code from the project repo.
-* Thurgood downloads the job's zip file, uppacks it, adds in any necessary build or authentication files and pushes it to a github repo.
+* Thurgood downloads the job's zip file, unpacks it, adds in any necessary build or authentication files and pushes it to a github repo.
 * Github post-commit webhook notifies Jenkins of new code. Each specific job listens for a webhook from a specific github repo. Therefore, there is a one-to-one relationship between repos and jenkins jobs.
 * Jenkins pulls code, run Checkmarx scan and deploys to Salesforce if necessary.
 * During the Jenkins process, it send status updates back to the API and writes to the job's log file.
-
-## To Do
-
-* The Jenkins account below is currently using the cxcloud.com server for scanning code. Once the Appirio Checkmarx server is running on AWS, the Checkmarx plugin in Jenkins needs to be updated with this URL.
-* Change the password for https://cxcloudscan.com/cxwebclient (jeff@appirio.com).
-* Post link to Thurgood queue
-* Upload to new repos
 
 
 ## Jenkins & Checkmark
 
 You can log into the Jenkins server at: [http://ec2-54-158-149-254.compute-1.amazonaws.com/jenkins/login](http://ec2-54-158-149-254.compute-1.amazonaws.com/jenkins/login).
-
-The Checkmarx server is located at:
 
 ## Models
 
