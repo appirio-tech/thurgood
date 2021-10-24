@@ -24,7 +24,7 @@
     "loopback-connector-mongodb": "^1.11.3",
     "loopback-datasource-juggler": "^2.19.0",
     "mongodb-uri": "^0.9.7",
-    "nodegit": "^0.4.1",
+    "nodegit": "^0.27.0",
     "properties": "^1.2.1",
     "request": "^2.58.0",
     "sendgrid": "^1.9.0",
